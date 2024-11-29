@@ -20,15 +20,7 @@ import sumo_rl
 
 
 if __name__ == "__main__":
-    # Use:
-    # ray[rllib]==2.7.0
-    # numpy == 1.23.4
-    # Pillow>=9.4.0
-    # ray[rllib]==2.7.0
-    # SuperSuit>=3.9.0
-    # torch>=1.13.1
-    # tensorflow-probability>=0.19.0
-    ray.init()
+    ray.init(local_mode=True, runtime_env={"env_vars": {"RAY_DEBUG": "1"}})
 
     env_name = "4x4grid"
 
@@ -36,8 +28,8 @@ if __name__ == "__main__":
         env_name,
         lambda _: ParallelPettingZooEnv(
             sumo_rl.parallel_env(
-                net_file="sumo_rl/nets/4x4-Lucas/4x4.net.xml",
-                route_file="sumo_rl/nets/4x4-Lucas/4x4c1c2c1c2.rou.xml",
+                net_file="/home/erzhu419/sumo-rl/sumo_rl/nets/4x4-Lucas/4x4.net.xml",
+                route_file="/home/erzhu419/sumo-rl/sumo_rl/nets/4x4-Lucas/4x4c1c2c1c2.rou.xml",
                 out_csv_name="outputs/4x4grid/ppo",
                 use_gui=False,
                 num_seconds=80000,
@@ -48,7 +40,7 @@ if __name__ == "__main__":
     config = (
         PPOConfig()
         .environment(env=env_name, disable_env_checking=True)
-        .rollouts(num_rollout_workers=4, rollout_fragment_length=128)
+        .rollouts(num_rollout_workers=0, rollout_fragment_length='auto')
         .training(
             train_batch_size=512,
             lr=2e-5,
