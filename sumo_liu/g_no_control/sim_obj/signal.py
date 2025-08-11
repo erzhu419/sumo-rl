@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Signal:    # 创建一个信号灯类,用于描述每一个信号灯的属性和行为
@@ -25,8 +29,8 @@ class Signal:    # 创建一个信号灯类,用于描述每一个信号灯的属
         self.lane_queue_number_l = []               # 各车道每秒的排队车辆数，列表类型（每秒更新） [记录时间,[进口道,排队车辆数],[进口道,排队车辆数],...]
 
     def get_attribute_by_traci(self):
-        self.cycle_length_n = float(traci.trafficlight.getParameter(self.signal_id_s, "cycleTime"))
-        self.old_signal_program_o = traci.trafficlight.getAllProgramLogics(self.signal_id_s)[0]
+        self.cycle_length_n = float(sumo.trafficlight.getParameter(self.signal_id_s, "cycleTime"))
+        self.old_signal_program_o = sumo.trafficlight.getAllProgramLogics(self.signal_id_s)[0]
 
     def get_pass_line(self, line_obj_dic_ex):
         for line_id in line_obj_dic_ex.keys():
@@ -35,9 +39,9 @@ class Signal:    # 创建一个信号灯类,用于描述每一个信号灯的属
 
     def update_signal_state(self, time_ex, bus_obj_dic_ex):    # 每周期更新
         for land_id in self.detector_d.keys():
-            if traci.inductionloop.getTimeSinceDetection(self.detector_d[land_id]) == 0:
-                self.lane_last_flow_d[land_id] = traci.inductionloop.getLastIntervalVehicleNumber(self.detector_d[land_id]) / 60
-                self.lane_last_speed_d[land_id] = traci.inductionloop.getLastIntervalMeanSpeed(self.detector_d[land_id])
+            if sumo.inductionloop.getTimeSinceDetection(self.detector_d[land_id]) == 0:
+                self.lane_last_flow_d[land_id] = sumo.inductionloop.getLastIntervalVehicleNumber(self.detector_d[land_id]) / 60
+                self.lane_last_speed_d[land_id] = sumo.inductionloop.getLastIntervalMeanSpeed(self.detector_d[land_id])
                 if self.lane_last_speed_d[land_id] == 0:
                     self.lane_last_density_d[land_id] = -1
                 else:
@@ -56,5 +60,5 @@ class Signal:    # 创建一个信号灯类,用于描述每一个信号灯的属
     def update_queue_number(self, time_ex):    # 每秒更新
         lane_queue_number = [time_ex]
         for land_id in self.in_lane_d.keys():
-            lane_queue_number.append([land_id, traci.lane.getLastStepHaltingNumber(land_id)])
+            lane_queue_number.append([land_id, sumo.lane.getLastStepHaltingNumber(land_id)])
         self.lane_queue_number_l.append(lane_queue_number)

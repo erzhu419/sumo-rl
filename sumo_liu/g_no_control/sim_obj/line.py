@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Line:    # 创建一个线路类,用于描述每一个线路的属性和行为
@@ -32,9 +36,9 @@ class Line:    # 创建一个线路类,用于描述每一个线路的属性和�
         self.density_d = {}
         state_data = [time_ex]
         for edge_id in self.edge_id_l:
-            veh_num_n = traci.edge.getLastStepVehicleNumber(edge_id)
-            speed_n = traci.edge.getLastStepMeanSpeed(edge_id)
-            density_n = veh_num_n / traci.lane.getLength(edge_id + "_0")
+            veh_num_n = sumo.edge.getLastStepVehicleNumber(edge_id)
+            speed_n = sumo.edge.getLastStepMeanSpeed(edge_id)
+            density_n = veh_num_n / sumo.lane.getLength(edge_id + "_0")
             flow_n = speed_n * density_n
             self.veh_num_d[edge_id] = veh_num_n
             self.flow_d[edge_id] = flow_n

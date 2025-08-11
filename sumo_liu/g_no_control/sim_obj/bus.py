@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性和行为
@@ -56,31 +60,31 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         self.passenger_num_n = 0
         self.next_stop_id_s = line_obj_ex.stop_id_l[0]
         next_stop_length_n = 0
-        if traci.vehicle.getLaneID(self.bus_id_s) == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
-            next_stop_length_n += (traci.lane.getLength(stop_obj_dic_ex[self.next_stop_id_s].at_lane_s) -
-                                   traci.vehicle.getLanePosition(self.bus_id_s))
+        if sumo.vehicle.getLaneID(self.bus_id_s) == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
+            next_stop_length_n += (sumo.lane.getLength(stop_obj_dic_ex[self.next_stop_id_s].at_lane_s) -
+                                   sumo.vehicle.getLanePosition(self.bus_id_s))
         else:
-            next_stop_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
-                                   traci.vehicle.getLanePosition(self.bus_id_s))
-            for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
-                next_stop_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+            next_stop_length_n += (sumo.lane.getLength(sumo.vehicle.getLaneID(self.bus_id_s)) -
+                                   sumo.vehicle.getLanePosition(self.bus_id_s))
+            for traci_lane_obj in sumo.vehicle.getNextLinks(self.bus_id_s):
+                next_stop_length_n += sumo.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                 if traci_lane_obj[0] == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
                     break
         self.next_stop_length_n = next_stop_length_n
-        next_signal_list = traci.vehicle.getNextTLS(self.bus_id_s)
+        next_signal_list = sumo.vehicle.getNextTLS(self.bus_id_s)
         self.next_signal_id_s = next_signal_list[0][0]
         self.next_signal_link_s = str(next_signal_list[0][1])
         self.next_signal_lane_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][0]
         self.next_signal_phase_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][3]
         next_signal_length_n = 0
-        if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
-            next_signal_length_n += (traci.lane.getLength(self.next_signal_lane_s) -
-                                     traci.vehicle.getLanePosition(self.bus_id_s))
+        if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+            next_signal_length_n += (sumo.lane.getLength(self.next_signal_lane_s) -
+                                     sumo.vehicle.getLanePosition(self.bus_id_s))
         else:
-            next_signal_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
-                                     traci.vehicle.getLanePosition(self.bus_id_s))
-            for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
-                next_signal_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+            next_signal_length_n += (sumo.lane.getLength(sumo.vehicle.getLaneID(self.bus_id_s)) -
+                                     sumo.vehicle.getLanePosition(self.bus_id_s))
+            for traci_lane_obj in sumo.vehicle.getNextLinks(self.bus_id_s):
+                next_signal_length_n += sumo.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                 if traci_lane_obj[0] == self.next_signal_lane_s:
                     break
         self.next_signal_length_n = next_signal_length_n
@@ -92,27 +96,27 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         # 如果上一步仿真，公交车在路段上
         if self.bus_state_s == "Edge":
             # 判断公交车是否到达公交站
-            if traci.vehicle.isAtBusStop(self.bus_id_s):
+            if sumo.vehicle.isAtBusStop(self.bus_id_s):
                 self.bus_state_s = "Stop"
                 self.timetable_deviation_n = time_ex - self.arriver_timetable_d[self.next_stop_id_s]
                 self.arriver_stop_time_d[self.next_stop_id_s] = time_ex
             else:
                 # 判断公交车是否到达信号灯（信号灯进口车道）
-                if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+                if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
                     self.bus_state_s = "Signal"
         # 如果上一步仿真，公交车在公交站
         if self.bus_state_s == "Stop":
             # 判断公交车是否离开公交站
-            if not traci.vehicle.isAtBusStop(self.bus_id_s):
+            if not sumo.vehicle.isAtBusStop(self.bus_id_s):
                 # 判断公交车是否到达信号灯（信号灯进口车道）
-                if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+                if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
                     self.bus_state_s = "Signal"
                 else:
                     self.bus_state_s = "Edge"
-                board_num = traci.vehicle.getPersonNumber(self.bus_id_s) - (self.passenger_num_n - self.alight_num_d[self.next_stop_id_s])
+                board_num = sumo.vehicle.getPersonNumber(self.bus_id_s) - (self.passenger_num_n - self.alight_num_d[self.next_stop_id_s])
                 self.board_num_d[self.next_stop_id_s] = board_num
                 strand_num = 0
-                stop_passenger_list = traci.busstop.getPersonIDs(self.next_stop_id_s)
+                stop_passenger_list = sumo.busstop.getPersonIDs(self.next_stop_id_s)
                 for passenger_id in stop_passenger_list:
                     if self.belong_line_id_s in passenger_obj_dic_ex[passenger_id].passable_line_l:
                         strand_num += 1
@@ -121,11 +125,11 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
                 self.want_board_num_d[self.next_stop_id_s] = want_board_num
                 self.depart_stop_time_d[self.next_stop_id_s] = time_ex
                 stop_obj_dic_ex[self.next_stop_id_s].update_service_data(self)    # 更新公交站的属性
-                self.passenger_num_n = traci.vehicle.getPersonNumber(self.bus_id_s)
+                self.passenger_num_n = sumo.vehicle.getPersonNumber(self.bus_id_s)
                 self.next_stop_id_s = line_obj_ex.get_next_stop_id_by_this_stop_id(self.next_stop_id_s)
                 if self.next_stop_id_s != "":
                     alight_num = 0
-                    bus_passenger_list = traci.vehicle.getPersonIDList(self.bus_id_s)
+                    bus_passenger_list = sumo.vehicle.getPersonIDList(self.bus_id_s)
                     for passenger_id in bus_passenger_list:
                         if passenger_obj_dic_ex[passenger_id].transfer_stop_id_s == self.next_stop_id_s or passenger_obj_dic_ex[passenger_id].end_stop_id_s == self.next_stop_id_s:
                             alight_num += 1
@@ -133,7 +137,7 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         # 如果上一步仿真，公交车在信号灯（信号灯进口车道）
         if self.bus_state_s == "Signal":
             # 判断公交车是否离开信号灯（信号灯进口车道）
-            next_signal_list = traci.vehicle.getNextTLS(self.bus_id_s)
+            next_signal_list = sumo.vehicle.getNextTLS(self.bus_id_s)
             if len(next_signal_list) == 0 or next_signal_list[0][0] != self.next_signal_id_s:
                 # 记录排队结束时间
                 if self.next_signal_id_s in self.arriver_signal_time_d.keys() and self.next_signal_id_s not in self.depart_signal_time_d.keys():
@@ -150,13 +154,13 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
                     self.next_signal_link_s = str(next_signal_list[0][1])
                     self.next_signal_lane_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][0]
                     self.next_signal_phase_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][3]
-                    if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+                    if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
                         self.bus_state_s = "Signal"
                     else:
                         self.bus_state_s = "Edge"
             else:
                 # 判断公交车是否在排队
-                if traci.vehicle.getSpeed(self.bus_id_s) <= 0.1:
+                if sumo.vehicle.getSpeed(self.bus_id_s) <= 0.1:
                     # 如果有排队记录还存在<0.1的情况，说明上一次不是最后一次最接近信号灯的排队，需要删除更新排队
                     if self.next_signal_id_s in self.arriver_signal_time_d.keys() and self.next_signal_id_s in self.depart_signal_time_d.keys():
                         del self.arriver_signal_time_d[self.next_signal_id_s]
@@ -169,18 +173,18 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
                     if self.next_signal_id_s in self.arriver_signal_time_d.keys() and self.next_signal_id_s not in self.depart_signal_time_d.keys():
                         self.depart_signal_time_d[self.next_signal_id_s] = time_ex
         # 更新每秒都需更新的状态
-        self.bus_speed_n = traci.vehicle.getSpeed(self.bus_id_s)
-        self.distance_n = traci.vehicle.getDistance(self.bus_id_s)
+        self.bus_speed_n = sumo.vehicle.getSpeed(self.bus_id_s)
+        self.distance_n = sumo.vehicle.getDistance(self.bus_id_s)
         if self.next_stop_id_s != "":
             next_stop_length_n = 0
-            if traci.vehicle.getLaneID(self.bus_id_s) == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
-                next_stop_length_n += (traci.lane.getLength(stop_obj_dic_ex[self.next_stop_id_s].at_lane_s) -
-                                       traci.vehicle.getLanePosition(self.bus_id_s))
+            if sumo.vehicle.getLaneID(self.bus_id_s) == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
+                next_stop_length_n += (sumo.lane.getLength(stop_obj_dic_ex[self.next_stop_id_s].at_lane_s) -
+                                       sumo.vehicle.getLanePosition(self.bus_id_s))
             else:
-                next_stop_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
-                                       traci.vehicle.getLanePosition(self.bus_id_s))
-                for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
-                    next_stop_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+                next_stop_length_n += (sumo.lane.getLength(sumo.vehicle.getLaneID(self.bus_id_s)) -
+                                       sumo.vehicle.getLanePosition(self.bus_id_s))
+                for traci_lane_obj in sumo.vehicle.getNextLinks(self.bus_id_s):
+                    next_stop_length_n += sumo.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                     if traci_lane_obj[0] == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
                         break
             self.next_stop_length_n = next_stop_length_n
@@ -188,14 +192,14 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
             self.next_stop_length_n = -1
         if self.next_signal_id_s != "":
             next_signal_length_n = 0
-            if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
-                next_signal_length_n += (traci.lane.getLength(self.next_signal_lane_s) -
-                                         traci.vehicle.getLanePosition(self.bus_id_s))
+            if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+                next_signal_length_n += (sumo.lane.getLength(self.next_signal_lane_s) -
+                                         sumo.vehicle.getLanePosition(self.bus_id_s))
             else:
-                next_signal_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
-                                         traci.vehicle.getLanePosition(self.bus_id_s))
-                for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
-                    next_signal_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+                next_signal_length_n += (sumo.lane.getLength(sumo.vehicle.getLaneID(self.bus_id_s)) -
+                                         sumo.vehicle.getLanePosition(self.bus_id_s))
+                for traci_lane_obj in sumo.vehicle.getNextLinks(self.bus_id_s):
+                    next_signal_length_n += sumo.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                     if traci_lane_obj[0] == self.next_signal_lane_s:
                         break
             self.next_signal_length_n = next_signal_length_n

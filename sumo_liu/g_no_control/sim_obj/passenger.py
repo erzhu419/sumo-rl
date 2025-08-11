@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Passenger:    # 创建一个乘客类,用于描述每一个乘客的属性和行为
@@ -43,7 +47,7 @@ class Passenger:    # 创建一个乘客类,用于描述每一个乘客的属性
         # 如果上一步仿真，乘客在车道上
         if self.passenger_state_s == "Lane":
             # 判断乘客是否到达公交站
-            if not traci.person.getLaneID(self.passenger_id_s):
+            if not sumo.person.getLaneID(self.passenger_id_s):
                 self.passenger_state_s = "Stop"
                 self.arriver_time_n = time_ex
                 passable_line_l = []
@@ -58,14 +62,14 @@ class Passenger:    # 创建一个乘客类,用于描述每一个乘客的属性
         # 如果上一步仿真，乘客在公交站
         if self.passenger_state_s == "Stop":
             # 判断乘客是否上车
-            if traci.person.getVehicle(self.passenger_id_s):
+            if sumo.person.getVehicle(self.passenger_id_s):
                 self.passenger_state_s = "Bus"
-                self.take_bus_id_s = traci.person.getVehicle(self.passenger_id_s)
+                self.take_bus_id_s = sumo.person.getVehicle(self.passenger_id_s)
                 self.boarding_time_n = time_ex
         # 如果上一步仿真，公交车在公交车
         if self.passenger_state_s == "Bus":
             # 判断公交车是否下车换乘
-            if not traci.person.getLaneID(self.passenger_id_s):
+            if not sumo.person.getLaneID(self.passenger_id_s):
                 self.passenger_state_s = "Stop"
                 self.alighting_time_n = time_ex
                 self.travel_data_l.append([self.arriver_time_n, self.boarding_time_n, self.alighting_time_n,

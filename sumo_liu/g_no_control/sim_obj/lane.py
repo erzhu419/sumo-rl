@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Lane:    # 创建一个车道类,用于描述每一个车道的属性和行为
@@ -19,8 +23,8 @@ class Lane:    # 创建一个车道类,用于描述每一个车道的属性和�
         self.state_data_l = []                    # 车道状态信息，列表类型（每秒更新） [记录时间,车辆数,流量,速度,密度]
 
     def update_lane_state(self, time_ex):   # 控制需要更新
-        self.veh_num_n = traci.lane.getLastStepVehicleNumber(self.lane_id_s)
-        self.speed_n = traci.lane.getLastStepMeanSpeed(self.lane_id_s)
+        self.veh_num_n = sumo.lane.getLastStepVehicleNumber(self.lane_id_s)
+        self.speed_n = sumo.lane.getLastStepMeanSpeed(self.lane_id_s)
         self.density_n = self.veh_num_n / self.length_n
         self.flow_n = self.speed_n * self.density_n
         self.state_data_l.append([time_ex, self.veh_num_n, self.flow_n, self.speed_n, self.density_n])

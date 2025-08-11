@@ -1,4 +1,8 @@
-import traci
+import sys
+import os
+# 添加父目录到路径以便导入sumo_adapter
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sumo_adapter as sumo
 
 
 class Stop:    # 创建一个公交站类,用于描述每一个公交站的属性和行为
@@ -56,9 +60,9 @@ class Stop:    # 创建一个公交站类,用于描述每一个公交站的属�
             self.passenger_arriver_rate_d[stop_id] = [n / 3600 for n in self.passenger_arriver_rate_d[stop_id]]
 
     def update_stop_state(self):    # 控制需要更新
-        self.passenger_id_l = traci.busstop.getPersonIDs(self.stop_id_s)
+        self.passenger_id_l = sumo.busstop.getPersonIDs(self.stop_id_s)
         self.passenger_num_n = len(self.passenger_id_l)
-        self.bus_id_l = traci.busstop.getVehicleIDs(self.stop_id_s)
+        self.bus_id_l = sumo.busstop.getVehicleIDs(self.stop_id_s)
         self.bus_num_n = len(self.bus_id_l)
 
     def update_service_data(self, bus_obj_ex):    # 公交离站更新
