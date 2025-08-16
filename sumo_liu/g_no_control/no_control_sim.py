@@ -53,12 +53,15 @@ line_obj_dic = result[3]
 bus_obj_dic = result[4]
 passenger_obj_dic = result[5]
 # 补充仿真各元素对象的静态变量
+# 1. 站点与线路的关系建立
 for stop_id in stop_obj_dic.keys():
     stop_obj_dic[stop_id].get_accessible_stop(line_obj_dic)
     stop_obj_dic[stop_id].get_passenger_arriver_rate(passenger_obj_dic)
+# 2. 信号灯与线路的关系建立  
 for signal_id in signal_obj_dic.keys():
     signal_obj_dic[signal_id].get_attribute_by_traci()
     signal_obj_dic[signal_id].get_pass_line(line_obj_dic)
+# 3. 公交车与线路的关系建立
 for bus_id in bus_obj_dic.keys():
     bus_obj_dic[bus_id].get_arriver_timetable(line_obj_dic[bus_obj_dic[bus_id].belong_line_id_s])
 
@@ -74,7 +77,7 @@ for step in range(0, 18000):
     # # 更新车站的状态：统计站台乘客数量、等车公交车数量，记录乘客上下车信息
     # for stop_id in stop_obj_dic.keys():
     #     stop_obj_dic[stop_id].update_stop_state()
-    # 更新信号灯状态：统计各进口道排队车辆数，如果信号灯处于周期开始时刻则更新信号状态
+    # # 1. 信号灯状态更新（每个周期）：统计各进口道排队车辆数，如果信号灯处于周期开始时刻则更新信号状态
     for signal_id in signal_obj_dic.keys():
         if simulation_current_time % QUEUE_UPDATE_INTERVAL == 0:
             signal_obj_dic[signal_id].update_queue_number(simulation_current_time)  # 更新排队车辆数统计
@@ -84,17 +87,21 @@ for step in range(0, 18000):
     # for line_id in line_obj_dic.keys():
     #     line_obj_dic[line_id].update_line_state(simulation_current_time)
     # 更新公交车状态：处理公交车的激活、运行过程，包括站点服务、信号灯交互等
-    vehicle_id_list = sumo.vehicle.getIDList()
-    for vehicle_id in vehicle_id_list:
-        if sumo.vehicle.getTypeID(vehicle_id) == "Bus":
-            if bus_obj_dic[vehicle_id].bus_state_s == "No":  # 公交车尚未激活
-                bus_obj_dic[vehicle_id].bus_activate(line_obj_dic[bus_obj_dic[vehicle_id].belong_line_id_s],
-                                                     stop_obj_dic, signal_obj_dic, simulation_current_time)  # 激活公交车，初始化运行状态
+    # 优化：只获取一次车辆列表，然后只处理已知的公交车
+    vehicle_id_list = sumo.vehicle.getIDList() # SUMO自动管理车辆激活
+    vehicle_id_set = set(vehicle_id_list)  # 转为集合以提高查找效率
+    # 2. 公交车状态管理（时间驱动激活）
+    for bus_id in bus_obj_dic.keys():
+        # 只处理仍在仿真中的公交车
+        if bus_id in vehicle_id_set:
+            if bus_obj_dic[bus_id].bus_state_s == "No":  # 首次激活,在bus_activate里会设置bus_state_s为其他
+                bus_obj_dic[bus_id].bus_activate(line_obj_dic[bus_obj_dic[bus_id].belong_line_id_s],
+                                                 stop_obj_dic, signal_obj_dic, simulation_current_time)  # 激活公交车，初始化运行状态
             else:  # 公交车已激活，正在运行
-                bus_obj_dic[vehicle_id].bus_running(line_obj_dic[bus_obj_dic[vehicle_id].belong_line_id_s],
-                                                    stop_obj_dic, signal_obj_dic, passenger_obj_dic,
-                                                    simulation_current_time)  # 更新公交车运行状态，处理到站、离站、载客等
-    
+                bus_obj_dic[bus_id].bus_running(line_obj_dic[bus_obj_dic[bus_id].belong_line_id_s],
+                                                stop_obj_dic, signal_obj_dic, passenger_obj_dic,
+                                                simulation_current_time)  # 更新公交车运行状态，处理到站、离站、载客等
+    # 3. 乘客状态管理（时间驱动激活）
     passenger_id_list = sumo.person.getIDList()
     for passenger_id in passenger_id_list:
         if passenger_obj_dic[passenger_id].passenger_state_s == "No":  # 乘客尚未激活

@@ -97,22 +97,23 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         if self.bus_state_s == "Edge":
             # 判断公交车是否到达公交站
             if sumo.vehicle.isAtBusStop(self.bus_id_s):
-                self.bus_state_s = "Stop"
+                self.bus_state_s = "Stop"   # 状态变为Stop
                 self.timetable_deviation_n = time_ex - self.arriver_timetable_d[self.next_stop_id_s]
-                self.arriver_stop_time_d[self.next_stop_id_s] = time_ex
+                self.arriver_stop_time_d[self.next_stop_id_s] = time_ex # 记录到站时间
             else:
                 # 判断公交车是否到达信号灯（信号灯进口车道）
                 if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
                     self.bus_state_s = "Signal"
-        # 如果上一步仿真，公交车在公交站
+        # 如果上一步仿真，公交车在公交站(# 第一步：公交车到达站台)
         if self.bus_state_s == "Stop":
-            # 判断公交车是否离开公交站
+            # 判断公交车是否离开公交站, 当离开的一刻才计算上下车乘客
             if not sumo.vehicle.isAtBusStop(self.bus_id_s):
-                # 判断公交车是否到达信号灯（信号灯进口车道）
+                # 判断公交车是否到达信号灯（信号灯进口车道）, 刚刚离开站台
                 if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
                     self.bus_state_s = "Signal"
                 else:
                     self.bus_state_s = "Edge"
+                # 这时计算上下车数据是最准确的
                 board_num = sumo.vehicle.getPersonNumber(self.bus_id_s) - (self.passenger_num_n - self.alight_num_d[self.next_stop_id_s])
                 self.board_num_d[self.next_stop_id_s] = board_num
                 strand_num = 0
@@ -143,23 +144,23 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
                 if self.next_signal_id_s in self.arriver_signal_time_d.keys() and self.next_signal_id_s not in self.depart_signal_time_d.keys():
                     self.depart_signal_time_d[self.next_signal_id_s] = time_ex
                 signal_obj_dic_ex[self.next_signal_id_s].update_service_data(self)    # 更新信号灯的属性
-                if len(next_signal_list) == 0:
+                if len(next_signal_list) == 0:  # 情况A：前方没有信号灯了，进入Edge状态
                     self.bus_state_s = "Edge"
                     self.next_signal_id_s = ""
                     self.next_signal_link_s = ""
                     self.next_signal_lane_s = ""
                     self.next_signal_phase_s = ""
-                else:
+                else:   # 情况B：前方还有信号灯，更新到下一个信号灯
                     self.next_signal_id_s = next_signal_list[0][0]
                     self.next_signal_link_s = str(next_signal_list[0][1])
                     self.next_signal_lane_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][0]
                     self.next_signal_phase_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][3]
                     if sumo.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
-                        self.bus_state_s = "Signal"
+                        self.bus_state_s = "Signal" # 已在下一个信号灯进口车道
                     else:
-                        self.bus_state_s = "Edge"
+                        self.bus_state_s = "Edge"   # 还在路段上
             else:
-                # 判断公交车是否在排队
+                # 判断公交车是否在排队（因红灯停车）
                 if sumo.vehicle.getSpeed(self.bus_id_s) <= 0.1:
                     # 如果有排队记录还存在<0.1的情况，说明上一次不是最后一次最接近信号灯的排队，需要删除更新排队
                     if self.next_signal_id_s in self.arriver_signal_time_d.keys() and self.next_signal_id_s in self.depart_signal_time_d.keys():
