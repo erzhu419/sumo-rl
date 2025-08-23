@@ -1,4 +1,10 @@
 import xml.etree.ElementTree as ET
+import os
+
+# 获取路径信息
+current_dir = os.path.dirname(os.path.abspath(__file__))
+online_control_dir = os.path.dirname(current_dir)
+output_file_dir = os.path.join(online_control_dir, "output_file")
 
 
 def save_lane_data(lane_obj_dic):
@@ -25,7 +31,7 @@ def save_lane_data(lane_obj_dic):
 
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_lane.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_lane.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"车道对象 XML 文件已生成。")
 
@@ -54,7 +60,7 @@ def save_lane_data_multiexp(lane_obj_dic, index):
 
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_lane.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_lane.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"车道对象 XML 文件已生成。")
 
@@ -82,7 +88,7 @@ def save_stop_data(stop_obj_dic):
         stop_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_stop.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_stop.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"车站对象 XML 文件已生成。")
 
@@ -110,7 +116,7 @@ def save_stop_data_multiexp(stop_obj_dic, index):
         stop_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_stop.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_stop.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"车站对象 XML 文件已生成。")
 
@@ -146,7 +152,7 @@ def save_signal_data(signal_obj_dic):
         signal_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_signal.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_signal.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"信号灯对象 XML 文件已生成。")
 
@@ -182,7 +188,7 @@ def save_signal_data_multiexp(signal_obj_dic, index):
         signal_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_signal.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_signal.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"信号灯对象 XML 文件已生成。")
 
@@ -207,7 +213,7 @@ def save_line_data(line_obj_dic):
         line_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_line.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_line.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"线路对象 XML 文件已生成。")
 
@@ -232,7 +238,7 @@ def save_line_data_multiexp(line_obj_dic, index):
         line_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_line.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_line.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"线路对象 XML 文件已生成。")
 
@@ -299,7 +305,7 @@ def save_bus_data(bus_obj_dic):
         bus_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_bus.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_bus.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"公交车对象 XML 文件已生成。")
 
@@ -366,7 +372,7 @@ def save_bus_data_multiexp(bus_obj_dic, index):
         bus_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_bus.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_bus.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"公交车对象 XML 文件已生成。")
 
@@ -394,7 +400,7 @@ def save_passenger_data(passenger_obj_dic):
         passenger_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = "../output_file/save_data_passenger.add.xml"
+    xml_file = os.path.join(output_file_dir, "save_data_passenger.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"乘客对象 XML 文件已生成。")
 
@@ -422,7 +428,7 @@ def save_passenger_data_multiexp(passenger_obj_dic, index):
         passenger_obj.tail = "\n\t"
     # 创建XML文件并写入数据
     xml_tree = ET.ElementTree(root)
-    xml_file = f"../output_file/{index}_save_data_passenger.add.xml"
+    xml_file = os.path.join(output_file_dir, f"{index}_save_data_passenger.add.xml")
     xml_tree.write(xml_file, encoding="utf-8", xml_declaration=True)
     print(f"乘客对象 XML 文件已生成。")
 

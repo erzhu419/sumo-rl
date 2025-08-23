@@ -2,9 +2,27 @@
 # 时间：2025年7月23日
 
 import copy
+import sys
+import os
+
+# 添加当前目录到Python路径以支持模块导入
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 import a_8_subfunction_for_initial_info
-import c_8_subfunction_for_gurobi_test
-import gurobipy
+try:
+    import c_8_subfunction_for_gurobi_test
+except ImportError:
+    print("Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited")
+    c_8_subfunction_for_gurobi_test = None
+
+try:
+    import gurobipy
+except ImportError:
+    print("Warning: gurobipy module not found, optimization functionality may be limited")
+    gurobipy = None
+
 import random
 import re
 from collections import defaultdict

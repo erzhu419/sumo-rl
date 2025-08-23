@@ -307,9 +307,11 @@ class SumoEnvironment(gym.Env):
         # No action, follow fixed TL defined in self.phases
         if self.fixed_ts or action is None or action == {}:
             for _ in range(self.delta_time):
+                # In self._sumo_step(), run sumo.simulationStep()
                 self._sumo_step()
         else:
             self._apply_actions(action)
+            # In self._run_step(), run sumo.simulationStep()
             self._run_steps()
 
         observations = self._compute_observations()

@@ -3,6 +3,14 @@
 
 # "../intersection_delay/a_sorted_busline_edge.xml"中的路段距离，不包括连接部分，以及交叉口部分，故计算到站时间存在一定的误差
 
+import sys
+import os
+
+# 添加当前目录到Python路径以支持模块导入
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 import f_8_create_obj
 import e_8_gurobi_test_considerbusnum_V3
 import d_8_compute_running_time
@@ -11,8 +19,6 @@ from sumolib import checkBinary
 import xml.etree.ElementTree as ET
 import traci
 import time
-import sys
-import os
 import math
 import pickle
 import tkinter as tk  # Tkinter 需要在主线程初始化
@@ -43,7 +49,9 @@ else:
     sumoBinary = checkBinary("sumo-gui")
     print(sumoBinary)
 
-sumo_cfg_file = "../control_sim_traci_period.sumocfg"
+# 使用绝对路径避免工作目录问题
+online_control_dir = os.path.dirname(current_dir)
+sumo_cfg_file = os.path.join(online_control_dir, "control_sim_traci_period.sumocfg")
 traci.start([sumoBinary, "-c", sumo_cfg_file])
 
 """准备工作"""
@@ -61,7 +69,8 @@ bus_line_list, station_dict, station_interval_dis_dict, scaled_line_station_od_o
     od_otd_arr_rate_dict, BusCap, AveAlightingTime, AveBoardingTime = e_8_gurobi_test_considerbusnum_V3.get_static_info(line_obj_dic)
 
 """获取各公交线路排好顺序的edge字典"""
-edge_file = ET.parse("../intersection_delay/a_sorted_busline_edge.xml")
+edge_file_path = os.path.join(online_control_dir, "intersection_delay", "a_sorted_busline_edge.xml")
+edge_file = ET.parse(edge_file_path)
 sorted_busline_edge_d, involved_tl_ID_l, busline_stop_edge_d, busline_tl_time_d = d_8_compute_running_time.get_sorted_busline_edge(edge_file)
 
 involved_signal_d = {}
@@ -166,7 +175,8 @@ for step in range(0, 18000):
         h_8_save_data.save_passenger_data(passenger_obj_dic)
 
 
-        with open("../output_file/VariableNumInfo.pkl", "wb") as f:
+        output_file_path = os.path.join(online_control_dir, "output_file", "VariableNumInfo.pkl")
+        with open(output_file_path, "wb") as f:
             pickle.dump(Variable_Num, f)
 
 
@@ -193,7 +203,8 @@ end = time.perf_counter()
 print("运行时间：", end - start)
 
 # 保存变量数量信息
-with open("../output_file/VariableNumInfo.pkl", "wb") as f:
+output_file_path = os.path.join(online_control_dir, "output_file", "VariableNumInfo.pkl")
+with open(output_file_path, "wb") as f:
     pickle.dump(Variable_Num, f)
 
 debug = 0

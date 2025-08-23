@@ -2,7 +2,11 @@
 # 时间：2025.03.23
 # 1) 在"d_8_compute_running_time_单周期同行OK"的基础上进行修改，那个计算复杂度高，而且若当前周期无法同行，程序还存在问题，所以本程序先更改为交叉口是 平均延误时间
 
-import gurobipy
+try:
+    import gurobipy
+except ImportError:
+    print("Warning: gurobipy module not found, optimization functionality may be limited")
+    gurobipy = None
 import copy
 
 def get_sorted_busline_edge(edge_file):

@@ -1,19 +1,43 @@
-from sim_obj import passenger
-from sim_obj import signal
-from sim_obj import lane
-from sim_obj import stop
-from sim_obj import line
-from sim_obj import bus
+import sys
+import os
 import xml.etree.ElementTree as ET
+
+# 添加项目路径以支持模块导入
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+# 导入模块
+try:
+    from sim_obj import passenger
+    from sim_obj import signal
+    from sim_obj import lane
+    from sim_obj import stop
+    from sim_obj import line
+    from sim_obj import bus
+except ImportError:
+    sys.path.insert(0, os.path.join(parent_dir, 'sim_obj'))
+    import passenger
+    import signal
+    import lane
+    import stop
+    import line
+    import bus
 
 
 def create_obj_fun():
-    lane_obj_xml_path = "../initialize_obj/save_obj_lane.add.xml"
-    stop_obj_xml_path = "../initialize_obj/save_obj_stop.add.xml"
-    signal_obj_xml_path = "../initialize_obj/save_obj_signal.add.xml"
-    line_obj_xml_path = "../initialize_obj/save_obj_line.add.xml"
-    bus_obj_xml_path = "../initialize_obj/save_obj_bus.add.xml"
-    passenger_obj_xml_path = "../initialize_obj/save_obj_passenger.add.xml"
+    # 获取当前脚本所在目录的父目录，即online_control目录
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    online_control_dir = os.path.dirname(script_dir)
+    initialize_obj_dir = os.path.join(online_control_dir, "initialize_obj")
+    
+    lane_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_lane.add.xml")
+    stop_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_stop.add.xml")
+    signal_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_signal.add.xml")
+    line_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_line.add.xml")
+    bus_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_bus.add.xml")
+    passenger_obj_xml_path = os.path.join(initialize_obj_dir, "save_obj_passenger.add.xml")
 
     lane_file = ET.parse(lane_obj_xml_path)
     lane_root = lane_file.getroot()
