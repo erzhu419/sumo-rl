@@ -70,14 +70,21 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         self.unserved_stop_l = []
         self.bus_passenger_d = {}
 
+        # 计算到下一个站点的距离
+        # 判断公交车是否已在下一个站点所在的车道上
         if traci.vehicle.getLanePosition(self.bus_id_s) == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s:
+            # 如果在同一车道：距离 = 目标车道总长度 - 公交车当前位置
             next_stop_length_n += (traci.lane.getLength(stop_obj_dic_ex[self.next_stop_id_s].at_lane_s) -
                                    traci.vehicle.getLanePosition(self.bus_id_s))
         else:
+            # 如果不在同一车道：需要计算当前车道剩余距离 + 中间车道距离
+            # 先计算当前车道的剩余距离
             next_stop_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
                                    traci.vehicle.getLanePosition(self.bus_id_s))
+            # 遍历后续车道，累加距离直到到达目标站点车道
             for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
                 next_stop_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+                # 检查是否到达目标站点所在车道（通过车道ID前缀匹配）
                 if traci_lane_obj[0][:-2] == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s[:-2]:
                     break
         self.next_stop_length_n = next_stop_length_n
@@ -86,15 +93,22 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         self.next_signal_link_s = str(next_signal_list[0][1])
         self.next_signal_lane_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][0]
         self.next_signal_phase_s = signal_obj_dic_ex[self.next_signal_id_s].connection_d[self.next_signal_link_s][3]
+        # 计算到下一个交通信号灯的距离
         next_signal_length_n = 0
+        # 判断公交车是否已在下一个信号灯所在的车道上
         if traci.vehicle.getLaneID(self.bus_id_s) == self.next_signal_lane_s:
+            # 如果在同一车道：距离 = 目标车道总长度 - 公交车当前位置
             next_signal_length_n += (traci.lane.getLength(self.next_signal_lane_s) -
                                      traci.vehicle.getLanePosition(self.bus_id_s))
         else:
+            # 如果不在同一车道：需要计算当前车道剩余距离 + 中间车道距离
+            # 先计算当前车道的剩余距离
             next_signal_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
                                      traci.vehicle.getLanePosition(self.bus_id_s))
+            # 遍历后续车道，累加距离直到到达目标信号灯车道
             for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
                 next_signal_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
+                # 检查是否到达目标信号灯所在车道（通过车道ID前缀匹配）
                 if traci_lane_obj[0][:-2] == self.next_signal_lane_s[:-2]:
                     break
         self.next_signal_length_n = next_signal_length_n
@@ -125,7 +139,7 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
                                 want_boarding_passenger_od[f"{passenger_obj_dic_ex[passenger_id].start_stop_id_s}-{passenger_obj_dic_ex[passenger_id].end_stop_id_s}"] = 1
                             else:
                                 want_boarding_passenger_od[f"{passenger_obj_dic_ex[passenger_id].start_stop_id_s}-{passenger_obj_dic_ex[passenger_id].end_stop_id_s}"] += 1
-                        else:
+                        else: # 现在没有效果，可能因为没有OTD乘客
                             if f"{passenger_obj_dic_ex[passenger_id].start_stop_id_s}-{passenger_obj_dic_ex[passenger_id].transfer_edge_id_s}-{passenger_obj_dic_ex[passenger_id].end_stop_id_s}" not in want_boarding_passenger_od:
                                 want_boarding_passenger_od[f"{passenger_obj_dic_ex[passenger_id].start_stop_id_s}-{passenger_obj_dic_ex[passenger_id].transfer_edge_id_s}-{passenger_obj_dic_ex[passenger_id].end_stop_id_s}"] = 1
                             else:

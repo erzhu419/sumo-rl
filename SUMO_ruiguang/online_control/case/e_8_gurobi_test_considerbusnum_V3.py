@@ -60,6 +60,7 @@ def get_static_info(line_obj_dic):
     scaled_line_station_od_otd_dict = a_8_subfunction_for_initial_info.get_scaled_line_station_od_otd_dict(line_station_od_otd_dict)
 
     bus_arrstation_od_otd_dict = a_8_subfunction_for_initial_info.get_bus_arrstation_od_otd(scaled_line_station_od_otd_dict, station_dict)
+    # 前面都是指获得od/otd的列表，到这一步是用列表去换取乘客到达率
     od_otd_arr_rate_dict = a_8_subfunction_for_initial_info.get_arr_rate(scaled_line_station_od_otd_dict)
 
     """常量定义"""

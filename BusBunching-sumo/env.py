@@ -36,13 +36,16 @@ class SumoEnv(gymnasium.Env):
         self.traffic = traffic
         self.mixedConfigs = mixedConfigs
 
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        
         if bunched:
-            self.config = 'sumo/bunched/ring.sumocfg'
+            self.config = os.path.join(script_dir, 'sumo/bunched/ring.sumocfg')
         else:
-            self.config = 'sumo/traffic/ring.sumocfg'
+            self.config = os.path.join(script_dir, 'sumo/traffic/ring.sumocfg')
 
         if self.traffic == 0:
-            self.config = 'sumo/noTraffic/ring.sumocfg'
+            self.config = os.path.join(script_dir, 'sumo/noTraffic/ring.sumocfg')
 
         self.noWarnings = noWarnings
         self.sumoCmd = [self._sumoBinary, "-c", self.config, "--tripinfo-output", "tripinfo.xml", "--no-internal-links", "false", "--lanechange.overtake-right", "true"]
@@ -68,7 +71,7 @@ class SumoEnv(gymnasium.Env):
 
         traci.start(self.sumoCmd)
 
-        self.busStops = list(traci.simulation.getBusStopIDList()) # get the list of bus stops from the simulation
+        self.busStops = list(traci.busstop.getIDList()) # get the list of bus stops from the simulation
         self.buses = [bus for bus in traci.vehicle.getIDList() if bus[0:3] == "bus"] # get the list of buses from the simulation
 
         self.busCapacity = 85
@@ -271,20 +274,30 @@ class SumoEnv(gymnasium.Env):
             done = False
 
         info = {}
+        truncated = False
 
-        return state, reward, done, info
+        return state, reward, done, truncated, info
 
 
     # reset function required by the gym environment 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         self.episodeNum += 1
+        
+        # Stop after first episode for profiling
+        if self.episodeNum > 1:
+            print(f"Stopping training after episode {self.episodeNum-1}")
+            traci.close()
+            import sys
+            sys.exit(0)
+            
         traci.close()
         
         if self.mixedConfigs: # choose the initial state of the environment (bunched or unbunched)
+            script_dir = os.path.dirname(os.path.abspath(__file__))
             if self.episodeNum % 2 == 0:
-                self.config = 'sumo/traffic/ring.sumocfg'
+                self.config = os.path.join(script_dir, 'sumo/traffic/ring.sumocfg')
             else:
-                self.config = 'sumo/bunched/ring.sumocfg'
+                self.config = os.path.join(script_dir, 'sumo/bunched/ring.sumocfg')
 
         self.sumoCmd = [self._sumoBinary, "-c", self.config, "--tripinfo-output", "tripinfo.xml", "--no-internal-links", "false", "--lanechange.overtake-right", "true"]
         if self.noWarnings:
@@ -314,7 +327,8 @@ class SumoEnv(gymnasium.Env):
         self.buses = [bus for bus in traci.vehicle.getIDList() if bus[0:3] == "bus"]
 
         state = self.computeState()
-        return state
+        info = {}
+        return state, info
 
     def close(self):
         traci.close()

@@ -98,6 +98,7 @@ def get_busline_station_od_otd_dict(temp_station_dict):
                 line_station_od_otd[busline][station] = []
             # 添加该站涉及的本线路的OD
             for station_D_index in range(index+1, len(temp_station_dict[busline])):
+                # 这里是在遍历该线路后续的公交站作为D
                 line_station_od_otd[busline][station].append(station + "-" + temp_station_dict[busline][station_D_index])
             # 该公交站为共线公交站，需要增加该站其它线路的OD
             if "_" in station and len(list(set([re.match(r'^(\d+[A-Z])', part).group(1) for part in station.split('_')]) & set(list(temp_station_dict.keys())))) > 1:

@@ -41,7 +41,7 @@ if "SUMO_HOME" in os.environ:
 else:
     sys.exit("Please declare environment variable 'SUMO_HOME'!")
 
-if_show_gui = True
+if_show_gui = False
 if not if_show_gui:
     sumoBinary = checkBinary("sumo")
     print(sumoBinary)
@@ -65,13 +65,12 @@ bus_obj_dic = result[4]
 passenger_obj_dic = result[5]
 
 """获取静态信息"""
-bus_line_list, station_dict, station_interval_dis_dict, scaled_line_station_od_otd_dict, line_station_od_otd_dict, bus_arrstation_od_otd_dict, \
-    od_otd_arr_rate_dict, BusCap, AveAlightingTime, AveBoardingTime = e_8_gurobi_test_considerbusnum_V3.get_static_info(line_obj_dic)
+_, _, _, _, line_station_od_otd_dict, bus_arrstation_od_otd_dict, _, BusCap, AveAlightingTime, AveBoardingTime = e_8_gurobi_test_considerbusnum_V3.get_static_info(line_obj_dic)
 
 """获取各公交线路排好顺序的edge字典"""
 edge_file_path = os.path.join(online_control_dir, "intersection_delay", "a_sorted_busline_edge.xml")
 edge_file = ET.parse(edge_file_path)
-sorted_busline_edge_d, involved_tl_ID_l, busline_stop_edge_d, busline_tl_time_d = d_8_compute_running_time.get_sorted_busline_edge(edge_file)
+sorted_busline_edge_d, involved_tl_ID_l, _, _ = d_8_compute_running_time.get_sorted_busline_edge(edge_file)
 
 involved_signal_d = {}
 
@@ -93,13 +92,13 @@ for bus_id in bus_obj_dic.keys():
 """交通仿真"""
 print("开始仿真！")
 
-# 初始化各车站已经进行控制的公交车ID
-stop_controled_bus_d = {}
-# 为周期乘客到达率之前的触发车站，虽然这个触发车站在当前周期性乘客分布下，不一定是车头时距大的，但是不影响，结果还可以，所以证明与车站无关，与车站数量，即触发频率有关，对应数据“Paper2_Code_2-3 - 20250312\i_with_control_delete_partial_OD_VC\trajectory\control_sim_traci_period_0413PeriodVC”
-trigger_stop_l = ["102X17_122S19_311S25_406X17", "311X31", "122X21_311X21_406S28", "406X35", "102X16_122S18_311S24_406X16", "102S23_122X18_311X18_406S25", "122X22_311X22_406S29"]  # 串车headway为150，排队长度为4
+# # 初始化各车站已经进行控制的公交车ID
+# stop_controled_bus_d = {}
+# # 为周期乘客到达率之前的触发车站，虽然这个触发车站在当前周期性乘客分布下，不一定是车头时距大的，但是不影响，结果还可以，所以证明与车站无关，与车站数量，即触发频率有关，对应数据“Paper2_Code_2-3 - 20250312\i_with_control_delete_partial_OD_VC\trajectory\control_sim_traci_period_0413PeriodVC”
+# trigger_stop_l = ["102X17_122S19_311S25_406X17", "311X31", "122X21_311X21_406S28", "406X35", "102X16_122S18_311S24_406X16", "102S23_122X18_311X18_406S25", "122X22_311X22_406S29"]  # 串车headway为150，排队长度为4
 
-for trigger_stop in trigger_stop_l:
-    stop_controled_bus_d[trigger_stop] = []
+# for trigger_stop in trigger_stop_l:
+#     stop_controled_bus_d[trigger_stop] = []
 
 bus_speed_curve = {}
 GurobimodelNoSolutionFlag_d = {}
@@ -128,8 +127,7 @@ for step in range(0, 18000):
     for vehicle_id in vehicle_id_list:
         if traci.vehicle.getTypeID(vehicle_id) == "Bus":
             if bus_obj_dic[vehicle_id].bus_state_s == "No":
-                bus_obj_dic[vehicle_id].bus_activate(line_obj_dic[bus_obj_dic[vehicle_id].belong_line_id_s],
-                                                     stop_obj_dic, signal_obj_dic, simulation_current_time)
+                bus_obj_dic[vehicle_id].bus_activate(line_obj_dic[bus_obj_dic[vehicle_id].belong_line_id_s], stop_obj_dic, signal_obj_dic, simulation_current_time)
             else:
                 BusCap = 50
                 AveAlightingTime = 1.5
