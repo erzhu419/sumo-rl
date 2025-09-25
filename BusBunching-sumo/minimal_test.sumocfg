@@ -1,0 +1,8 @@
+<configuration>
+    <input>
+        <net-file value="sumo/traffic/ring.net.xml"/>
+    </input>
+    <time>
+        <end value="10"/>
+    </time>
+</configuration>
