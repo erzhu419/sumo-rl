@@ -1,0 +1,288 @@
+import os
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass, field
+from collections import defaultdict
+from typing import Callable, Dict, List, Tuple, Optional, Any
+
+import numpy as np
+from gym.spaces import Box
+
+
+def _median_headway(sorted_times: List[float], fallback: float) -> float:
+    if len(sorted_times) < 2:
+        return fallback
+    diffs = [j - i for i, j in zip(sorted_times[:-1], sorted_times[1:])]
+    diffs = [d for d in diffs if d > 0]
+    if not diffs:
+        return fallback
+    return float(np.median(diffs))
+
+
+@dataclass
+class DecisionEvent:
+    line_id: str
+    bus_id: str
+    stop_id: str
+    stop_idx: int
+    direction: int
+    sim_time: float
+    forward_headway: float
+    backward_headway: float
+    waiting_passengers: int
+    base_stop_duration: float
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    assigned_action: Optional[float] = None
+
+
+class SumoBusHoldingEnv:
+    """Bridge SUMO multi-line bus simulation with the SAC training loop.
+
+    The environment expects a *decision provider* callable which advances the
+    underlying simulation until a new batch of DecisionEvent objects are ready.
+    Each event corresponds to one bus that just completed passenger exchange and
+    is waiting for a holding decision. After the agent supplies holding times via
+    ``step`` we call the *action executor* to push these decisions back to SUMO.
+
+    The class maintains observations and rewards in a nested dictionary structure
+    (line -> bus -> list_of_observations) to mirror multi-line settings.
+    """
+
+    def __init__(
+        self,
+        root_dir: str,
+        schedule_file: str = "initialize_obj/save_obj_bus.add.xml",
+        *,
+        decision_provider: Optional[Callable[[], Tuple[List[DecisionEvent], bool]]] = None,
+        action_executor: Optional[Callable[[DecisionEvent, float], None]] = None,
+        reset_callback: Optional[Callable[[], None]] = None,
+        close_callback: Optional[Callable[[], None]] = None,
+        time_period_span: int = 3600,
+        headway_fallback: float = 360.0,
+    ) -> None:
+        self.root_dir = os.path.abspath(root_dir)
+        self.schedule_path = schedule_file if os.path.isabs(schedule_file) else os.path.join(self.root_dir, schedule_file)
+        if not os.path.exists(self.schedule_path):
+            raise FileNotFoundError(f"Schedule xml not found: {self.schedule_path}")
+
+        self.decision_provider = decision_provider
+        self.action_executor = action_executor or (lambda event, action: setattr(event, "assigned_action", action))
+        self.reset_callback = reset_callback
+        self.close_callback = close_callback
+        self.time_period_span = time_period_span
+        self.headway_fallback = headway_fallback
+
+        self.line_departures: Dict[str, List[Tuple[float, str]]] = defaultdict(list)
+        self._line_headway: Dict[str, float] = {}
+        self._line_index: Dict[str, int] = {}
+        self._bus_index: Dict[str, int] = {}
+        self._station_index: Dict[Tuple[str, str], int] = {}
+        self._time_period_index: Dict[int, int] = {}
+
+        self.cat_cols = ["line_id", "bus_id", "station_id", "time_period", "direction"]
+        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration"]
+
+        self._state_buffers: Dict[str, Dict[str, List[List[float]]]] = defaultdict(lambda: defaultdict(list))
+        self._reward_buffers: Dict[str, Dict[str, float]] = defaultdict(dict)
+        self._pending_events: Dict[Tuple[str, str], DecisionEvent] = {}
+        self._done = False
+
+        self.action_space = Box(low=np.array([0.0], dtype=np.float32), high=np.array([60.0], dtype=np.float32))
+
+        self._load_schedule()
+        self._initialize_indices()
+
+    # region schedule & feature encoding helpers
+    def _load_schedule(self) -> None:
+        tree = ET.parse(self.schedule_path)
+        root = tree.getroot()
+        for bus_elem in root.findall(".//bus_obj"):
+            line_id = bus_elem.get("belong_line_id_s")
+            bus_id = bus_elem.get("bus_id_s")
+            start_time = float(bus_elem.get("start_time_n", "0"))
+            if line_id and bus_id:
+                self.line_departures[line_id].append((start_time, bus_id))
+        for line_id, entries in self.line_departures.items():
+            entries.sort(key=lambda pair: pair[0])
+            times = [item[0] for item in entries]
+            self._line_headway[line_id] = _median_headway(times, self.headway_fallback)
+
+    def _initialize_indices(self) -> None:
+        for idx, line_id in enumerate(sorted(self.line_departures.keys())):
+            self._line_index[line_id] = idx
+        bus_counter = 0
+        for line_id, departures in self.line_departures.items():
+            for _, bus_id in departures:
+                if bus_id not in self._bus_index:
+                    self._bus_index[bus_id] = bus_counter
+                    bus_counter += 1
+
+    def _encode_time_period(self, sim_time: float) -> int:
+        period = int(sim_time // self.time_period_span)
+        if period not in self._time_period_index:
+            self._time_period_index[period] = len(self._time_period_index)
+        return self._time_period_index[period]
+
+    def _encode_station(self, line_id: str, stop_id: str, stop_idx: Optional[int]) -> int:
+        key = (line_id, stop_id)
+        if key in self._station_index:
+            return self._station_index[key]
+        if stop_idx is not None and stop_idx >= 0:
+            self._station_index[key] = stop_idx
+            return stop_idx
+        new_idx = len(self._station_index)
+        self._station_index[key] = new_idx
+        return new_idx
+    # endregion
+
+    # region public API
+    @property
+    def expects_nested_actions(self) -> bool:
+        return True
+
+    @property
+    def line_codes(self) -> List[str]:
+        return list(self._line_index.keys())
+
+    @property
+    def bus_codes(self) -> List[str]:
+        return list(self._bus_index.keys())
+
+    @property
+    def max_agent_num(self) -> int:
+        return max(len(self._bus_index), 1)
+
+    def get_feature_spec(self) -> Dict[str, Any]:
+        cat_sizes = {
+            "line_id": max(len(self._line_index), 1),
+            "bus_id": max(len(self._bus_index), 1),
+            "station_id": max(len(self._station_index), 1) or 1,
+            "time_period": max(len(self._time_period_index), 1) or 1,
+            "direction": 2,
+        }
+        return {
+            "cat_cols": list(self.cat_cols),
+            "cat_sizes": cat_sizes,
+            "num_cont_features": len(self.continuous_features),
+        }
+
+    def reset(self) -> Tuple[Dict[str, Dict[str, List[List[float]]]], Dict[str, Dict[str, float]], bool]:
+        self._state_buffers.clear()
+        self._reward_buffers.clear()
+        self._pending_events.clear()
+        self._done = False
+        if self.reset_callback is not None:
+            self.reset_callback()
+        self._advance_until_state()
+        return self._snapshot_state(), self._snapshot_reward(), self._done
+
+    def initialize_state(self) -> Tuple[Dict[str, Dict[str, List[List[float]]]], Dict[str, Dict[str, float]], bool]:
+        if not any(self._state_buffers.values()):
+            self._advance_until_state()
+        return self._snapshot_state(), self._snapshot_reward(), self._done
+
+    def step(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> Tuple[Dict[str, Dict[str, List[List[float]]]], Dict[str, Dict[str, float]], bool]:
+        self._apply_actions(action_dict)
+        if not self._done:
+            self._advance_until_state()
+        return self._snapshot_state(), self._snapshot_reward(), self._done
+
+    def close(self) -> None:
+        if self.close_callback is not None:
+            self.close_callback()
+    # endregion
+
+    # region core mechanics
+    def _apply_actions(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> None:
+        for line_id, bus_actions in action_dict.items():
+            if not isinstance(bus_actions, dict):
+                continue
+            for bus_id, action_value in bus_actions.items():
+                if action_value is None:
+                    continue
+                event = self._pending_events.pop((line_id, bus_id), None)
+                if event is None:
+                    continue
+                hold_value = float(action_value)
+                hold_value = max(0.0, hold_value)
+                self.action_executor(event, hold_value)
+
+    def _advance_until_state(self) -> None:
+        if self.decision_provider is None:
+            raise RuntimeError("decision_provider callable is required to advance the environment")
+        while not self._done:
+            events, terminated = self._pull_events()
+            if terminated:
+                self._done = True
+            if not events:
+                if self._done:
+                    break
+                continue
+            for event in events:
+                self._register_event(event)
+            if any(self._state_buffers.values()):
+                break
+
+    def _pull_events(self) -> Tuple[List[DecisionEvent], bool]:
+        result = self.decision_provider()
+        terminated = False
+        events: List[DecisionEvent]
+        if isinstance(result, tuple):
+            events, terminated = result
+        else:
+            events = result
+        if events is None:
+            events = []
+        return events, terminated
+
+    def _register_event(self, event: DecisionEvent) -> None:
+        line_idx = self._line_index.setdefault(event.line_id, len(self._line_index))
+        if event.bus_id not in self._bus_index:
+            self._bus_index[event.bus_id] = len(self._bus_index)
+        bus_idx = self._bus_index[event.bus_id]
+        station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
+        time_period_idx = self._encode_time_period(event.sim_time)
+        direction = int(event.direction)
+
+        target_headway = self._line_headway.get(event.line_id, self.headway_fallback)
+        obs = [
+            float(line_idx),
+            float(bus_idx),
+            float(station_idx),
+            float(time_period_idx),
+            float(direction),
+            float(event.forward_headway),
+            float(event.backward_headway),
+            float(event.waiting_passengers),
+            float(target_headway),
+            float(event.base_stop_duration),
+        ]
+
+        reward = self._compute_reward(event, target_headway)
+        state_list = self._state_buffers[event.line_id][event.bus_id]
+        state_list.append(obs)
+        if len(state_list) > 2:
+            state_list.pop(0)
+        self._reward_buffers[event.line_id][event.bus_id] = reward
+        self._pending_events[(event.line_id, event.bus_id)] = event
+
+    def _compute_reward(self, event: DecisionEvent, target_headway: float) -> float:
+        forward_error = abs(event.forward_headway - target_headway)
+        backward_error = abs(event.backward_headway - target_headway)
+        similarity_penalty = abs(event.forward_headway - event.backward_headway) * 0.5
+        reward = -(forward_error + backward_error) * 0.5 - similarity_penalty
+        if forward_error > target_headway * 0.5 or backward_error > target_headway * 0.5:
+            reward -= 20.0
+        return reward
+
+    def _snapshot_state(self) -> Dict[str, Dict[str, List[List[float]]]]:
+        return {line: {bus: [list(obs) for obs in history] for bus, history in buses.items()} for line, buses in self._state_buffers.items()}
+
+    def _snapshot_reward(self) -> Dict[str, Dict[str, float]]:
+        return {line: dict(buses) for line, buses in self._reward_buffers.items()}
+    # endregion
+
+
+__all__ = [
+    "DecisionEvent",
+    "SumoBusHoldingEnv",
+]

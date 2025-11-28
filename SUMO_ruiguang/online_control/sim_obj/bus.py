@@ -123,7 +123,13 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
             # 判断公交车是否到达公交站
             if traci.vehicle.isAtBusStop(self.bus_id_s):
                 self.bus_state_s = "Stop"
-                self.timetable_deviation_n = time_ex - self.arriver_timetable_d[self.next_stop_id_s]
+                # self.timetable_deviation_n = time_ex - self.arriver_timetable_d[self.next_stop_id_s]# TODO 这里没处理好当后车还没出现的时候的情况，让codex仿照前面的写法进行补充
+                if self.next_stop_id_s and self.next_stop_id_s in self.arriver_timetable_d:
+                    self.timetable_deviation_n = time_ex - self.arriver_timetable_d[self.next_stop_id_s]
+                else:
+                    self.timetable_deviation_n = 0.0  # 或者维持上一次的值/做其他处理
+                    # 提前 return 也可以，看后续逻辑是否依赖该站
+                    return
                 self.arriver_stop_time_d[self.next_stop_id_s] = time_ex
                 next_stop_index = line_obj_ex.stop_id_l.index(self.next_stop_id_s)
                 self.unserved_stop_l = line_obj_ex.stop_id_l[next_stop_index+1:]

@@ -8,6 +8,9 @@ paper: https://arxiv.org/pdf/1812.05905.pdf
 import psutil,tracemalloc
 import gym
 import copy
+import importlib
+import sys
+from typing import Any, Dict, Optional
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -23,6 +26,10 @@ import os
 import argparse
 import numpy as np
 import random
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 GPU = True
 device_idx = 0
@@ -49,6 +56,13 @@ parser.add_argument("--batch_size", type=int, default=2048, help="batch size")
 parser.add_argument("--max_episodes", type=int, default=500, help="max episodes")
 parser.add_argument('--save_root', type=str, default='.', help='Base directory for saving models, logs, and figures')
 parser.add_argument('--run_name', type=str, default='gpt_version', help='Optional identifier appended to save directories to avoid overwriting previous runs')
+parser.add_argument('--render', action='store_true', help='Enable environment rendering (SUMO GUI when available)')
+parser.add_argument('--use_sumo_env', action='store_true', help='(deprecated) retained for backwards compatibility')
+parser.add_argument('--no_sumo_env', action='store_true', help='Force legacy LSTM-RL env instead of SUMO bridge')
+parser.add_argument('--sumo_root', type=str, default='SUMO_ruiguang/online_control', help='Base directory containing SUMO scenario assets')
+parser.add_argument('--sumo_schedule', type=str, default='initialize_obj/save_obj_bus.add.xml', help='Path to schedule xml relative to --sumo_root')
+parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks, format module:function')
+parser.add_argument('--sumo_gui', action='store_true', help='Launch SUMO with GUI (implies rendering)')
 args = parser.parse_args()
 
 
@@ -101,6 +115,83 @@ class ReplayBuffer:
 
     def __len__(self):
         return len(self.buffer)
+
+
+class LegacyEnvAdapter:
+    def __init__(self, legacy_env):
+        self.legacy_env = legacy_env
+        self.action_space = legacy_env.action_space
+        self.max_agent_num = legacy_env.max_agent_num
+        self.expects_nested_actions = True
+
+    def reset(self):
+        return self.legacy_env.reset()
+
+    def initialize_state(self, render=False):
+        state, reward, done = self.legacy_env.initialize_state(render=render)
+        return {'default': state}, {'default': reward}, done
+
+    def step(self, action_dict, debug=False, render=False):
+        flat_actions = action_dict.get('default', {})
+        full_action = {key: flat_actions.get(key, None) for key in range(self.legacy_env.max_agent_num)}
+        state, reward, done = self.legacy_env.step(full_action, debug=debug, render=render)
+        return {'default': state}, {'default': reward}, done
+
+    def get_feature_spec(self):
+        cat_cols = ['bus_id', 'station_id', 'time_period', 'direction']
+        cat_sizes = {
+            'bus_id': self.legacy_env.max_agent_num,
+            'station_id': max(round(len(self.legacy_env.stations) / 2), 1),
+            'time_period': int(self.legacy_env.timetables[-1].launch_time // 3600) + 2,
+            'direction': 2,
+        }
+        num_cont = self.legacy_env.state_dim - len(cat_cols)
+        return {
+            'cat_cols': cat_cols,
+            'cat_sizes': cat_sizes,
+            'num_cont_features': num_cont,
+        }
+
+    @property
+    def line_codes(self):
+        return ['default']
+
+    @property
+    def bus_codes(self):
+        return list(range(self.legacy_env.max_agent_num))
+
+    def __getattr__(self, item):
+        return getattr(self.legacy_env, item)
+
+
+def safe_initialize_state(env, render=False):
+    try:
+        return env.initialize_state(render=render)
+    except TypeError:
+        return env.initialize_state()
+
+
+def safe_step(env, action_dict, debug=False, render=False):
+    try:
+        return env.step(action_dict, debug=debug, render=render)
+    except TypeError:
+        return env.step(action_dict)
+
+
+def build_action_template(state_dict, previous=None):
+    template = {}
+    for line_id, buses in state_dict.items():
+        template[line_id] = {}
+        for bus_id in buses.keys():
+            if previous and line_id in previous and bus_id in previous[line_id]:
+                template[line_id][bus_id] = previous[line_id][bus_id]
+            else:
+                template[line_id][bus_id] = None
+    return template
+
+
+def get_reward_value(reward_dict, line_id, bus_id):
+    return reward_dict.get(line_id, {}).get(bus_id, 0.0)
 
 
 class EmbeddingLayer(nn.Module):
@@ -287,17 +378,25 @@ class PolicyNetwork(nn.Module):
 
 class SAC_Trainer():
     def __init__(self, env, replay_buffer, hidden_dim, action_range):
-        # 以下是类别特征和数值特征
-        cat_cols = ['bus_id', 'station_id', 'time_period','direction']
-        cat_code_dict = {
-            'bus_id': {i: i for i in range(env.max_agent_num)},  # 最大车辆数，预设值
-            'station_id': {i: i for i in range(round(len(env.stations) / 2))},  # station_id，有几个站就有几个类别
-            'time_period': {i: i for i in range(env.timetables[-1].launch_time//3600 + 2)},  # time period,以每小时区分，+2是因为让车运行完
-            'direction': {0: 0, 1: 1}  # direction 二分类
-        }
-        # 数值特征的数量
+        if hasattr(env, 'get_feature_spec'):
+            spec = env.get_feature_spec()
+            cat_cols = spec['cat_cols']
+            cat_code_dict = {col: {i: i for i in range(spec['cat_sizes'][col])} for col in cat_cols}
+            num_cont_features = spec['num_cont_features']
+        else:
+            cat_cols = ['bus_id', 'station_id', 'time_period', 'direction']
+            cat_code_dict = {
+                'bus_id': {i: i for i in range(env.max_agent_num)},
+                'station_id': {i: i for i in range(max(round(len(env.stations) / 2), 1))},
+                'time_period': {i: i for i in range(int(env.timetables[-1].launch_time // 3600) + 2)},
+                'direction': {0: 0, 1: 1}
+            }
+            num_cont_features = env.state_dim - len(cat_cols)
+
+        self.cat_cols = cat_cols
         self.num_cat_features = len(cat_cols)
-        self.num_cont_features = env.state_dim - self.num_cat_features  # 包括 forward_headway, backward_headway 和最后一个 feature
+        self.num_cont_features = num_cont_features
+        self.station_feature_idx = cat_cols.index('station_id') if 'station_id' in cat_cols else None
         # 创建嵌入层模板，并为每个网络提供独立副本，避免目标网络与在线网络共享参数
         embedding_template = EmbeddingLayer(cat_code_dict, cat_cols, layer_norm=True, dropout=0.05)
         state_dim = embedding_template.output_dim + self.num_cont_features  # 状态维度 = 嵌入维度 + 数值特征维度
@@ -331,8 +430,8 @@ class SAC_Trainer():
         self.alpha_optimizer = optim.Adam([self.log_alpha], lr=alpha_lr)
 
         # 初始化RunningMeanStd
-        initial_mean = [360., 360., 90.]
-        initial_std = [165., 133., 45.]
+        initial_mean = np.zeros(self.num_cont_features)
+        initial_std = np.ones(self.num_cont_features)
 
         running_ms = RunningMeanStd(shape=(self.num_cont_features,), init_mean=initial_mean, init_std=initial_std)
 
@@ -465,33 +564,35 @@ def evaluate_policy(sac_trainer, env, num_eval_episodes=5, deterministic=True):
     
     for eval_ep in range(num_eval_episodes):
         env.reset()
-        state_dict, reward_dict, _ = env.initialize_state(render=False)
+        state_dict, reward_dict, _ = safe_initialize_state(env, render=False)
         
         done = False
         episode_reward = 0
-        action_dict = {key: None for key in list(range(env.max_agent_num))}
+        action_dict = build_action_template(state_dict)
+        station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
         
         while not done:
-            # 完全遵循训练代码中的逻辑处理每个agent
-            for key in state_dict:
-                if len(state_dict[key]) == 1:
-                    if action_dict[key] is None:
-                        state_input = np.array(state_dict[key][0])
-                        a = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=deterministic)
-                        action_dict[key] = a
-                        
-                elif len(state_dict[key]) == 2:
-                    if state_dict[key][0][1] != state_dict[key][1][1]:
-                        # 累加奖励，这是关键部分
-                        episode_reward += reward_dict[key]
-                    
-                    state_dict[key] = state_dict[key][1:]
-                    state_input = np.array(state_dict[key][0])
-                    action_dict[key] = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=deterministic)
-            
-            # 执行动作
-            state_dict, reward_dict, done = env.step(action_dict, render=False)
-        
+            action_dict = build_action_template(state_dict, action_dict)
+            for line_id, buses in state_dict.items():
+                for bus_id, history in buses.items():
+                    if len(history) == 0:
+                        continue
+                    if len(history) == 1:
+                        if action_dict[line_id][bus_id] is None:
+                            state_input = np.array(history[0])
+                            state_tensor = torch.from_numpy(state_input).float()
+                            a = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+                            action_dict[line_id][bus_id] = a
+                    elif len(history) >= 2:
+                        if history[0][station_feature_idx] != history[1][station_feature_idx]:
+                            episode_reward += get_reward_value(reward_dict, line_id, bus_id)
+                        state_dict[line_id][bus_id] = history[1:]
+                        state_input = np.array(state_dict[line_id][bus_id][0])
+                        state_tensor = torch.from_numpy(state_input).float()
+                        action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+
+            state_dict, reward_dict, done = safe_step(env, action_dict, render=False)
+
         eval_rewards.append(episode_reward)
     
     mean_reward = np.mean(eval_rewards)
@@ -528,9 +629,52 @@ replay_buffer_size = 1e6
 replay_buffer = ReplayBuffer(replay_buffer_size)
 
 debug = False
-render = False
-path = os.getcwd() + '/env'
-env = env_bus(path, debug=debug)
+render = bool(getattr(args, 'render', False))
+if getattr(args, 'sumo_gui', False):
+    render = True
+use_sumo_env = True
+if getattr(args, 'no_sumo_env', False):
+    use_sumo_env = False
+elif getattr(args, 'use_sumo_env', False):
+    use_sumo_env = True
+
+if use_sumo_env:
+    if not args.sumo_bridge:
+        raise ValueError("--sumo_bridge must be provided when --use_sumo_env is enabled")
+    module_name, _, attr_name = args.sumo_bridge.partition(':')
+    bridge_module = importlib.import_module(module_name)
+    factory = getattr(bridge_module, attr_name or 'build_bridge')
+    bridge = factory(root_dir=args.sumo_root, gui=getattr(args, 'sumo_gui', False) or render)
+    if isinstance(bridge, tuple):
+        decision_provider = bridge[0] if len(bridge) > 0 else None
+        action_executor = bridge[1] if len(bridge) > 1 else None
+        reset_cb = bridge[2] if len(bridge) > 2 else None
+        close_cb = bridge[3] if len(bridge) > 3 else None
+    elif isinstance(bridge, dict):
+        decision_provider = bridge.get('decision_provider')
+        action_executor = bridge.get('action_executor')
+        reset_cb = bridge.get('reset_callback')
+        close_cb = bridge.get('close_callback')
+    else:
+        raise ValueError("Bridge factory must return a tuple or dict with decision_provider/action_executor")
+    if decision_provider is None or action_executor is None:
+        raise ValueError("Bridge must provide decision_provider and action_executor")
+    from SUMO_ruiguang.online_control.rl_env import SumoBusHoldingEnv
+    env = SumoBusHoldingEnv(
+        root_dir=args.sumo_root,
+        schedule_file=args.sumo_schedule,
+        decision_provider=decision_provider,
+        action_executor=action_executor,
+        reset_callback=reset_cb,
+        close_callback=close_cb,
+    )
+else:
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
+    env = env_bus(path, debug=debug)
+
+if not getattr(env, 'expects_nested_actions', False):
+    env = LegacyEnvAdapter(env)
+
 env.reset()
 
 action_dim = env.action_space.shape[0]
@@ -578,78 +722,54 @@ if __name__ == '__main__':
         for eps in range(args.max_episodes):
             if eps != 0:
                 env.reset()
-            state_dict, reward_dict, _ = env.initialize_state(render=render)
+            state_dict, reward_dict, _ = safe_initialize_state(env, render=render)
 
             done = False
             episode_steps = 0
             training_steps = 0 # 记录已经训练了多少次
-            action_dict = {key: None for key in list(range(env.max_agent_num))}
-            action_dict_zero = {key: 0 for key in list(range(env.max_agent_num))}  # 全0的action，用于查看reward的上限
-            action_dict_twenty = {key: 20 for key in list(range(env.max_agent_num))}  # 全20的action，用于查看reward的上限
-
-            prob_dict = {key: None for key in list(range(env.max_agent_num))}
-            v_dict = {key: None for key in list(range(env.max_agent_num))}
-            total_rewards, v_loss = 0, 0
-
+            action_dict = build_action_template(state_dict)
             episode_reward = 0
+            station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
 
             while not done:
-                for key in state_dict:
-                    if len(state_dict[key]) == 1:
-                        if action_dict[key] is None:
+                action_dict = build_action_template(state_dict, action_dict)
+                for line_id, buses in state_dict.items():
+                    for bus_id, history in buses.items():
+                        if len(history) == 0:
+                            continue
+                        if len(history) == 1:
+                            if action_dict[line_id][bus_id] is None:
+                                state_vec = np.array(history[0])
+                                if args.use_state_norm:
+                                    state_vec = sac_trainer.state_norm(state_vec)
+                                action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
+                                action_dict[line_id][bus_id] = action
+                        elif len(history) >= 2:
+                            state_vec = np.array(history[0])
+                            next_state_vec = np.array(history[1])
                             if args.use_state_norm:
-                                state_input = sac_trainer.state_norm(np.array(state_dict[key][0]))
-                            else:
-                                state_input = np.array(state_dict[key][0])
-                            a = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
-                            action_dict[key] = a
+                                state_vec = sac_trainer.state_norm(state_vec)
+                                next_state_vec = sac_trainer.state_norm(next_state_vec)
+                            if action_dict[line_id][bus_id] is None:
+                                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
 
-                            if key == 2 and debug:
-                                print('From Algorithm, when no state, Bus id: ', key, ' , station id is: ', state_dict[key][0][1], ' ,current time is: ', env.current_time, ' ,action is: ', a, ', reward: ', reward_dict[key])
-                                print()
+                            records_available = len(history[0]) > station_feature_idx and len(history[1]) > station_feature_idx
+                            station_changed = history[0][station_feature_idx] != history[1][station_feature_idx] if records_available else True
+                            if station_changed:
+                                raw_reward = get_reward_value(reward_dict, line_id, bus_id)
+                                stored_reward = sac_trainer.reward_scaling(raw_reward) if args.use_reward_scaling else raw_reward
+                                replay_buffer.push(state_vec, action_dict[line_id][bus_id], stored_reward, next_state_vec, done)
+                                episode_steps += 1
+                                step += 1
+                                episode_reward += raw_reward
 
-                    elif len(state_dict[key]) == 2:
-
-                        if state_dict[key][0][1] != state_dict[key][1][1]:
-                            # print(state_dict[key][0], action_dict[key], reward_dict[key], state_dict[key][1], prob_dict[key], v_dict[key], done)
-
+                            state_dict[line_id][bus_id] = history[1:]
+                            updated_state_vec = np.array(state_dict[line_id][bus_id][0])
                             if args.use_state_norm:
-                                state = sac_trainer.state_norm(np.array(state_dict[key][0]))
-                                next_state = sac_trainer.state_norm(np.array(state_dict[key][1]))
-                            else:
-                                state = np.array(state_dict[key][0])
-                                next_state = np.array(state_dict[key][1])
-                            if args.use_reward_scaling:
-                                reward = sac_trainer.reward_scaling(reward_dict[key])
-                            else:
-                                reward = reward_dict[key]
+                                updated_state_vec = sac_trainer.state_norm(updated_state_vec)
+                            action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(updated_state_vec).float(), deterministic=DETERMINISTIC)
 
-                            replay_buffer.push(state, action_dict[key], reward, next_state, done)
-                            if key == 2 and debug:
-                                print('From Algorithm store, Bus id: ', key, ' , station id is: ', state_dict[key][0][1], ' ,current time is: ', env.current_time, ' ,action is: ', action_dict[key], ', reward: ', reward_dict[key],
-                                      'value is: ', v_dict[key])
-                                print()
-
-                            episode_steps += 1
-                            step += 1
-                            episode_reward += reward_dict[key]
-                            # if reward_dict[key] == 1.0:
-                            #     print('Bus id: ',key,' , station id is: ' , state_dict[key][1][1],' ,current time is: ', env.current_time)
-                        state_dict[key] = state_dict[key][1:]
-                        if args.use_state_norm:
-                            state_input = sac_trainer.state_norm(np.array(state_dict[key][0]))
-                        else:
-                            state_input = np.array(state_dict[key][0])
-
-                        action_dict[key]= sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
-                        # print(action_dict[key])
-                        # print info like before
-                        if key == 2 and debug:
-                            print('From Algorithm run, Bus id: ', key, ' , station id is: ', state_dict[key][0][1], ' ,current time is: ', env.current_time, ' ,action is: ', action_dict[key], ', reward: ', reward_dict[key], ' ,value is: ',
-                                  v_dict[key])
-                            print()
-
-                state_dict, reward_dict, done = env.step(action_dict, debug=debug, render=render)
+                state_dict, reward_dict, done = safe_step(env, action_dict, debug=debug, render=render)
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
                     for i in range(update_itr):
@@ -740,27 +860,28 @@ if __name__ == '__main__':
 
             done = False
             env.reset()
-            state_dict, reward_dict, _ = env.initialize_state(render=render)
+            state_dict, reward_dict, _ = safe_initialize_state(env, render=render)
             episode_reward = 0
-            action_dict = {key: None for key in list(range(env.max_agent_num))}
+            action_dict = build_action_template(state_dict)
+            station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
 
             while not done:
-                for key in state_dict:
-                    if len(state_dict[key]) == 1:
-                        if action_dict[key] is None:
-                            state_input = np.array(state_dict[key][0])
-                            a = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
-                            action_dict[key] = a
-                    elif len(state_dict[key]) == 2:
-                        if state_dict[key][0][1] != state_dict[key][1][1]:
-                            episode_reward += reward_dict[key]
+                action_dict = build_action_template(state_dict, action_dict)
+                for line_id, buses in state_dict.items():
+                    for bus_id, history in buses.items():
+                        if len(history) == 0:
+                            continue
+                        if len(history) == 1:
+                            if action_dict[line_id][bus_id] is None:
+                                state_input = np.array(history[0])
+                                action = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
+                                action_dict[line_id][bus_id] = action
+                        elif len(history) >= 2:
+                            if history[0][station_feature_idx] != history[1][station_feature_idx]:
+                                episode_reward += get_reward_value(reward_dict, line_id, bus_id)
+                            state_dict[line_id][bus_id] = history[1:]
+                            state_input = np.array(state_dict[line_id][bus_id][0])
+                            action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
 
-                        state_dict[key] = state_dict[key][1:]
-
-                        state_input = np.array(state_dict[key][0])
-
-                        action_dict[key] = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
-
-                state_dict, reward_dict, done = env.step(action_dict)
-                # env.render()
+                state_dict, reward_dict, done = safe_step(env, action_dict)
             print('Episode: ', eps, '| Episode Reward: ', episode_reward)
