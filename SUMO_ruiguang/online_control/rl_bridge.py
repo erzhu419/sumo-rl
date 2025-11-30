@@ -2,7 +2,12 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict, deque
-from typing import Callable, Dict, List, Tuple, Optional
+import time
+import random
+import argparse
+import math
+import numpy as np
+from typing import Tuple, List, Dict, Set, Any, Callable, Optional
 
 if "SUMO_HOME" in os.environ:
     tools_path = os.path.join(os.environ["SUMO_HOME"], "tools")
@@ -11,8 +16,19 @@ if "SUMO_HOME" in os.environ:
 else:
     raise EnvironmentError("Please declare environment variable 'SUMO_HOME'!")
 
-import traci
+try:
+    import libsumo
+    sys.modules['traci'] = libsumo
+    import traci
+    print("Using libsumo for simulation (globally patched).")
+    LIBSUMO = True
+except ImportError:
+    import traci
+    print("Using traci for simulation.")
+    LIBSUMO = False
+
 from sumolib import checkBinary
+import traci.constants as tc
 
 from .case import f_8_create_obj
 from .case import e_8_gurobi_test_considerbusnum_V3
@@ -31,6 +47,7 @@ class SumoRLBridge:
         max_steps: int = 18000,
         time_step: float = 1.0,
         default_headway: float = 360.0,
+        update_freq: int = 10,
     ) -> None:
         self.root_dir = os.path.abspath(root_dir)
         self.sumo_cfg = sumo_cfg if os.path.isabs(sumo_cfg) else os.path.join(self.root_dir, sumo_cfg)
@@ -38,8 +55,10 @@ class SumoRLBridge:
         self.max_steps = max_steps
         self.time_step = time_step
         self.default_headway = default_headway
+        self.update_freq = update_freq
 
         self.initialized = False
+        self.first_run = True
         self.done = False
         self.current_time = 0.0
         self.steps = 0
@@ -71,11 +90,48 @@ class SumoRLBridge:
 
     # region SUMO lifecycle
     def reset(self) -> None:
-        if self.initialized:
-            self.close()
-        self._ensure_sumo_home()
-        self._start_traci()
-        self._load_objects()
+        # Optimization: Load network once and reuse state
+        if self.first_run:
+            if self.initialized:
+                 self.close()
+            self._ensure_sumo_home()
+            self._start_traci()
+            self._load_objects()
+            # Save state for future resets
+            if LIBSUMO:
+                traci.simulation.saveState("sumo_start_state.sbx")
+            self.first_run = False
+        else:
+            # Soft reset using saved state
+            if LIBSUMO:
+                # Suppress "Loading state..." output
+                with open(os.devnull, 'w') as devnull:
+                    try:
+                        # Redirect stdout (fd 1) and stderr (fd 2) at the OS level
+                        # This is necessary because libsumo prints from C++
+                        old_stdout = os.dup(1)
+                        old_stderr = os.dup(2)
+                        os.dup2(devnull.fileno(), 1)
+                        os.dup2(devnull.fileno(), 2)
+                        try:
+                            traci.simulation.loadState("sumo_start_state.sbx")
+                        finally:
+                            os.dup2(old_stdout, 1)
+                            os.dup2(old_stderr, 2)
+                            os.close(old_stdout)
+                            os.close(old_stderr)
+                    except Exception:
+                        # Fallback if redirection fails
+                        traci.simulation.loadState("sumo_start_state.sbx")
+            else:
+                # Fallback for standard traci (if needed, though we focus on libsumo)
+                self.close()
+                self._ensure_sumo_home()
+                self._start_traci()
+            
+            # Always reload objects to ensure fresh python state matching the simulation
+            self._load_objects()
+
         self.initialized = True
         self.done = False
         self.current_time = traci.simulation.getTime()
@@ -85,11 +141,21 @@ class SumoRLBridge:
         self.active_events.clear()
         self.arrival_history.clear()
         self.depart_history.clear()
+        
+        # Optimization: Track active agents locally to avoid expensive getIDList() calls
+        self.active_bus_ids = set()
+        self.active_passenger_ids = set()
+        self.just_departed_buses = []
 
     def close(self) -> None:
-        if traci.isLoaded():
-            traci.close()
+        # Optimization: Do NOT close traci if using libsumo reuse strategy
+        if not LIBSUMO:
+            if traci.isLoaded():
+                traci.close()
+        
         self.initialized = False
+        self.active_bus_ids = set()
+        self.active_passenger_ids = set()
 
     def _ensure_sumo_home(self) -> None:
         if "SUMO_HOME" not in os.environ:
@@ -99,9 +165,19 @@ class SumoRLBridge:
             sys.path.append(tools)
 
     def _start_traci(self) -> None:
-        binary = checkBinary('sumo-gui' if self.gui else 'sumo')
-        traci.start([binary, "-c", self.sumo_cfg])
-        self.sumo_binary = binary
+        # Optimization: If traci is already loaded, don't start it again
+        if LIBSUMO and traci.isLoaded():
+            return
+
+        if LIBSUMO:
+            # libsumo runs in-process, no binary needed, but argv[0] is expected
+            # Added --duration-log.disable and --log /dev/null to suppress verbose output
+            traci.start(["sumo", "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
+            self.sumo_binary = "libsumo"
+        else:
+            binary = checkBinary('sumo-gui' if self.gui else 'sumo')
+            traci.start([binary, "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
+            self.sumo_binary = binary
 
     def _load_objects(self) -> None:
         result = f_8_create_obj.create_obj_fun()
@@ -137,9 +213,12 @@ class SumoRLBridge:
             stop_obj.get_accessible_stop(self.line_obj_dic)
             stop_obj.get_passenger_arriver_rate(self.passenger_obj_dic)
             stop_obj.get_initial_just_leave_data(line_station_od_otd_dict, trigger_time)
+        
+        # Optimization: Skip signal object initialization as it is unused for Holding Control
         for signal_id, signal_obj in self.signal_obj_dic.items():
             signal_obj.get_attribute_by_traci()
             signal_obj.get_pass_line(self.line_obj_dic)
+            
         for bus_id, bus_obj in self.bus_obj_dic.items():
             line = self.line_obj_dic[bus_obj.belong_line_id_s]
             bus_obj.get_arriver_timetable(line)
@@ -150,18 +229,22 @@ class SumoRLBridge:
     # endregion
 
     # region RL hooks
-    def fetch_events(self) -> Tuple[List[DecisionEvent], bool]:
+    def fetch_events(self) -> Tuple[List[DecisionEvent], bool, List[str]]:
         if self.done:
-            return [], True
+            return [], True, []
         if not self.initialized:
             self.reset()
         if not self.decision_queue:
             self._advance_until_event()
         if not self.decision_queue and self.done:
-            return [], True
+            return [], True, []
         events = list(self.decision_queue)
         self.decision_queue.clear()
-        return events, self.done
+        
+        departed = list(self.just_departed_buses)
+        self.just_departed_buses.clear()
+        
+        return events, self.done, departed
 
     def apply_action(self, event: DecisionEvent, hold_value: float) -> None:
         if not self.initialized or self.done:
@@ -170,13 +253,18 @@ class SumoRLBridge:
         bus_id = event.bus_id
         stop_id = event.stop_id
         stopping_place = event.metadata.get('stopping_place', stop_id)
+        
         try:
+            # Since we applied pre-emptive holding (duration=3600) in _collect_new_events,
+            # the stop should still be active and at index 0.
+            # We simply update it to the actual desired duration.
             traci.vehicle.setStopParameter(bus_id, 0, "duration", str(duration))
-        except traci.TraCIException:
-            try:
-                traci.vehicle.setBusStop(bus_id, stopping_place, duration=duration)
-            except traci.TraCIException:
-                pass
+        except traci.TraCIException as e:
+            # If it still fails, log it but don't crash.
+            # This might happen if the bus somehow left the stop despite our best efforts.
+            print(f"WARNING: Failed to apply holding to {bus_id} at {stop_id}. Error: {e}")
+            pass
+
         key = (event.line_id, bus_id, stop_id)
         if key not in self.pending_events:
             self.pending_events[key] = event
@@ -199,12 +287,59 @@ class SumoRLBridge:
         if self.done:
             return
         simulation_current_time = traci.simulation.getTime()
-        for stop in self.stop_obj_dic.values():
-            stop.update_stop_state()
-        vehicle_ids = traci.vehicle.getIDList()
-        for vehicle_id in vehicle_ids:
-            if traci.vehicle.getTypeID(vehicle_id) != "Bus":
-                continue
+        
+        # Update active buses
+        if self.steps == 0:
+            # On the first step, check ALL existing vehicles to catch those that departed at time 0
+            initial_ids = traci.vehicle.getIDList()
+            for veh_id in initial_ids:
+                if veh_id == "311S_1":
+                    print(f"DEBUG: 311S_1 found in initial_ids at step {self.steps}")
+                if veh_id in self.bus_obj_dic:
+                    self.active_bus_ids.add(veh_id)
+    
+        
+        departed_ids = traci.simulation.getDepartedIDList()
+        for veh_id in departed_ids:
+            if veh_id == "311S_1":
+                print(f"DEBUG: 311S_1 found in departed_ids at step {self.steps}")
+            if veh_id in self.bus_obj_dic:
+                self.active_bus_ids.add(veh_id)
+
+        
+        arrived_ids = traci.simulation.getArrivedIDList()
+        for veh_id in arrived_ids:
+            if veh_id in self.active_bus_ids:
+                self.active_bus_ids.discard(veh_id)
+                self.just_departed_buses.append(veh_id)
+                
+        # Update active passengers
+        departed_persons = traci.simulation.getDepartedPersonIDList()
+        for person_id in departed_persons:
+            if person_id in self.passenger_obj_dic:
+                self.active_passenger_ids.add(person_id)
+                
+        arrived_persons = traci.simulation.getArrivedPersonIDList()
+        for person_id in arrived_persons:
+            if person_id in self.active_passenger_ids:
+                self.active_passenger_ids.discard(person_id)
+
+        # Optimization: Update stops and passengers only every update_freq steps
+        if self.steps % self.update_freq == 0:
+            for stop in self.stop_obj_dic.values():
+                stop.update_stop_state()
+            
+            # Iterate only active passengers
+            for passenger_id in list(self.active_passenger_ids):
+                passenger_obj = self.passenger_obj_dic[passenger_id]
+                if passenger_obj.passenger_state_s == "No":
+                    passenger_obj.passenger_activate(simulation_current_time, self.line_obj_dic)
+                else:
+                    passenger_obj.passenger_run(simulation_current_time, self.line_obj_dic)
+
+        # CRITICAL: Bus logic must run EVERY step to detect arrivals/departures correctly
+        # Otherwise, short stops (duration=0) are missed if they fall between update intervals
+        for vehicle_id in list(self.active_bus_ids):
             bus_obj = self.bus_obj_dic[vehicle_id]
             line_obj = self.line_obj_dic[bus_obj.belong_line_id_s]
             if bus_obj.bus_state_s == "No":
@@ -224,13 +359,40 @@ class SumoRLBridge:
                     self.involved_tl_ID_l,
                     self.busline_edge_order,
                 )
-        passenger_ids = traci.person.getIDList()
-        for passenger_id in passenger_ids:
-            passenger_obj = self.passenger_obj_dic[passenger_id]
-            if passenger_obj.passenger_state_s == "No":
-                passenger_obj.passenger_activate(simulation_current_time, self.line_obj_dic)
-            else:
-                passenger_obj.passenger_run(simulation_current_time, self.line_obj_dic)
+            # Still need to run bus logic for basic movement/arrival detection if not covered by SUMO?
+            # Actually, bus_running updates 'just_server_stop_data_d' which is needed for events.
+            # If we skip bus_running, we might miss arrivals.
+            # However, the user said "passenger/road condition update".
+            # Bus movement is critical. Passenger state is expensive.
+            # Let's split: Bus running always (or check if it can be skipped), Passenger/Stop throttled.
+            
+            # Re-reading user request: "passenger/road condition... update freq".
+            # Bus logic (bus_running) updates 'arriver_stop_time_d' and 'just_server_stop_data_d'.
+            # If we skip it, we miss arrivals.
+            # So we MUST run bus logic.
+            # But we can skip Stop and Passenger updates.
+            
+            # Iterate only active buses (Always run to catch arrivals)
+            for vehicle_id in list(self.active_bus_ids):
+                bus_obj = self.bus_obj_dic[vehicle_id]
+                line_obj = self.line_obj_dic[bus_obj.belong_line_id_s]
+                if bus_obj.bus_state_s == "No":
+                    bus_obj.bus_activate(line_obj, self.stop_obj_dic, self.signal_obj_dic, simulation_current_time)
+                else:
+                    bus_obj.bus_running(
+                        line_obj,
+                        self.stop_obj_dic,
+                        self.signal_obj_dic,
+                        self.passenger_obj_dic,
+                        simulation_current_time,
+                        self.BusCap,
+                        self.AveAlightingTime,
+                        self.AveBoardingTime,
+                        self.bus_arrstation_od_otd_dict,
+                        self.bus_obj_dic,
+                        self.involved_tl_ID_l,
+                        self.busline_edge_order,
+                    )
 
         self._collect_new_events(simulation_current_time)
 
@@ -240,6 +402,50 @@ class SumoRLBridge:
 
         self._cleanup_departed_buses()
         self._check_termination()
+
+    def _find_neighbors(self, line_id: str, current_bus_id: str) -> Tuple[Optional[Any], Optional[Any]]:
+        # Find all buses on this line
+        buses = [b for b in self.bus_obj_dic.values() if b.belong_line_id_s == line_id]
+        # Sort by start_time_n (earlier start time = forward bus)
+        buses.sort(key=lambda b: b.start_time_n)
+        
+        try:
+            current_idx = [b.bus_id_s for b in buses].index(current_bus_id)
+        except ValueError:
+            return None, None
+            
+        forward_bus = buses[current_idx - 1] if current_idx > 0 else None
+        backward_bus = buses[current_idx + 1] if current_idx < len(buses) - 1 else None
+        
+        return forward_bus, backward_bus
+
+    def _compute_robust_headway(self, subject_bus, front_bus, stop_id, current_time, target_headway=360.0) -> float:
+        if not front_bus or not subject_bus:
+            return target_headway
+            
+        # 1. Try trajectory-based calculation (if front bus has arrived at this stop)
+        # Note: We check front_bus trajectory because we want (Subject Arrival - Front Arrival)
+        # But here 'current_time' is effectively Subject Arrival (or estimation of it)
+        if stop_id in front_bus.trajectory_dict and front_bus.trajectory_dict[stop_id]:
+            front_arrive_time = front_bus.trajectory_dict[stop_id][-1]
+            # Headway = Subject Arrival - Front Arrival
+            return current_time - front_arrive_time
+            
+        # 2. Fallback to distance-based calculation
+        # Headway = -(Subject Dist - Front Dist) / Subject Speed
+        dist_diff = subject_bus.distance_n - front_bus.distance_n
+        
+        # Calculate subject average speed
+        duration = current_time - subject_bus.start_time_n
+        if duration <= 1.0:
+             return target_headway
+             
+        avg_speed = subject_bus.distance_n / duration
+        if avg_speed < 0.1:
+            return target_headway
+            
+        headway = -dist_diff / avg_speed
+        return max(headway, 0.0) # Ensure positive
 
     def _collect_new_events(self, simulation_current_time: float) -> None:
         for bus_id, bus_obj in self.bus_obj_dic.items():
@@ -251,14 +457,49 @@ class SumoRLBridge:
                 continue
             arrive_time, predicted_depart_time = bus_obj.just_server_stop_data_d[stop_id]
             base_duration = max(predicted_depart_time - arrive_time, 0.0)
+            
+            # Timing Alignment: Only process if passenger exchange is done
+            # This ensures we observe the state AFTER passengers have boarded/alighted, matching original logic
+            if simulation_current_time < arrive_time + base_duration:
+                continue
+
+            # Prevent duplicate events for the same stop visit
+            if getattr(bus_obj, 'last_action_time', -1.0) == arrive_time:
+                continue
+            bus_obj.last_action_time = arrive_time
+
             line_id = bus_obj.belong_line_id_s
+            
+            # Find neighbors for robust headway calculation
+            forward_bus, backward_bus = self._find_neighbors(line_id, bus_id)
+            
+            # "No Control" Logic: Skip isolated buses
+            if not forward_bus and not backward_bus:
+                continue
+                
+            # Dynamic Target Headway Calculation
+            target_forward = 360.0
+            if forward_bus:
+                target_forward = abs(bus_obj.start_time_n - forward_bus.start_time_n)
+                
+            target_backward = 360.0
+            if backward_bus:
+                target_backward = abs(backward_bus.start_time_n - bus_obj.start_time_n)
+                
+            # Robust Headway Calculation
+            # Forward Headway: Me - Front
+            forward_headway = self._compute_robust_headway(bus_obj, forward_bus, stop_id, simulation_current_time, target_headway=target_forward)
+            # Backward Headway: Back - Me
+            # Note: We pass backward_bus as subject, bus_obj as front
+            backward_headway = self._compute_robust_headway(backward_bus, bus_obj, stop_id, simulation_current_time, target_headway=target_backward)
+
             stop_idx = self.stop_indices[line_id].get(stop_id, -1)
             direction = 1 if line_id.endswith('S') else 0
             waiting_passengers = len(traci.busstop.getPersonIDs(stop_id))
-            forward_headway = self._compute_forward_headway(line_id, stop_id, arrive_time)
-            backward_headway = self._compute_backward_headway(line_id, stop_id)
+            
             stop_data = traci.vehicle.getStops(bus_id, 1)
             stopping_place = stop_data[0].stoppingPlaceID if stop_data else stop_id
+            
             event = DecisionEvent(
                 line_id=line_id,
                 bus_id=bus_id,
@@ -270,8 +511,22 @@ class SumoRLBridge:
                 backward_headway=backward_headway,
                 waiting_passengers=waiting_passengers,
                 base_stop_duration=base_duration,
+                forward_bus_present=bool(forward_bus),
+                backward_bus_present=bool(backward_bus),
+                target_forward_headway=target_forward,
+                target_backward_headway=target_backward,
                 metadata={'arrive_time': arrive_time, 'stopping_place': stopping_place},
             )
+            
+            # Pre-emptive Holding:
+            # Immediately set a large duration to keep the stop active in SUMO while the agent decides.
+            # This prevents the "not downstream" error caused by SUMO finishing the stop prematurely.
+            try:
+                # Use setStopParameter to modify the current stop (index 0)
+                traci.vehicle.setStopParameter(bus_id, 0, "duration", "3600.0")
+            except traci.TraCIException:
+                pass
+
             self.decision_queue.append(event)
             self.pending_events[key] = event
             self.arrival_history[line_id][stop_id].append(arrive_time)
@@ -321,8 +576,13 @@ class SumoRLBridge:
     # endregion
 
 
-def build_bridge(*, root_dir: str, sumo_cfg: str = "control_sim_traci_period.sumocfg", gui: bool = False) -> Dict[str, Callable]:
-    bridge = SumoRLBridge(root_dir=root_dir, sumo_cfg=sumo_cfg, gui=gui)
+
+
+
+
+
+def build_bridge(*, root_dir: str, sumo_cfg: str = "control_sim_traci_period.sumocfg", gui: bool = False, update_freq: int = 10) -> Dict[str, Callable]:
+    bridge = SumoRLBridge(root_dir=root_dir, sumo_cfg=sumo_cfg, gui=gui, update_freq=update_freq)
 
     def decision_provider() -> Tuple[List[DecisionEvent], bool]:
         return bridge.fetch_events()
@@ -342,3 +602,4 @@ def build_bridge(*, root_dir: str, sumo_cfg: str = "control_sim_traci_period.sum
         'reset_callback': reset_callback,
         'close_callback': close_callback,
     }
+

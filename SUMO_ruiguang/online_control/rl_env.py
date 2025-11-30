@@ -1,3 +1,6 @@
+import libsumo
+traci = libsumo
+LIBSUMO = True
 import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -30,6 +33,10 @@ class DecisionEvent:
     backward_headway: float
     waiting_passengers: int
     base_stop_duration: float
+    forward_bus_present: bool = True
+    backward_bus_present: bool = True
+    target_forward_headway: float = 360.0
+    target_backward_headway: float = 360.0
     metadata: Dict[str, Any] = field(default_factory=dict)
     assigned_action: Optional[float] = None
 
@@ -189,7 +196,13 @@ class SumoBusHoldingEnv:
     def close(self) -> None:
         if self.close_callback is not None:
             self.close_callback()
-    # endregion
+        
+        # Optimization: Do NOT close traci if using libsumo reuse strategy
+        if not LIBSUMO:
+            try:
+                traci.close()
+            except:
+                pass
 
     # region core mechanics
     def _apply_actions(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> None:
@@ -210,7 +223,20 @@ class SumoBusHoldingEnv:
         if self.decision_provider is None:
             raise RuntimeError("decision_provider callable is required to advance the environment")
         while not self._done:
-            events, terminated = self._pull_events()
+            events, terminated, departed = self._pull_events()
+            
+            # Cleanup departed buses
+            for bus_id in departed:
+                for line_id in self._state_buffers:
+                    if bus_id in self._state_buffers[line_id]:
+                        del self._state_buffers[line_id][bus_id]
+                    if bus_id in self._reward_buffers[line_id]:
+                        del self._reward_buffers[line_id][bus_id]
+                # Also clear pending events for this bus
+                keys_to_remove = [k for k in self._pending_events if k[1] == bus_id]
+                for k in keys_to_remove:
+                    del self._pending_events[k]
+
             if terminated:
                 self._done = True
             if not events:
@@ -219,20 +245,52 @@ class SumoBusHoldingEnv:
                 continue
             for event in events:
                 self._register_event(event)
-            if any(self._state_buffers.values()):
+            
+            if events:
                 break
 
-    def _pull_events(self) -> Tuple[List[DecisionEvent], bool]:
+    def _start_simulation(self) -> None:
+        # Optimization: If traci is already loaded (e.g. by bridge or previous run), skip start
+        try:
+            if traci.isLoaded():
+                return
+        except:
+            pass
+
+        sumo_cmd = [
+            "sumo-gui" if self.sumo_gui else "sumo",
+            "-c", self.sumo_cfg,
+            "--no-warnings",
+            "--duration-log.disable",
+            "--log", "/dev/null"
+        ]
+        
+        if LIBSUMO:
+            # libsumo requires argv list
+            traci.start(sumo_cmd)
+        else:
+            traci.start(sumo_cmd)
+
+    def _pull_events(self) -> Tuple[List[DecisionEvent], bool, List[str]]:
         result = self.decision_provider()
         terminated = False
-        events: List[DecisionEvent]
+        events: List[DecisionEvent] = []
+        departed: List[str] = []
+        
         if isinstance(result, tuple):
-            events, terminated = result
+            if len(result) == 3:
+                events, terminated, departed = result
+            elif len(result) == 2:
+                events, terminated = result
+            else:
+                # Fallback or error
+                events = result[0]
         else:
             events = result
+            
         if events is None:
             events = []
-        return events, terminated
+        return events, terminated, departed
 
     def _register_event(self, event: DecisionEvent) -> None:
         line_idx = self._line_index.setdefault(event.line_id, len(self._line_index))
@@ -266,16 +324,34 @@ class SumoBusHoldingEnv:
         self._pending_events[(event.line_id, event.bus_id)] = event
 
     def _compute_reward(self, event: DecisionEvent, target_headway: float) -> float:
-        forward_error = abs(event.forward_headway - target_headway)
-        backward_error = abs(event.backward_headway - target_headway)
-        similarity_penalty = abs(event.forward_headway - event.backward_headway) * 0.5
-        reward = -(forward_error + backward_error) * 0.5 - similarity_penalty
-        if forward_error > target_headway * 0.5 or backward_error > target_headway * 0.5:
+        # Note: target_headway arg is kept for compatibility but we use event-specific targets
+        
+        def headway_reward(headway, target):
+            return -abs(headway - target)
+
+        forward_reward = headway_reward(event.forward_headway, event.target_forward_headway) if event.forward_bus_present else None
+        backward_reward = headway_reward(event.backward_headway, event.target_backward_headway) if event.backward_bus_present else None
+
+        if forward_reward is not None and backward_reward is not None:
+            weight = abs(event.forward_headway - event.target_forward_headway) / (abs(event.forward_headway - event.target_forward_headway) + abs(event.backward_headway - event.target_backward_headway) + 1e-6)
+            similarity_bonus = -abs(event.forward_headway - event.backward_headway) * 0.5
+            reward = forward_reward * weight + backward_reward * (1 - weight) + similarity_bonus
+        elif forward_reward is not None:
+            reward = forward_reward
+        elif backward_reward is not None:
+            reward = backward_reward
+        else:
+            reward = -50.0
+
+        # Threshold is 0.5 * target (proportional to schedule)
+        if (event.forward_bus_present and abs(event.forward_headway - event.target_forward_headway) > event.target_forward_headway * 0.5) or \
+           (event.backward_bus_present and abs(event.backward_headway - event.target_backward_headway) > event.target_backward_headway * 0.5):
             reward -= 20.0
         return reward
 
     def _snapshot_state(self) -> Dict[str, Dict[str, List[List[float]]]]:
-        return {line: {bus: [list(obs) for obs in history] for bus, history in buses.items()} for line, buses in self._state_buffers.items()}
+        # Return the reference to _state_buffers so the agent can modify/consume it
+        return self._state_buffers
 
     def _snapshot_reward(self) -> Dict[str, Dict[str, float]]:
         return {line: dict(buses) for line, buses in self._reward_buffers.items()}

@@ -1,10 +1,3 @@
-'''
-Soft Actor-Critic version 2
-using target Q instead of V net: 2 Q net, 2 target Q net, 1 policy net
-add alpha loss compared with version 1
-paper: https://arxiv.org/pdf/1812.05905.pdf
-'''
-
 import psutil,tracemalloc
 import gym
 import copy
@@ -26,6 +19,7 @@ import os
 import argparse
 import numpy as np
 import random
+import libsumo as traci
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
@@ -45,7 +39,7 @@ parser.add_argument('--test', dest='test', action='store_true', default=False)
 parser.add_argument('--use_gradient_clip', type=bool, default=True, help="Trick 1:gradient clipping")
 parser.add_argument("--use_state_norm", type=bool, default=False, help="Trick 2:state normalization")
 parser.add_argument("--use_reward_norm", type=bool, default=False, help="Trick 3:reward normalization")
-parser.add_argument("--use_reward_scaling", type=bool, default=False, help="Trick 4:reward scaling")
+parser.add_argument("--use_reward_scaling", type=bool, default=True, help="Trick 4:reward scaling")
 parser.add_argument("--gamma", type=float, default=0.99, help="Discount factor 0.99")
 parser.add_argument("--training_freq", type=int, default=10, help="frequency of training the network")
 parser.add_argument("--plot_freq", type=int, default=1, help="frequency of plotting the result")
@@ -53,16 +47,17 @@ parser.add_argument('--weight_reg', type=float, default=0.1, help='weight of reg
 parser.add_argument('--auto_entropy', type=bool, default=True, help='automatically updating alpha')
 parser.add_argument("--maximum_alpha", type=float, default=0.3, help="max entropy weight")
 parser.add_argument("--batch_size", type=int, default=2048, help="batch size")
-parser.add_argument("--max_episodes", type=int, default=500, help="max episodes")
+parser.add_argument("--max_episodes", type=int, default=50, help="max episodes")
 parser.add_argument('--save_root', type=str, default='.', help='Base directory for saving models, logs, and figures')
 parser.add_argument('--run_name', type=str, default='gpt_version', help='Optional identifier appended to save directories to avoid overwriting previous runs')
 parser.add_argument('--render', action='store_true', help='Enable environment rendering (SUMO GUI when available)')
 parser.add_argument('--use_sumo_env', action='store_true', help='(deprecated) retained for backwards compatibility')
 parser.add_argument('--no_sumo_env', action='store_true', help='Force legacy LSTM-RL env instead of SUMO bridge')
-parser.add_argument('--sumo_root', type=str, default='SUMO_ruiguang/online_control', help='Base directory containing SUMO scenario assets')
+parser.add_argument('--sumo_root', type=str, default=os.path.join(PROJECT_ROOT, 'SUMO_ruiguang/online_control'), help='Base directory containing SUMO scenario assets')
 parser.add_argument('--sumo_schedule', type=str, default='initialize_obj/save_obj_bus.add.xml', help='Path to schedule xml relative to --sumo_root')
 parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks, format module:function')
 parser.add_argument('--sumo_gui', action='store_true', help='Launch SUMO with GUI (implies rendering)')
+parser.add_argument('--passenger_update_freq', type=int, default=10, help='Frequency of passenger/stop state updates (in steps)')
 args = parser.parse_args()
 
 
@@ -171,9 +166,9 @@ def safe_initialize_state(env, render=False):
         return env.initialize_state()
 
 
-def safe_step(env, action_dict, debug=False, render=False):
+def safe_step(env, action_dict, render=False):
     try:
-        return env.step(action_dict, debug=debug, render=render)
+        return env.step(action_dict)
     except TypeError:
         return env.step(action_dict)
 
@@ -514,8 +509,8 @@ class SAC_Trainer():
             policy_loss.backward(retain_graph=False)
             self.policy_optimizer.step()
 
-            # print('q loss: ', q_value_loss1, q_value_loss2)
-            # print('policy loss: ', policy_loss )
+            # print('q loss: ', q_value_loss1.item(), q_value_loss2.item())
+            # print('policy loss: ', policy_loss.item())
 
         # Soft update the target value net
         for target_param, param in zip(self.target_soft_q_net1.parameters(), self.soft_q_net1.parameters()):
@@ -644,7 +639,10 @@ if use_sumo_env:
     module_name, _, attr_name = args.sumo_bridge.partition(':')
     bridge_module = importlib.import_module(module_name)
     factory = getattr(bridge_module, attr_name or 'build_bridge')
-    bridge = factory(root_dir=args.sumo_root, gui=getattr(args, 'sumo_gui', False) or render)
+    module_name, _, attr_name = args.sumo_bridge.partition(':')
+    bridge_module = importlib.import_module(module_name)
+    factory = getattr(bridge_module, attr_name or 'build_bridge')
+    bridge = factory(root_dir=args.sumo_root, gui=getattr(args, 'sumo_gui', False) or render, update_freq=args.passenger_update_freq)
     if isinstance(bridge, tuple):
         decision_provider = bridge[0] if len(bridge) > 0 else None
         action_executor = bridge[1] if len(bridge) > 1 else None
@@ -755,6 +753,8 @@ if __name__ == '__main__':
 
                             records_available = len(history[0]) > station_feature_idx and len(history[1]) > station_feature_idx
                             station_changed = history[0][station_feature_idx] != history[1][station_feature_idx] if records_available else True
+                            # Debug SUMO states
+
                             if station_changed:
                                 raw_reward = get_reward_value(reward_dict, line_id, bus_id)
                                 stored_reward = sac_trainer.reward_scaling(raw_reward) if args.use_reward_scaling else raw_reward
@@ -762,6 +762,11 @@ if __name__ == '__main__':
                                 episode_steps += 1
                                 step += 1
                                 episode_reward += raw_reward
+                                
+                                # DEBUG: Verify Replay Buffer Integrity
+                                s_stop = history[0][station_feature_idx]
+                                ns_stop = history[1][station_feature_idx]
+                                print(f"DEBUG_RB: Line {line_id} Bus {bus_id} Step {step} | S_Stop {s_stop} -> NS_Stop {ns_stop} | Reward {raw_reward:.2f}")
 
                             state_dict[line_id][bus_id] = history[1:]
                             updated_state_vec = np.array(state_dict[line_id][bus_id][0])
@@ -769,7 +774,7 @@ if __name__ == '__main__':
                                 updated_state_vec = sac_trainer.state_norm(updated_state_vec)
                             action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(updated_state_vec).float(), deterministic=DETERMINISTIC)
 
-                state_dict, reward_dict, done = safe_step(env, action_dict, debug=debug, render=render)
+                state_dict, reward_dict, done = safe_step(env, action_dict, render=render)
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
                     for i in range(update_itr):
@@ -777,6 +782,8 @@ if __name__ == '__main__':
                         training_steps += 1
 
                 if done:
+                    if args.use_reward_scaling:
+                        sac_trainer.reward_scaling.reset()
                     replay_buffer.last_episode_step = episode_steps
                     break
             # 计算每个 episode 的平均 Q 值
@@ -786,6 +793,15 @@ if __name__ == '__main__':
             reg_norms2_episode.append(np.mean(reg_norms2[-training_steps:]))
             log_probs_episode.append(np.mean(log_probs[-training_steps:]))
             alpha_values_episode.append(np.mean(alpha_values[-training_steps:]))
+
+            # Print Episode Summary (Matching original format)
+            replay_buffer_usage = len(replay_buffer) / replay_buffer_size * 100
+            print(
+                f"[SAC | max_alpha={args.maximum_alpha}] Episode: {eps} | Episode Reward: {episode_reward:.2f} "
+                f"| CPU Memory: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB | "
+                f"GPU Memory Allocated: {torch.cuda.memory_allocated() / 1024 ** 2:.2f} MB | "
+                f"Replay Buffer Usage: {replay_buffer_usage:.2f}% | "
+                f"Avg Q-Value: {q_values_episode[-1]:.2f}")
 
             if eps % args.plot_freq == 0:  # plot and model saving interval
                 if not os.path.exists(LOG_DIR):
@@ -800,7 +816,7 @@ if __name__ == '__main__':
                 np.save(os.path.join(LOG_DIR, 'alpha_values_episode.npy'), alpha_values_episode)
                 
                 # 评估当前策略
-                mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=15, deterministic=True)
+                mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=3, deterministic=True)
                 print(f"评估结果 (Episode {eps}): 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
                 
                 # 记录评估结果
