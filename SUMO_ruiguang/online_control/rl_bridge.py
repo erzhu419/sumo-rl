@@ -293,16 +293,12 @@ class SumoRLBridge:
             # On the first step, check ALL existing vehicles to catch those that departed at time 0
             initial_ids = traci.vehicle.getIDList()
             for veh_id in initial_ids:
-                if veh_id == "311S_1":
-                    print(f"DEBUG: 311S_1 found in initial_ids at step {self.steps}")
                 if veh_id in self.bus_obj_dic:
                     self.active_bus_ids.add(veh_id)
     
         
         departed_ids = traci.simulation.getDepartedIDList()
         for veh_id in departed_ids:
-            if veh_id == "311S_1":
-                print(f"DEBUG: 311S_1 found in departed_ids at step {self.steps}")
             if veh_id in self.bus_obj_dic:
                 self.active_bus_ids.add(veh_id)
 
@@ -359,40 +355,6 @@ class SumoRLBridge:
                     self.involved_tl_ID_l,
                     self.busline_edge_order,
                 )
-            # Still need to run bus logic for basic movement/arrival detection if not covered by SUMO?
-            # Actually, bus_running updates 'just_server_stop_data_d' which is needed for events.
-            # If we skip bus_running, we might miss arrivals.
-            # However, the user said "passenger/road condition update".
-            # Bus movement is critical. Passenger state is expensive.
-            # Let's split: Bus running always (or check if it can be skipped), Passenger/Stop throttled.
-            
-            # Re-reading user request: "passenger/road condition... update freq".
-            # Bus logic (bus_running) updates 'arriver_stop_time_d' and 'just_server_stop_data_d'.
-            # If we skip it, we miss arrivals.
-            # So we MUST run bus logic.
-            # But we can skip Stop and Passenger updates.
-            
-            # Iterate only active buses (Always run to catch arrivals)
-            for vehicle_id in list(self.active_bus_ids):
-                bus_obj = self.bus_obj_dic[vehicle_id]
-                line_obj = self.line_obj_dic[bus_obj.belong_line_id_s]
-                if bus_obj.bus_state_s == "No":
-                    bus_obj.bus_activate(line_obj, self.stop_obj_dic, self.signal_obj_dic, simulation_current_time)
-                else:
-                    bus_obj.bus_running(
-                        line_obj,
-                        self.stop_obj_dic,
-                        self.signal_obj_dic,
-                        self.passenger_obj_dic,
-                        simulation_current_time,
-                        self.BusCap,
-                        self.AveAlightingTime,
-                        self.AveBoardingTime,
-                        self.bus_arrstation_od_otd_dict,
-                        self.bus_obj_dic,
-                        self.involved_tl_ID_l,
-                        self.busline_edge_order,
-                    )
 
         self._collect_new_events(simulation_current_time)
 

@@ -20,6 +20,9 @@ import argparse
 import numpy as np
 import random
 import libsumo as traci
+import cProfile
+import pstats
+import io
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
@@ -47,7 +50,7 @@ parser.add_argument('--weight_reg', type=float, default=0.1, help='weight of reg
 parser.add_argument('--auto_entropy', type=bool, default=True, help='automatically updating alpha')
 parser.add_argument("--maximum_alpha", type=float, default=0.3, help="max entropy weight")
 parser.add_argument("--batch_size", type=int, default=2048, help="batch size")
-parser.add_argument("--max_episodes", type=int, default=50, help="max episodes")
+parser.add_argument("--max_episodes", type=int, default=1, help="max episodes")
 parser.add_argument('--save_root', type=str, default='.', help='Base directory for saving models, logs, and figures')
 parser.add_argument('--run_name', type=str, default='gpt_version', help='Optional identifier appended to save directories to avoid overwriting previous runs')
 parser.add_argument('--render', action='store_true', help='Enable environment rendering (SUMO GUI when available)')
@@ -58,6 +61,7 @@ parser.add_argument('--sumo_schedule', type=str, default='initialize_obj/save_ob
 parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks, format module:function')
 parser.add_argument('--sumo_gui', action='store_true', help='Launch SUMO with GUI (implies rendering)')
 parser.add_argument('--passenger_update_freq', type=int, default=10, help='Frequency of passenger/stop state updates (in steps)')
+parser.add_argument('--profile', action='store_true', help='Enable cProfile performance analysis')
 args = parser.parse_args()
 
 
@@ -675,6 +679,18 @@ if not getattr(env, 'expects_nested_actions', False):
 
 env.reset()
 
+# Initialize Trajectory Log
+with open("trajectory_log.csv", "w") as f:
+    f.write("LineID,BusID,Step,S_Stop,NS_Stop,Action,Reward,S_Fwd_Headway,S_Bwd_Headway\n")
+
+# Initialize Action Log
+with open("action_log.csv", "w") as f:
+    f.write("LineID,BusID,Step,StopID,Action,Fwd_Headway,Bwd_Headway\n")
+
+# Initialize buffers for logging
+trajectory_log_buffer = []
+action_log_buffer = []
+
 action_dim = env.action_space.shape[0]
 action_range = env.action_space.high[0]
 
@@ -715,6 +731,10 @@ tracemalloc.start()
 sac_trainer = SAC_Trainer(env, replay_buffer, hidden_dim=hidden_dim, action_range=action_range)
 
 if __name__ == '__main__':
+    if args.profile:
+        profiler = cProfile.Profile()
+        profiler.enable()
+
     if args.train:
         # training loop
         for eps in range(args.max_episodes):
@@ -742,6 +762,16 @@ if __name__ == '__main__':
                                     state_vec = sac_trainer.state_norm(state_vec)
                                 action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
                                 action_dict[line_id][bus_id] = action
+                                
+                                # Action Logging (Case 1: First Stop)
+                                action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
+                                stop_id = history[0][station_feature_idx]
+                                fwd_h = history[0][5]
+                                bwd_h = history[0][6]
+                                log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+                                action_log_buffer.append(log_entry)
+                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, Stop {stop_id}, Action {action_val:.4f}")
+
                         elif len(history) >= 2:
                             state_vec = np.array(history[0])
                             next_state_vec = np.array(history[1])
@@ -750,6 +780,16 @@ if __name__ == '__main__':
                                 next_state_vec = sac_trainer.state_norm(next_state_vec)
                             if action_dict[line_id][bus_id] is None:
                                 action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
+                                
+                                # Action Logging (Case 2: Subsequent Stops - Initial Action)
+                                action_val = action_dict[line_id][bus_id]
+                                if isinstance(action_val, (np.ndarray, list)):
+                                    action_val = action_val[0]
+                                stop_id = history[0][station_feature_idx]
+                                fwd_h = history[0][5]
+                                bwd_h = history[0][6]
+                                log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+                                action_log_buffer.append(log_entry)
 
                             records_available = len(history[0]) > station_feature_idx and len(history[1]) > station_feature_idx
                             station_changed = history[0][station_feature_idx] != history[1][station_feature_idx] if records_available else True
@@ -763,18 +803,47 @@ if __name__ == '__main__':
                                 step += 1
                                 episode_reward += raw_reward
                                 
-                                # DEBUG: Verify Replay Buffer Integrity
+                                # Trajectory Logging
+                                action_val = action_dict[line_id][bus_id]
+                                if isinstance(action_val, (np.ndarray, list)):
+                                    action_val = action_val[0]
                                 s_stop = history[0][station_feature_idx]
                                 ns_stop = history[1][station_feature_idx]
-                                print(f"DEBUG_RB: Line {line_id} Bus {bus_id} Step {step} | S_Stop {s_stop} -> NS_Stop {ns_stop} | Reward {raw_reward:.2f}")
+                                s_fwd_h = history[0][5]
+                                s_bwd_h = history[0][6]
+                                log_entry = f"{line_id},{bus_id},{step},{s_stop},{ns_stop},{action_val:.4f},{raw_reward:.4f},{s_fwd_h:.2f},{s_bwd_h:.2f}\n"
+                                trajectory_log_buffer.append(log_entry)
+                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, S_Stop {s_stop}, NS_Stop {ns_stop}, Action {action_val:.4f}, Reward {raw_reward:.4f}")
 
                             state_dict[line_id][bus_id] = history[1:]
                             updated_state_vec = np.array(state_dict[line_id][bus_id][0])
                             if args.use_state_norm:
                                 updated_state_vec = sac_trainer.state_norm(updated_state_vec)
                             action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(updated_state_vec).float(), deterministic=DETERMINISTIC)
+                            
+                            # Action Logging (Case 3: Subsequent Stops - Next Action)
+                            action_val = action_dict[line_id][bus_id]
+                            if isinstance(action_val, (np.ndarray, list)):
+                                action_val = action_val[0]
+                            current_state = state_dict[line_id][bus_id][0]
+                            stop_id = current_state[station_feature_idx]
+                            fwd_h = current_state[5]
+                            bwd_h = current_state[6]
+                            log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+                            action_log_buffer.append(log_entry)
 
                 state_dict, reward_dict, done = safe_step(env, action_dict, render=render)
+                
+                # Flush logs periodically (e.g., every 1000 steps) to avoid memory issues
+                if step % 1000 == 0:
+                    if action_log_buffer:
+                        with open("action_log.csv", "a") as f:
+                            f.writelines(action_log_buffer)
+                        action_log_buffer = []
+                    if trajectory_log_buffer:
+                        with open("trajectory_log.csv", "a") as f:
+                            f.writelines(trajectory_log_buffer)
+                        trajectory_log_buffer = []
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
                     for i in range(update_itr):
@@ -837,12 +906,6 @@ if __name__ == '__main__':
                 # for stat in snapshot.statistics('lineno')[:10]:
                 #     print(stat)  # 显示内存占用最大的10行
             replay_buffer_usage = len(replay_buffer) / replay_buffer_size * 100
-            
-            print(
-                f"Episode: {eps} | Episode Reward: {episode_reward} "
-                f"| CPU Memory: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB | "
-                f"GPU Memory Allocated: {torch.cuda.memory_allocated() / 1024 ** 2:.2f} MB | "
-                f"Replay Buffer Usage: {replay_buffer_usage:.2f}%")
           # 在训练结束时保存完整模型（包括critic和actor）
         sac_trainer.save_model(model_path)
         
