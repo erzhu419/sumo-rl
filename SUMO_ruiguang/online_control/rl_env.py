@@ -86,7 +86,7 @@ class SumoBusHoldingEnv:
         self._time_period_index: Dict[int, int] = {}
 
         self.cat_cols = ["line_id", "bus_id", "station_id", "time_period", "direction"]
-        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration"]
+        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time"]
 
         self._state_buffers: Dict[str, Dict[str, List[List[float]]]] = defaultdict(lambda: defaultdict(list))
         self._reward_buffers: Dict[str, Dict[str, float]] = defaultdict(dict)
@@ -302,6 +302,18 @@ class SumoBusHoldingEnv:
         direction = int(event.direction)
 
         target_headway = self._line_headway.get(event.line_id, self.headway_fallback)
+        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time"]
+
+    def _register_event(self, event: DecisionEvent) -> None:
+        line_idx = self._line_index.setdefault(event.line_id, len(self._line_index))
+        if event.bus_id not in self._bus_index:
+            self._bus_index[event.bus_id] = len(self._bus_index)
+        bus_idx = self._bus_index[event.bus_id]
+        station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
+        time_period_idx = self._encode_time_period(event.sim_time)
+        direction = int(event.direction)
+
+        target_headway = self._line_headway.get(event.line_id, self.headway_fallback)
         obs = [
             float(line_idx),
             float(bus_idx),
@@ -313,6 +325,7 @@ class SumoBusHoldingEnv:
             float(event.waiting_passengers),
             float(target_headway),
             float(event.base_stop_duration),
+            float(event.sim_time),
         ]
 
         reward = self._compute_reward(event, target_headway)
@@ -327,13 +340,23 @@ class SumoBusHoldingEnv:
         # Note: target_headway arg is kept for compatibility but we use event-specific targets
         
         def headway_reward(headway, target):
-            return -abs(headway - target)
+            dev = abs(headway - target)
+            if dev <= 10:
+                return 100.0  # Perfect match
+            elif dev <= 60:
+                return 5.0    # Small deviation
+            else:
+                return np.exp(-dev) * 10.0  # Large deviation, decaying positive reward
 
         forward_reward = headway_reward(event.forward_headway, event.target_forward_headway) if event.forward_bus_present else None
         backward_reward = headway_reward(event.backward_headway, event.target_backward_headway) if event.backward_bus_present else None
 
         if forward_reward is not None and backward_reward is not None:
-            weight = abs(event.forward_headway - event.target_forward_headway) / (abs(event.forward_headway - event.target_forward_headway) + abs(event.backward_headway - event.target_backward_headway) + 1e-6)
+            # Weight emphasizes the larger deviation (worse headway)
+            fwd_dev = abs(event.forward_headway - event.target_forward_headway)
+            bwd_dev = abs(event.backward_headway - event.target_backward_headway)
+            weight = fwd_dev / (fwd_dev + bwd_dev + 1e-6)
+            
             similarity_bonus = -abs(event.forward_headway - event.backward_headway) * 0.5
             reward = forward_reward * weight + backward_reward * (1 - weight) + similarity_bonus
         elif forward_reward is not None:
@@ -343,18 +366,30 @@ class SumoBusHoldingEnv:
         else:
             reward = -50.0
 
-        # Threshold is 0.5 * target (proportional to schedule)
-        if (event.forward_bus_present and abs(event.forward_headway - event.target_forward_headway) > event.target_forward_headway * 0.5) or \
-           (event.backward_bus_present and abs(event.backward_headway - event.target_backward_headway) > event.target_backward_headway * 0.5):
+        # Threshold penalty (kept from LSTM-RL logic)
+        if (event.forward_bus_present and abs(event.forward_headway - event.target_forward_headway) > 180) or \
+           (event.backward_bus_present and abs(event.backward_headway - event.target_backward_headway) > 180):
             reward -= 20.0
+            
         return reward
 
     def _snapshot_state(self) -> Dict[str, Dict[str, List[List[float]]]]:
         # Return the reference to _state_buffers so the agent can modify/consume it
-        return self._state_buffers
+        # CRITICAL FIX: Only return states for buses that have a PENDING decision event.
+        # This matches LSTM-RL logic where only buses in WAITING_ACTION state are returned.
+        snapshot = defaultdict(dict)
+        for (line_id, bus_id) in self._pending_events.keys():
+            if line_id in self._state_buffers and bus_id in self._state_buffers[line_id]:
+                snapshot[line_id][bus_id] = self._state_buffers[line_id][bus_id]
+        return snapshot
 
     def _snapshot_reward(self) -> Dict[str, Dict[str, float]]:
-        return {line: dict(buses) for line, buses in self._reward_buffers.items()}
+        # Similarly, only return rewards for the current pending events
+        snapshot = defaultdict(dict)
+        for (line_id, bus_id) in self._pending_events.keys():
+            if line_id in self._reward_buffers and bus_id in self._reward_buffers[line_id]:
+                snapshot[line_id][bus_id] = self._reward_buffers[line_id][bus_id]
+        return snapshot
     # endregion
 
 

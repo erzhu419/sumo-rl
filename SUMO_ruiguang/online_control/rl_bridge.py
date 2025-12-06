@@ -87,6 +87,7 @@ class SumoRLBridge:
 
         self.busline_edge_order = {}
         self.involved_tl_ID_l = []
+        self.line_headways = {}  # Store median headway per line
 
     # region SUMO lifecycle
     def reset(self) -> None:
@@ -187,6 +188,10 @@ class SumoRLBridge:
         self.line_obj_dic = result[3]
         self.bus_obj_dic = result[4]
         self.passenger_obj_dic = result[5]
+        for bus in self.bus_obj_dic.values():
+            bus.last_forward_headway = None  # Store the last calculated forward headway (for backward bus logic)
+            if not hasattr(bus, 'trajectory_dict'):
+                bus.trajectory_dict = defaultdict(list)
 
         (
             _,
@@ -225,6 +230,22 @@ class SumoRLBridge:
 
         for line_id, line in self.line_obj_dic.items():
             self.stop_indices[line_id] = {stop_id: idx for idx, stop_id in enumerate(line.stop_id_l)}
+
+        # Compute median headway for each line
+        for line_id, line in self.line_obj_dic.items():
+            # Find all buses for this line
+            buses = [b for b in self.bus_obj_dic.values() if b.belong_line_id_s == line_id]
+            if len(buses) > 1:
+                buses.sort(key=lambda b: b.start_time_n)
+                start_times = [b.start_time_n for b in buses]
+                diffs = [j - i for i, j in zip(start_times[:-1], start_times[1:])]
+                if diffs:
+                    self.line_headways[line_id] = float(np.median(diffs))
+                else:
+                    self.line_headways[line_id] = self.default_headway
+            else:
+                self.line_headways[line_id] = self.default_headway
+        # print(f"Computed Line Headways: {self.line_headways}")
 
     # endregion
 
@@ -381,20 +402,16 @@ class SumoRLBridge:
         
         return forward_bus, backward_bus
 
-    def _compute_robust_headway(self, subject_bus, front_bus, stop_id, current_time, target_headway=360.0) -> float:
+    def _compute_robust_headway(self, subject_bus, front_bus, stop_id, current_time, target_headway=360.0, force_distance=False) -> float:
         if not front_bus or not subject_bus:
             return target_headway
             
         # 1. Try trajectory-based calculation (if front bus has arrived at this stop)
-        # Note: We check front_bus trajectory because we want (Subject Arrival - Front Arrival)
-        # But here 'current_time' is effectively Subject Arrival (or estimation of it)
-        if stop_id in front_bus.trajectory_dict and front_bus.trajectory_dict[stop_id]:
+        if not force_distance and stop_id in front_bus.trajectory_dict and front_bus.trajectory_dict[stop_id]:
             front_arrive_time = front_bus.trajectory_dict[stop_id][-1]
-            # Headway = Subject Arrival - Front Arrival
             return current_time - front_arrive_time
             
         # 2. Fallback to distance-based calculation
-        # Headway = -(Subject Dist - Front Dist) / Subject Speed
         dist_diff = subject_bus.distance_n - front_bus.distance_n
         
         # Calculate subject average speed
@@ -440,20 +457,36 @@ class SumoRLBridge:
                 continue
                 
             # Dynamic Target Headway Calculation
-            target_forward = 360.0
+            default_line_headway = self.line_headways.get(line_id, self.default_headway)
+            
+            target_forward = default_line_headway
             if forward_bus:
                 target_forward = abs(bus_obj.start_time_n - forward_bus.start_time_n)
                 
-            target_backward = 360.0
+            target_backward = default_line_headway
             if backward_bus:
                 target_backward = abs(backward_bus.start_time_n - bus_obj.start_time_n)
                 
+            # Service Completion Time: When passenger exchange finishes (Arrive + Duration)
+            # This is the exact time point used for Headway calculation in LSTM-RL
+            service_completion_time = arrive_time + base_duration
+
             # Robust Headway Calculation
             # Forward Headway: Me - Front
-            forward_headway = self._compute_robust_headway(bus_obj, forward_bus, stop_id, simulation_current_time, target_headway=target_forward)
+            # Use service_completion_time instead of simulation_current_time for precision
+            forward_headway = self._compute_robust_headway(bus_obj, forward_bus, stop_id, service_completion_time, target_headway=target_forward)
+            
+            # Store this forward headway for the backward bus to use later
+            bus_obj.last_forward_headway = forward_headway
+
             # Backward Headway: Back - Me
             # Note: We pass backward_bus as subject, bus_obj as front
-            backward_headway = self._compute_robust_headway(backward_bus, bus_obj, stop_id, simulation_current_time, target_headway=target_backward)
+            # CRITICAL UPDATE: Use the backward bus's *stored* forward headway (stale but exact), matching LSTM-RL logic.
+            # If backward bus hasn't recorded a headway yet (e.g. just started), fallback to target.
+            if backward_bus and backward_bus.last_forward_headway is not None:
+                backward_headway = backward_bus.last_forward_headway
+            else:
+                backward_headway = target_backward
 
             stop_idx = self.stop_indices[line_id].get(stop_id, -1)
             direction = 1 if line_id.endswith('S') else 0
@@ -492,6 +525,10 @@ class SumoRLBridge:
             self.decision_queue.append(event)
             self.pending_events[key] = event
             self.arrival_history[line_id][stop_id].append(arrive_time)
+            
+            # Populate trajectory_dict with SERVICE COMPLETION time
+            # This matches LSTM-RL logic: current_time + holding_time
+            bus_obj.trajectory_dict[stop_id].append(service_completion_time)
 
     def _cleanup_departed_buses(self) -> None:
         to_remove = []

@@ -31,6 +31,10 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         self.arriver_signal_queue_info_l = ["", 0, 0]   # 公交车到达交叉口处排队处，距离信号灯停止线的距离，列表类型（到信号灯并进行排队才更新）[公交车到达队尾时所处路段，公交车到达队尾的时间，到达队尾时与信号灯的距离]
         self.subsequent_signal_info_d = {}            # 公交车后面要经过的各信号灯的信息，字典类型（触发更新）{信号灯ID:[当前时间，当前相位ID，绿灯时长，信号周期时长，绿灯或红灯已经经过的时长，信号周期已经经过的时长，当前车道排队长度，平均延误时间]...}
         self.trajectory_dict = {}                     # 轨迹记录 {stop_id: [arrive_time, ...]}，用于计算Headway
+        
+        # Optimization: Cache for getNextLinks
+        self.cached_next_links = None
+        self.cached_lane = None
 
         """容器属性"""
         self.bus_speed_l = []                         # 公交车的速度，列表类型（每秒更新） [速度值,速度值,...]
@@ -47,6 +51,17 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
         self.stop_signal_id_list_l = []               # 有在信号灯排队的信号灯标签，列表类型（离信号灯排队更新） [信号灯标签,信号灯标签,...]
         self.bus_served_lane_l = []                   # 公交车经过的车道id，列表类型（每秒更新） [车道id,车道id,...]
 
+
+    def _get_next_links(self):
+        """
+        Optimized wrapper for traci.vehicle.getNextLinks.
+        Caches the result based on the current lane ID.
+        """
+        current_lane = traci.vehicle.getLaneID(self.bus_id_s)
+        if current_lane != self.cached_lane or self.cached_next_links is None:
+            self.cached_lane = current_lane
+            self.cached_next_links = traci.vehicle.getNextLinks(self.bus_id_s)
+        return self.cached_next_links
 
     def get_arriver_timetable(self, line_obj_ex):
         stop_id_list = line_obj_ex.stop_id_l
@@ -83,7 +98,7 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
             next_stop_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
                                    traci.vehicle.getLanePosition(self.bus_id_s))
             # 遍历后续车道，累加距离直到到达目标站点车道
-            for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
+            for traci_lane_obj in self._get_next_links():
                 next_stop_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                 # 检查是否到达目标站点所在车道（通过车道ID前缀匹配）
                 if traci_lane_obj[0][:-2] == stop_obj_dic_ex[self.next_stop_id_s].at_lane_s[:-2]:
@@ -108,7 +123,7 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
             next_signal_length_n += (traci.lane.getLength(traci.vehicle.getLaneID(self.bus_id_s)) -
                                      traci.vehicle.getLanePosition(self.bus_id_s))
             # 遍历后续车道，累加距离直到到达目标信号灯车道
-            for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
+            for traci_lane_obj in self._get_next_links():
                 next_signal_length_n += traci.lane.getLength(traci_lane_obj[0]) + traci_lane_obj[-1]
                 # 检查是否到达目标信号灯所在车道（通过车道ID前缀匹配）
                 if traci_lane_obj[0][:-2] == self.next_signal_lane_s[:-2]:
@@ -321,7 +336,7 @@ class Bus:    # 创建一个公交车类,用于描述每一个公交车的属性
             else:
                 next_stop_length_n += (traci.lane.getLength(current_lane) -
                                        traci.vehicle.getLanePosition(self.bus_id_s))
-                for traci_lane_obj in traci.vehicle.getNextLinks(self.bus_id_s):
+                for traci_lane_obj in self._get_next_links():
                     # 判断是否公交车处于临进入公交站情况，这种情况下traci.vehicle.getNextLinks(self.bus_id_s)会直接跳过临进入的公交站，导致无法获取准确的公交车到达下一个公交站的距离
                     busline_edge_l = list(sorted_busline_edge_d[self.belong_line_id_s].keys())
                     
