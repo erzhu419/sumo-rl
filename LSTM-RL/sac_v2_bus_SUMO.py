@@ -674,6 +674,7 @@ if use_sumo_env:
         action_executor=action_executor,
         reset_callback=reset_cb,
         close_callback=close_cb,
+        debug=debug,
     )
 else:
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
@@ -778,48 +779,52 @@ if __name__ == '__main__':
                                 # Action Logging (Case 1: First Stop)
                                 action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
                                 stop_id = history[0][station_feature_idx]
+                                sim_time = history[0][-1]
                                 fwd_h = history[0][5]
                                 bwd_h = history[0][6]
                                 log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
                                 action_log_buffer.append(log_entry)
-                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, Stop {stop_id}, Action {action_val:.4f}")
+                                
+                                if debug:
+                                    # Format: From Algorithm, when no state, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+                                    print(f'From Algorithm, when no state, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
+                                    print()
 
                         elif len(history) >= 2:
                             state_vec = np.array(history[0])
                             next_state_vec = np.array(history[1])
-                            if args.use_state_norm:
-                                state_vec = sac_trainer.state_norm(state_vec)
-                                next_state_vec = sac_trainer.state_norm(next_state_vec)
-                            if action_dict[line_id][bus_id] is None:
-                                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
+                            
+                            # Check if station changed (valid transition)
+                            if history[0][station_feature_idx] != history[1][station_feature_idx]:
+                                if args.use_state_norm:
+                                    state_vec_norm = sac_trainer.state_norm(state_vec)
+                                    next_state_vec_norm = sac_trainer.state_norm(next_state_vec)
+                                else:
+                                    state_vec_norm = state_vec
+                                    next_state_vec_norm = next_state_vec
                                 
-                                # Action Logging (Case 2: Subsequent Stops - Initial Action)
-                                action_val = action_dict[line_id][bus_id]
-                                if isinstance(action_val, (np.ndarray, list)):
-                                    action_val = action_val[0]
-                                stop_id = history[0][station_feature_idx]
-                                fwd_h = history[0][5]
-                                bwd_h = history[0][6]
-                                log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
-                                action_log_buffer.append(log_entry)
+                                current_reward = get_reward_value(reward_dict, line_id, bus_id)
+                                if args.use_reward_scaling:
+                                    scaled_reward = sac_trainer.reward_scaling(current_reward)
+                                else:
+                                    scaled_reward = current_reward
 
-                            records_available = len(history[0]) > station_feature_idx and len(history[1]) > station_feature_idx
-                            station_changed = history[0][station_feature_idx] != history[1][station_feature_idx] if records_available else True
-                            # Debug SUMO states
-
-                            if station_changed:
-                                raw_reward = get_reward_value(reward_dict, line_id, bus_id)
-                                stored_reward = sac_trainer.reward_scaling(raw_reward) if args.use_reward_scaling else raw_reward
-                                replay_buffer.push(state_vec, action_dict[line_id][bus_id], stored_reward, next_state_vec, done)
-                                episode_steps += 1
-                                step += 1
-                                episode_reward += raw_reward
-                                # DEBUG: Check for large negative rewards
-                                if raw_reward < -100:
-                                    print(f"DEBUG_REWARD: Line {line_id}, Bus {bus_id}, Step {step}, Reward {raw_reward:.2f}, EpReward {episode_reward:.2f}, Fwd {history[0][5]:.2f}, Bwd {history[0][6]:.2f}")
+                                # Retrieve stored action
+                                stored_action = action_dict[line_id][bus_id] if action_dict[line_id][bus_id] is not None else 0.0
+                                
+                                replay_buffer.push(state_vec_norm, stored_action, scaled_reward, next_state_vec_norm, done)
+                                
+                                if debug:
+                                    # Format: From Algorithm store, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+                                    # Note: using history[0] (previous state) for station id and time to match the 'store' context
+                                    store_time = history[0][-1]
+                                    store_stop = history[0][station_feature_idx]
+                                    # print(f'From Algorithm store, Bus id: {line_id}_{bus_id} , station id is: {int(store_stop)} , current time is: {store_time:.1f} , action is: {stored_action}, reward: {current_reward:.4f}')
+                                    pass
                                 
                                 # Trajectory Logging
-                                action_val = action_dict[line_id][bus_id]
+                                raw_reward = current_reward
+                                action_val = stored_action
                                 if isinstance(action_val, (np.ndarray, list)):
                                     action_val = action_val[0]
                                 s_stop = history[0][station_feature_idx]
@@ -828,37 +833,62 @@ if __name__ == '__main__':
                                 s_bwd_h = history[0][6]
                                 log_entry = f"{line_id},{bus_id},{step},{s_stop},{ns_stop},{action_val:.4f},{raw_reward:.4f},{s_fwd_h:.2f},{s_bwd_h:.2f}\n"
                                 trajectory_log_buffer.append(log_entry)
-                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, S_Stop {s_stop}, NS_Stop {ns_stop}, Action {action_val:.4f}, Reward {raw_reward:.4f}")
+                                # DEBUG: Check for large negative rewards
+                                if raw_reward < -100:
+                                    print(f"DEBUG_REWARD: Line {line_id}, Bus {bus_id}, Step {step}, Reward {raw_reward:.2f}, EpReward {episode_reward:.2f}, Fwd {history[0][5]:.2f}, Bwd {history[0][6]:.2f}")
 
-                            state_dict[line_id][bus_id] = history[1:]
-                            updated_state_vec = np.array(state_dict[line_id][bus_id][0])
-                            if args.use_state_norm:
-                                updated_state_vec = sac_trainer.state_norm(updated_state_vec)
-                            action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(updated_state_vec).float(), deterministic=DETERMINISTIC)
+                                episode_steps += 1
+                                step += 1
+                                episode_reward += current_reward
+
+                            # Initializing Action for Next State
+                            state_dict[line_id][bus_id] = history[1:] # Shift history
+                            # Now history is history[1:] - [0] is the NEW state
                             
-                            # Action Logging (Case 3: Subsequent Stops - Next Action)
-                            action_val = action_dict[line_id][bus_id]
-                            if isinstance(action_val, (np.ndarray, list)):
-                                action_val = action_val[0]
-                            current_state = state_dict[line_id][bus_id][0]
-                            stop_id = current_state[station_feature_idx]
-                            fwd_h = current_state[5]
-                            bwd_h = current_state[6]
+                            new_state_vec = np.array(state_dict[line_id][bus_id][0])
+                            if args.use_state_norm:
+                                new_state_vec_norm = sac_trainer.state_norm(new_state_vec)
+                            else:
+                                new_state_vec_norm = new_state_vec
+
+                            action = sac_trainer.policy_net.get_action(torch.from_numpy(new_state_vec_norm).float(), deterministic=DETERMINISTIC)
+                            action_dict[line_id][bus_id] = action
+
+                            # Action Logging (Case 2: Subsequent Stops - Initial Action)
+                            action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
+                            stop_id = state_dict[line_id][bus_id][0][station_feature_idx]
+                            sim_time = state_dict[line_id][bus_id][0][-1]
+                            fwd_h = state_dict[line_id][bus_id][0][5]
+                            bwd_h = state_dict[line_id][bus_id][0][6]
                             log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
                             action_log_buffer.append(log_entry)
+                            
+                            if debug:
+                                # Format: From Algorithm run, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+                                # print(f'From Algorithm run, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
+                                # print(f"DEBUG_SET: Bus {line_id}_{bus_id} key={line_id},{bus_id} Val={action} DictVal={action_dict.get(line_id, {}).get(bus_id)}")
+                                pass
+            
+            # DEBUG: Trace action_dict before step
+            if debug:
+                # for line_id, buses in action_dict.items():
+                #     for bus_id, action in buses.items():
+                #         if action is not None:
+                #             print(f"DEBUG_TRACE Pre-Step: Bus {line_id}_{bus_id} Action={action}")
+                pass
 
-                state_dict, reward_dict, done = safe_step(env, action_dict, render=render)
-                
-                # Flush logs periodically (e.g., every 1000 steps) to avoid memory issues
-                if step % 1000 == 0:
-                    if action_log_buffer:
-                        with open("action_log.csv", "a") as f:
-                            f.writelines(action_log_buffer)
-                        action_log_buffer = []
-                    if trajectory_log_buffer:
-                        with open("trajectory_log.csv", "a") as f:
-                            f.writelines(trajectory_log_buffer)
-                        trajectory_log_buffer = []
+            state_dict, reward_dict, done = safe_step(env, action_dict, render=render)
+
+            # Flush logs periodically (e.g., every 1000 steps)
+            if step % 1000 == 0:
+                if action_log_buffer:
+                    with open("action_log.csv", "a") as f:
+                        f.writelines(action_log_buffer)
+                    action_log_buffer = []
+                if trajectory_log_buffer:
+                    with open("trajectory_log.csv", "a") as f:
+                        f.writelines(trajectory_log_buffer)
+                    trajectory_log_buffer = []
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
                     for i in range(update_itr):
@@ -968,7 +998,6 @@ if __name__ == '__main__':
 
             done = False
             env.reset()
-            state_dict, reward_dict, _ = safe_initialize_state(env, render=render)
             episode_reward = 0
             action_dict = build_action_template(state_dict)
             station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1

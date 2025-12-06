@@ -1,6 +1,6 @@
-import libsumo
-traci = libsumo
-LIBSUMO = True
+import traci
+# traci = libsumo
+LIBSUMO = False
 import os
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -65,7 +65,9 @@ class SumoBusHoldingEnv:
         close_callback: Optional[Callable[[], None]] = None,
         time_period_span: int = 3600,
         headway_fallback: float = 360.0,
+        debug: bool = False,
     ) -> None:
+        self.debug = debug
         self.root_dir = os.path.abspath(root_dir)
         self.schedule_path = schedule_file if os.path.isabs(schedule_file) else os.path.join(self.root_dir, schedule_file)
         if not os.path.exists(self.schedule_path):
@@ -188,6 +190,13 @@ class SumoBusHoldingEnv:
         return self._snapshot_state(), self._snapshot_reward(), self._done
 
     def step(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> Tuple[Dict[str, Dict[str, List[List[float]]]], Dict[str, Dict[str, float]], bool]:
+        # DEBUG: Trace action_dict at start of step
+        # using print to stdout
+        # for line_id_key, bus_actions in action_dict.items():
+        #     for bus_id_key, action_val in bus_actions.items():
+        #         if action_val is not None:
+        #             print(f"DEBUG_TRACE Env-Step: Bus {line_id_key}_{bus_id_key} Action={action_val}")
+        
         self._apply_actions(action_dict)
         if not self._done:
             self._advance_until_state()
@@ -217,6 +226,16 @@ class SumoBusHoldingEnv:
                     continue
                 hold_value = float(action_value)
                 hold_value = max(0.0, hold_value)
+                
+                # DEBUG: Print simulation-side action application
+                # Format: Simulation: Bus id: ... , station id: ... , dwelling time is: ...
+                # Matching temp_lstm_rl/env/bus.py line 286
+                # We need to look up event details if possible, but event was popped.
+                # 'event' variable is available here.
+                if event:
+                    station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
+                    print(f"Simulation: Bus id: {event.line_id}_{event.bus_id} , station id: {station_idx} , dwelling time is: {hold_value:.4f}")
+
                 self.action_executor(event, hold_value)
 
     def _advance_until_state(self) -> None:
@@ -366,10 +385,14 @@ class SumoBusHoldingEnv:
         else:
             reward = -50.0
 
-        # Threshold penalty (kept from LSTM-RL logic)
         if (event.forward_bus_present and abs(event.forward_headway - event.target_forward_headway) > 180) or \
            (event.backward_bus_present and abs(event.backward_headway - event.target_backward_headway) > 180):
             reward -= 20.0
+        
+        # DEBUG: Print simulation-side reward calculation
+        # Format: From Simulation , bus id is: ... , station id is: ... , current time: ... , reward: ...
+        # Matching temp_lstm_rl/env/bus.py line 270
+        # print(f"From Simulation , bus id is: {event.line_id}_{event.bus_id}, station id is: {self._encode_station(event.line_id, event.stop_id, event.stop_idx)} , current time: {event.sim_time:.1f} , reward: {reward:.4f}")
             
         return reward
 
