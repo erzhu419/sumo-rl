@@ -42,7 +42,7 @@ parser.add_argument('--test', dest='test', action='store_true', default=False)
 parser.add_argument('--use_gradient_clip', type=bool, default=True, help="Trick 1:gradient clipping")
 parser.add_argument("--use_state_norm", type=bool, default=False, help="Trick 2:state normalization")
 parser.add_argument("--use_reward_norm", type=bool, default=False, help="Trick 3:reward normalization")
-parser.add_argument("--use_reward_scaling", type=bool, default=False, help="Trick 4:reward scaling")
+parser.add_argument("--use_reward_scaling", type=bool, default=True, help="Trick 4:reward scaling")
 parser.add_argument("--gamma", type=float, default=0.99, help="Discount factor 0.99")
 parser.add_argument("--training_freq", type=int, default=10, help="frequency of training the network")
 parser.add_argument("--plot_freq", type=int, default=1, help="frequency of plotting the result")
@@ -50,7 +50,7 @@ parser.add_argument('--weight_reg', type=float, default=0.1, help='weight of reg
 parser.add_argument('--auto_entropy', type=bool, default=True, help='automatically updating alpha')
 parser.add_argument("--maximum_alpha", type=float, default=0.3, help="max entropy weight")
 parser.add_argument("--batch_size", type=int, default=2048, help="batch size")
-parser.add_argument("--max_episodes", type=int, default=100, help="max episodes")
+parser.add_argument("--max_episodes", type=int, default=1, help="max episodes")
 parser.add_argument('--save_root', type=str, default='.', help='Base directory for saving models, logs, and figures')
 parser.add_argument('--run_name', type=str, default='gpt_version', help='Optional identifier appended to save directories to avoid overwriting previous runs')
 parser.add_argument('--render', action='store_true', help='Enable environment rendering (SUMO GUI when available)')
@@ -562,7 +562,6 @@ def evaluate_policy(sac_trainer, env, num_eval_episodes=5, deterministic=True):
     eval_rewards = []
     
     for eval_ep in range(num_eval_episodes):
-        print(f"Evaluating episode {eval_ep + 1}/{num_eval_episodes}...")
         env.reset()
         state_dict, reward_dict, _ = safe_initialize_state(env, render=False)
         
@@ -591,16 +590,12 @@ def evaluate_policy(sac_trainer, env, num_eval_episodes=5, deterministic=True):
                         state_tensor = torch.from_numpy(state_input).float()
                         action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
 
-            state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=False)
+            state_dict, reward_dict, done = safe_step(env, action_dict, render=False)
 
         eval_rewards.append(episode_reward)
     
-    if len(eval_rewards) > 0:
-        mean_reward = np.mean(eval_rewards)
-        reward_std = np.std(eval_rewards)
-    else:
-        mean_reward = 0.0
-        reward_std = 0.0
+    mean_reward = np.mean(eval_rewards)
+    reward_std = np.std(eval_rewards)
     
     return mean_reward, reward_std
 
@@ -667,8 +662,6 @@ if use_sumo_env:
     if decision_provider is None or action_executor is None:
         raise ValueError("Bridge must provide decision_provider and action_executor")
     from SUMO_ruiguang.online_control.rl_env import SumoBusHoldingEnv
-    import inspect
-    # print(f"DEBUG_IMPORT: SumoBusHoldingEnv loaded from {inspect.getfile(SumoBusHoldingEnv)}", flush=True)
     env = SumoBusHoldingEnv(
         root_dir=args.sumo_root,
         schedule_file=args.sumo_schedule,
@@ -676,7 +669,6 @@ if use_sumo_env:
         action_executor=action_executor,
         reset_callback=reset_cb,
         close_callback=close_cb,
-        debug=debug,
     )
 else:
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
@@ -756,9 +748,7 @@ if __name__ == '__main__':
             action_dict = build_action_template(state_dict)
             episode_reward = 0
             station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
-            last_heartbeat_time = 0.0
-            loop_count = 0
-            
+
             while not done:
                 action_dict = build_action_template(state_dict, action_dict)
                 for line_id, buses in state_dict.items():
@@ -772,62 +762,49 @@ if __name__ == '__main__':
                                     state_vec = sac_trainer.state_norm(state_vec)
                                 action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
                                 action_dict[line_id][bus_id] = action
-                                    
+                                
                                 # Action Logging (Case 1: First Stop)
                                 action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
                                 stop_id = history[0][station_feature_idx]
-                                sim_time = history[0][-1]
                                 fwd_h = history[0][5]
                                 bwd_h = history[0][6]
                                 log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
                                 action_log_buffer.append(log_entry)
-                                    
-                                if debug:
-                                    # Format: From Algorithm, when no state, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
-                                    print(f'From Algorithm, when no state, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
-                                    print()
-    
+                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, Stop {stop_id}, Action {action_val:.4f}")
+
                         elif len(history) >= 2:
                             state_vec = np.array(history[0])
                             next_state_vec = np.array(history[1])
-                            
-                            # Check if station changed (valid transition)
-                            if history[0][station_feature_idx] != history[1][station_feature_idx]:
-                                if args.use_state_norm:
-                                    state_vec_norm = sac_trainer.state_norm(state_vec)
-                                    next_state_vec_norm = sac_trainer.state_norm(next_state_vec)
-                                else:
-                                    state_vec_norm = state_vec
-                                    next_state_vec_norm = next_state_vec
-                                    
-                                current_reward = get_reward_value(reward_dict, line_id, bus_id)
-                                if args.use_reward_scaling:
-                                    scaled_reward = sac_trainer.reward_scaling(current_reward)
-                                else:
-                                    scaled_reward = current_reward
-    
-                                # Retrieve stored action
-                                stored_action = action_dict[line_id][bus_id]
-                                if stored_action is None:
-                                    stored_action = np.zeros(action_dim, dtype=np.float32)
-                                elif np.isscalar(stored_action):
-                                    stored_action = np.array([stored_action], dtype=np.float32)
-                                else:
-                                    stored_action = np.array(stored_action, dtype=np.float32).reshape(-1)
+                            if args.use_state_norm:
+                                state_vec = sac_trainer.state_norm(state_vec)
+                                next_state_vec = sac_trainer.state_norm(next_state_vec)
+                            if action_dict[line_id][bus_id] is None:
+                                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
                                 
-                                replay_buffer.push(state_vec_norm, stored_action, scaled_reward, next_state_vec_norm, done)
+                                # Action Logging (Case 2: Subsequent Stops - Initial Action)
+                                action_val = action_dict[line_id][bus_id]
+                                if isinstance(action_val, (np.ndarray, list)):
+                                    action_val = action_val[0]
+                                stop_id = history[0][station_feature_idx]
+                                fwd_h = history[0][5]
+                                bwd_h = history[0][6]
+                                log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+                                action_log_buffer.append(log_entry)
+
+                            records_available = len(history[0]) > station_feature_idx and len(history[1]) > station_feature_idx
+                            station_changed = history[0][station_feature_idx] != history[1][station_feature_idx] if records_available else True
+                            # Debug SUMO states
+
+                            if station_changed:
+                                raw_reward = get_reward_value(reward_dict, line_id, bus_id)
+                                stored_reward = sac_trainer.reward_scaling(raw_reward) if args.use_reward_scaling else raw_reward
+                                replay_buffer.push(state_vec, action_dict[line_id][bus_id], stored_reward, next_state_vec, done)
+                                episode_steps += 1
+                                step += 1
+                                episode_reward += raw_reward
                                 
-                                if debug:
-                                    # Format: From Algorithm store, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
-                                    # Note: using history[0] (previous state) for station id and time to match the 'store' context
-                                    store_time = history[0][-1]
-                                    store_stop = history[0][station_feature_idx]
-                                    # print(f'From Algorithm store, Bus id: {line_id}_{bus_id} , station id is: {int(store_stop)} , current time is: {store_time:.1f} , action is: {stored_action}, reward: {current_reward:.4f}')
-                                    pass
-                                    
                                 # Trajectory Logging
-                                raw_reward = current_reward
-                                action_val = stored_action
+                                action_val = action_dict[line_id][bus_id]
                                 if isinstance(action_val, (np.ndarray, list)):
                                     action_val = action_val[0]
                                 s_stop = history[0][station_feature_idx]
@@ -836,88 +813,55 @@ if __name__ == '__main__':
                                 s_bwd_h = history[0][6]
                                 log_entry = f"{line_id},{bus_id},{step},{s_stop},{ns_stop},{action_val:.4f},{raw_reward:.4f},{s_fwd_h:.2f},{s_bwd_h:.2f}\n"
                                 trajectory_log_buffer.append(log_entry)
-                                # DEBUG: Check for large negative rewards
-                                # if raw_reward < -100:
-                                #     print(f"DEBUG_REWARD: Line {line_id}, Bus {bus_id}, Step {step}, Reward {raw_reward:.2f}, EpReward {episode_reward:.2f}, Fwd {history[0][5]:.2f}, Bwd {history[0][6]:.2f}")
+                                # print(f"DEBUG_RB: Line {line_id}, Bus {bus_id}, Step {step}, S_Stop {s_stop}, NS_Stop {ns_stop}, Action {action_val:.4f}, Reward {raw_reward:.4f}")
 
-                                episode_steps += 1
-                                step += 1
-                                episode_reward += current_reward
-    
-                                # Initializing Action for Next State
-                                state_dict[line_id][bus_id] = history[1:] # Shift history
-                                # Now history is history[1:] - [0] is the NEW state
-                                
-                                new_state_vec = np.array(state_dict[line_id][bus_id][0])
-                                if args.use_state_norm:
-                                    new_state_vec_norm = sac_trainer.state_norm(new_state_vec)
-                                else:
-                                    new_state_vec_norm = new_state_vec
-    
-                                action = sac_trainer.policy_net.get_action(torch.from_numpy(new_state_vec_norm).float(), deterministic=DETERMINISTIC)
-                                action_dict[line_id][bus_id] = action
-    
-                                # Action Logging (Case 2: Subsequent Stops - Initial Action)
-                                action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
-                                stop_id = state_dict[line_id][bus_id][0][station_feature_idx]
-                                sim_time = state_dict[line_id][bus_id][0][-1]
-                                fwd_h = state_dict[line_id][bus_id][0][5]
-                                bwd_h = state_dict[line_id][bus_id][0][6]
-                                log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
-                                action_log_buffer.append(log_entry)
-                                
-                                if debug:
-                                    # Format: From Algorithm run, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
-                                    # print(f'From Algorithm run, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
-                                    # print(f"DEBUG_SET: Bus {line_id}_{bus_id} key={line_id},{bus_id} Val={action} DictVal={action_dict.get(line_id, {}).get(bus_id)}")
-                                    pass
+                            state_dict[line_id][bus_id] = history[1:]
+                            updated_state_vec = np.array(state_dict[line_id][bus_id][0])
+                            if args.use_state_norm:
+                                updated_state_vec = sac_trainer.state_norm(updated_state_vec)
+                            action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(updated_state_vec).float(), deterministic=DETERMINISTIC)
+                            
+                            # Action Logging (Case 3: Subsequent Stops - Next Action)
+                            action_val = action_dict[line_id][bus_id]
+                            if isinstance(action_val, (np.ndarray, list)):
+                                action_val = action_val[0]
+                            current_state = state_dict[line_id][bus_id][0]
+                            stop_id = current_state[station_feature_idx]
+                            fwd_h = current_state[5]
+                            bwd_h = current_state[6]
+                            log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+                            action_log_buffer.append(log_entry)
+
+                state_dict, reward_dict, done = safe_step(env, action_dict, render=render)
                 
-                # DEBUG: Trace action_dict before step
-                if debug:
-                    # for line_id, buses in action_dict.items():
-                    #     for bus_id, action in buses.items():
-                    #         if action is not None:
-                    #             print(f"DEBUG_TRACE Pre-Step: Bus {line_id}_{bus_id} Action={action}")
-                    pass
-    
-                state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=render)
-    
-                # Heartbeat Logging (Simulation Time)
-                current_sim_time = None
-                # Try to get time from state_dict
-                for lines in state_dict.values():
-                    for history in lines.values():
-                        if len(history) > 0:
-                            current_sim_time = history[0][-1]
-                            break
-                    if current_sim_time is not None:
-                        break
-                
+                # Flush logs periodically (e.g., every 1000 steps) to avoid memory issues
+                if step % 1000 == 0:
+                    if action_log_buffer:
+                        with open("action_log.csv", "a") as f:
+                            f.writelines(action_log_buffer)
+                        action_log_buffer = []
+                    if trajectory_log_buffer:
+                        with open("trajectory_log.csv", "a") as f:
+                            f.writelines(trajectory_log_buffer)
+                        trajectory_log_buffer = []
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
                     for i in range(update_itr):
                         _ = sac_trainer.update(args.batch_size, training_steps, reward_scale=10., auto_entropy=args.auto_entropy, target_entropy=-1. * action_dim)
                         training_steps += 1
-    
-                    if done:
-                        if args.use_reward_scaling:
-                            sac_trainer.reward_scaling.reset()
-                        replay_buffer.last_episode_step = episode_steps
-                        break
+
+                if done:
+                    if args.use_reward_scaling:
+                        sac_trainer.reward_scaling.reset()
+                    replay_buffer.last_episode_step = episode_steps
+                    break
             # 计算每个 episode 的平均 Q 值
             rewards.append(episode_reward)
-            if training_steps > 0:
-                q_values_episode.append(np.mean(q_values[-training_steps:]))
-                reg_norms1_episode.append(np.mean(reg_norms1[-training_steps:]))
-                reg_norms2_episode.append(np.mean(reg_norms2[-training_steps:]))
-                log_probs_episode.append(np.mean(log_probs[-training_steps:]))
-                alpha_values_episode.append(np.mean(alpha_values[-training_steps:]))
-            else:
-                q_values_episode.append(0.0)
-                reg_norms1_episode.append(0.0)
-                reg_norms2_episode.append(0.0)
-                log_probs_episode.append(0.0)
-                alpha_values_episode.append(0.0)
+            q_values_episode.append(np.mean(q_values[-training_steps:]))
+            reg_norms1_episode.append(np.mean(reg_norms1[-training_steps:]))
+            reg_norms2_episode.append(np.mean(reg_norms2[-training_steps:]))
+            log_probs_episode.append(np.mean(log_probs[-training_steps:]))
+            alpha_values_episode.append(np.mean(alpha_values[-training_steps:]))
 
             # Print Episode Summary (Matching original format)
             replay_buffer_usage = len(replay_buffer) / replay_buffer_size * 100
@@ -941,8 +885,8 @@ if __name__ == '__main__':
                 np.save(os.path.join(LOG_DIR, 'alpha_values_episode.npy'), alpha_values_episode)
                 
                 # 评估当前策略
-                mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=0, deterministic=True)
-                # print(f"评估结果 (Episode {eps}): 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
+                mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=3, deterministic=True)
+                print(f"评估结果 (Episode {eps}): 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
                 
                 # 记录评估结果
                 eval_episodes.append(eps)
@@ -966,8 +910,8 @@ if __name__ == '__main__':
         sac_trainer.save_model(model_path)
         
         # 评估最终策略
-        mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=0, deterministic=True)
-        # print(f"最终评估结果: 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
+        mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=15, deterministic=True)
+        print(f"最终评估结果: 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
         
         # 记录最终评估结果
         final_eval_episode = args.max_episodes - 1
@@ -979,13 +923,6 @@ if __name__ == '__main__':
         final_log_dir = LOG_DIR
         if not os.path.exists(final_log_dir):
             os.makedirs(final_log_dir, exist_ok=True)
-
-        np.save(os.path.join(final_log_dir, 'rewards.npy'), rewards)
-        np.save(os.path.join(final_log_dir, 'q_values.npy'), q_values_episode)
-        np.save(os.path.join(final_log_dir, 'reg_norms1_episode.npy'), reg_norms1_episode)
-        np.save(os.path.join(final_log_dir, 'reg_norms2_episode.npy'), reg_norms2_episode)
-        np.save(os.path.join(final_log_dir, 'log_probs_episode.npy'), log_probs_episode)
-        np.save(os.path.join(final_log_dir, 'alpha_values_episode.npy'), alpha_values_episode)
 
         np.save(os.path.join(final_log_dir, 'eval_episodes.npy'), eval_episodes)
         np.save(os.path.join(final_log_dir, 'eval_mean_rewards.npy'), eval_mean_rewards)
@@ -1002,6 +939,7 @@ if __name__ == '__main__':
 
             done = False
             env.reset()
+            state_dict, reward_dict, _ = safe_initialize_state(env, render=render)
             episode_reward = 0
             action_dict = build_action_template(state_dict)
             station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1

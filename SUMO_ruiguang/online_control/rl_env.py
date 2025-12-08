@@ -54,6 +54,8 @@ class SumoBusHoldingEnv:
     (line -> bus -> list_of_observations) to mirror multi-line settings.
     """
 
+    expects_nested_actions = True
+
     def __init__(
         self,
         root_dir: str,
@@ -189,18 +191,14 @@ class SumoBusHoldingEnv:
             self._advance_until_state()
         return self._snapshot_state(), self._snapshot_reward(), self._done
 
-    def step(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> Tuple[Dict[str, Dict[str, List[List[float]]]], Dict[str, Dict[str, float]], bool]:
-        # DEBUG: Trace action_dict at start of step
-        # using print to stdout
-        # for line_id_key, bus_actions in action_dict.items():
-        #     for bus_id_key, action_val in bus_actions.items():
-        #         if action_val is not None:
-        #             print(f"DEBUG_TRACE Env-Step: Bus {line_id_key}_{bus_id_key} Action={action_val}")
-        
+    def step(self, action_dict: Dict[str, Dict[str, Optional[float]]]) -> Tuple[Dict, Dict, bool, Dict]:
         self._apply_actions(action_dict)
-        if not self._done:
-            self._advance_until_state()
-        return self._snapshot_state(), self._snapshot_reward(), self._done
+        self._advance_until_state()
+        
+        obs = self._snapshot_state()
+        rewards = self._snapshot_reward()
+        # print(f"DEBUG_STEP_EXIT: Done={self._done}", flush=True)
+        return obs, rewards, self._done, {}
 
     def close(self) -> None:
         if self.close_callback is not None:
@@ -227,14 +225,8 @@ class SumoBusHoldingEnv:
                 hold_value = float(action_value)
                 hold_value = max(0.0, hold_value)
                 
-                # DEBUG: Print simulation-side action application
-                # Format: Simulation: Bus id: ... , station id: ... , dwelling time is: ...
-                # Matching temp_lstm_rl/env/bus.py line 286
-                # We need to look up event details if possible, but event was popped.
-                # 'event' variable is available here.
-                if event:
-                    station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
-                    print(f"Simulation: Bus id: {event.line_id}_{event.bus_id} , station id: {station_idx} , dwelling time is: {hold_value:.4f}")
+                station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
+                # print(f"Simulation: Bus id: {event.line_id}_{event.bus_id} , station id: {station_idx} , dwelling time is: {hold_value:.4f}")
 
                 self.action_executor(event, hold_value)
 
