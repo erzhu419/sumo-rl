@@ -7,7 +7,7 @@ import random
 import argparse
 import math
 import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Set, Any
+from typing import Tuple, List, Dict, Set, Any, Callable, Optional
 
 if "SUMO_HOME" in os.environ:
     tools_path = os.path.join(os.environ["SUMO_HOME"], "tools")
@@ -267,29 +267,15 @@ class SumoRLBridge:
         
         return events, self.done, departed
 
-    def apply_action(self, event: DecisionEvent, action_value: Any) -> None:
+    def apply_action(self, event: DecisionEvent, hold_value: float) -> None:
         if not self.initialized or self.done:
             return
-            
-        # Parse 2D Action: [Holding Time, Speed Ratio]
-        if hasattr(action_value, '__len__') and len(action_value) >= 2:
-            hold_value = float(action_value[0])
-            speed_ratio = float(action_value[1])
-        else:
-            hold_value = float(action_value)
-            speed_ratio = 1.0  # Fallback
-            
-        duration = max(event.base_stop_duration + hold_value, 0.0)
+        duration = max(event.base_stop_duration + float(hold_value), 0.0)
         bus_id = event.bus_id
         stop_id = event.stop_id
         stopping_place = event.metadata.get('stopping_place', stop_id)
         
         try:
-            # Physics Override Fix: setMaxSpeed only caps the vehicle mechanically,
-            # but remains bounded by the lane's physical speed limit.
-            # Using setSpeedFactor() instructs the driver to treat the lane speed limit multiplied by the factor.
-            traci.vehicle.setSpeedFactor(bus_id, speed_ratio)
-
             # Since we applied pre-emptive holding (duration=3600) in _collect_new_events,
             # the stop should still be active and at index 0.
             # We simply update it to the actual desired duration.

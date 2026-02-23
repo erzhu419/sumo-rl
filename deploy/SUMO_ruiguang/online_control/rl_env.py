@@ -68,9 +68,7 @@ class SumoBusHoldingEnv:
         time_period_span: int = 3600,
         headway_fallback: float = 360.0,
         debug: bool = False,
-        reward_type: str = "positive_step",
     ) -> None:
-        self.reward_type = reward_type
         self.debug = debug
         self.root_dir = os.path.abspath(root_dir)
         self.schedule_path = schedule_file if os.path.isabs(schedule_file) else os.path.join(self.root_dir, schedule_file)
@@ -224,24 +222,13 @@ class SumoBusHoldingEnv:
                 event = self._pending_events.pop((line_id, bus_id), None)
                 if event is None:
                     continue
-                if hasattr(action_value, '__len__') and len(action_value) >= 2:
-                    raw_hold = float(action_value[0])
-                    raw_speed = float(action_value[1])
-                    
-                    hold_value = max(0.0, raw_hold)
-                    speed_value = max(0.1, raw_speed)  # Ensure speed doesn't go below 0.1 to avoid stopping indefinitely
-                    
-                    action_to_apply = [hold_value, speed_value]
-                else:
-                    # Fallback for 1D action space
-                    hold_value = max(0.0, float(action_value))
-                    action_to_apply = hold_value
+                hold_value = float(action_value)
+                hold_value = max(0.0, hold_value)
                 
                 station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
                 # print(f"Simulation: Bus id: {event.line_id}_{event.bus_id} , station id: {station_idx} , dwelling time is: {hold_value:.4f}")
 
-                # Pass the dynamically filtered action_to_apply
-                self.action_executor(event, action_to_apply)
+                self.action_executor(event, hold_value)
 
     def _advance_until_state(self) -> None:
         if self.decision_provider is None:
@@ -361,57 +348,6 @@ class SumoBusHoldingEnv:
         self._pending_events[(event.line_id, event.bus_id)] = event
 
     def _compute_reward(self, event: DecisionEvent, target_headway: float) -> float:
-        """Calculate reward based on the selected reward_type."""
-        # Using self.reward_type if available (defaulting to "positive_step" if not set in __init__ yet?)
-        # Actually I need to update __init__ as well.
-        # But this edit is just for this block.
-        # I'll rely on the fact that I will update __init__ in a separate call or same if I can view it.
-        # Wait, I cannot invoke multiple edits unless using multi_replace.
-        # I will just use hasattr for now to be safe, defaulting to old behavior.
-        
-        rtype = getattr(self, "reward_type", "positive_step")
-        
-        if rtype == "linear_penalty":
-            return self._compute_reward_linear(event, target_headway)
-        else:
-            return self._compute_reward_default(event, target_headway)
-
-    def _compute_reward_linear(self, event: DecisionEvent, target_headway: float) -> float:
-        """Linear negative penalty reward function (matches sac_v2_bus.py logic)."""
-        def headway_reward(headway, target):
-            return -abs(headway - target)
-
-        forward_reward = headway_reward(event.forward_headway, event.target_forward_headway) if event.forward_bus_present else None
-        backward_reward = headway_reward(event.backward_headway, event.target_backward_headway) if event.backward_bus_present else None
-
-        if forward_reward is not None and backward_reward is not None:
-            fwd_dev = abs(event.forward_headway - event.target_forward_headway)
-            bwd_dev = abs(event.backward_headway - event.target_backward_headway)
-            weight = fwd_dev / (fwd_dev + bwd_dev + 1e-6)
-            
-            # Use proportional deviation asymmetry for irregular schedules instead of absolute distance
-            # Ensures optimal ridge follows the intended ratio, rather than straight 1:1 symmetry.
-            R = event.target_forward_headway / max(event.target_backward_headway, 1e-6)
-            similarity_bonus = -abs(event.forward_headway - R * event.backward_headway) * 0.5 / ((1 + R) / 2)
-            reward = forward_reward * weight + backward_reward * (1 - weight) + similarity_bonus
-        elif forward_reward is not None:
-            reward = forward_reward
-        elif backward_reward is not None:
-            reward = backward_reward
-        else:
-            reward = -50.0
-
-        # Replace hard threshold with smooth Tanh penalty dropping exactly like the original Q-table tests
-        # Smoothly penalizes deviations beyond 50% of the target headway
-        f_pen = 20.0 * np.tanh((abs(event.forward_headway - event.target_forward_headway) - 0.5 * event.target_forward_headway) / 30.0) if event.forward_bus_present and event.target_forward_headway > 0 else 0.0
-        b_pen = 20.0 * np.tanh((abs(event.backward_headway - event.target_backward_headway) - 0.5 * event.target_backward_headway) / 30.0) if event.backward_bus_present and event.target_backward_headway > 0 else 0.0
-        penalty_factor = f_pen + b_pen
-        reward -= max(0.0, penalty_factor)
-        
-        # Removed empirical action penalty
-        return reward
-
-    def _compute_reward_default(self, event: DecisionEvent, target_headway: float) -> float:
         # Note: target_headway arg is kept for compatibility but we use event-specific targets
         
         def headway_reward(headway, target):
@@ -432,10 +368,7 @@ class SumoBusHoldingEnv:
             bwd_dev = abs(event.backward_headway - event.target_backward_headway)
             weight = fwd_dev / (fwd_dev + bwd_dev + 1e-6)
             
-            # Use proportional deviation asymmetry for irregular schedules instead of absolute distance
-            # Ensures optimal ridge follows the intended ratio, rather than straight 1:1 symmetry.
-            R = event.target_forward_headway / max(event.target_backward_headway, 1e-6)
-            similarity_bonus = -abs(event.forward_headway - R * event.backward_headway) * 0.5 / ((1 + R) / 2)
+            similarity_bonus = -abs(event.forward_headway - event.backward_headway) * 0.5
             reward = forward_reward * weight + backward_reward * (1 - weight) + similarity_bonus
         elif forward_reward is not None:
             reward = forward_reward
@@ -444,15 +377,9 @@ class SumoBusHoldingEnv:
         else:
             reward = -50.0
 
-        # Replace hard threshold with smooth Tanh penalty dropping exactly like the original Q-table tests
-        # Smoothly penalizes deviations beyond 50% of the target headway
-        f_pen = 20.0 * np.tanh((abs(event.forward_headway - event.target_forward_headway) - 0.5 * event.target_forward_headway) / 30.0) if event.forward_bus_present and event.target_forward_headway > 0 else 0.0
-        b_pen = 20.0 * np.tanh((abs(event.backward_headway - event.target_backward_headway) - 0.5 * event.target_backward_headway) / 30.0) if event.backward_bus_present and event.target_backward_headway > 0 else 0.0
-        penalty_factor = f_pen + b_pen
-        reward -= max(0.0, penalty_factor)
-        
-        # Removed empirical action penalty
-        pass
+        if (event.forward_bus_present and abs(event.forward_headway - event.target_forward_headway) > 180) or \
+           (event.backward_bus_present and abs(event.backward_headway - event.target_backward_headway) > 180):
+            reward -= 20.0
         
         # DEBUG: Print simulation-side reward calculation
         # Format: From Simulation , bus id is: ... , station id is: ... , current time: ... , reward: ...

@@ -7,34 +7,81 @@ import random
 import argparse
 import math
 import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Set, Any
+from typing import Tuple, List, Dict, Set, Any, Callable, Optional
 
+# Force standard traci
 if "SUMO_HOME" in os.environ:
     tools_path = os.path.join(os.environ["SUMO_HOME"], "tools")
     if tools_path not in sys.path:
         sys.path.append(tools_path)
+    try:
+        if os.environ.get("FORCE_TRACI") == "1":
+            raise ImportError("Forced Traci")
+        import libsumo as traci
+        sys.modules['traci'] = traci # <--- Hijack global traci import so other modules use libsumo
+        LIBSUMO = True
+        print("Offline Bridge: Using REAL libsumo (Hijacked via sys.modules).")
+    except ImportError as e:
+        print(f"Offline Bridge: FAILED to import libsumo: {e}")
+        # Critical: Purge broken modules from cache to ensure clean traci import
+        sys.modules.pop('traci', None)
+        sys.modules.pop('libsumo', None)
+        import traci
+        # Fallback Patch: If traci is missing domains (e.g. trafficlight), try to aliasing them from private modules
+        # This happens in some pure-python fallbacks
+        if not hasattr(traci, 'trafficlight') and hasattr(traci, '_trafficlight'):
+             print("Offline Bridge: Patching missing traci.trafficlight domain...")
+             # Inspect _trafficlight to find the domain object
+             # Usually it's traci._trafficlight.TrafficLightDomain() instance called 'TrafficLightDomain'
+             # Or sometimes traci uses a module. 
+             # Let's simple check if _trafficlight has a 'TrafficLightDomain' class
+             try:
+                 if hasattr(traci._trafficlight, 'TrafficLightDomain'):
+                     traci.trafficlight = traci._trafficlight.TrafficLightDomain()
+                 else:
+                     # Check if it has 'logic' or getParameter?
+                     # Debug print
+                     print(f"Offline Bridge: _trafficlight dir: {dir(traci._trafficlight)}")
+             except Exception as patch_e:
+                 print(f"Offline Bridge: Failed to patch trafficlight: {patch_e}")
+
+        # Check if this "traci" is actually libsumo (no start method)
+        if hasattr(traci, 'start'):
+            LIBSUMO = False
+            print("Offline Bridge: Libsumo not found, falling back to standard traci.")
+        else:
+            LIBSUMO = True
+            sys.modules['traci'] = traci
+            print("Offline Bridge: 'traci' imported, but has no start(). Treating as Libsumo.")
 else:
     raise EnvironmentError("Please declare environment variable 'SUMO_HOME'!")
-
-try:
-    import libsumo
-    sys.modules['traci'] = libsumo
-    import traci
-    print("Using libsumo for simulation (globally patched).")
-    LIBSUMO = True
-except ImportError:
-    import traci
-    print("Using traci for simulation.")
-    LIBSUMO = False
 
 from sumolib import checkBinary
 import traci.constants as tc
 
-from .case import f_8_create_obj
-from .case import e_8_gurobi_test_considerbusnum_V3
-from .case import d_8_compute_running_time
+# Fix relative imports
+class SuppressOutput:
+    """Context manager to suppress stdout and stderr at the OS level."""
+    def __enter__(self):
+        self.devnull = open(os.devnull, 'w')
+        self.old_stdout = os.dup(1)
+        self.old_stderr = os.dup(2)
+        os.dup2(self.devnull.fileno(), 1)
+        os.dup2(self.devnull.fileno(), 2)
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.dup2(self.old_stdout, 1)
+        os.dup2(self.old_stderr, 2)
+        os.close(self.old_stdout)
+        os.close(self.old_stderr)
+        self.devnull.close()
 
-from .rl_env import DecisionEvent
+with SuppressOutput():
+    from SUMO_ruiguang.online_control.case import f_8_create_obj
+    from SUMO_ruiguang.online_control.case import e_8_gurobi_test_considerbusnum_V3
+    from SUMO_ruiguang.online_control.case import d_8_compute_running_time
+
+from SUMO_ruiguang.online_control.rl_env import DecisionEvent
 
 
 class SumoRLBridge:
@@ -48,6 +95,7 @@ class SumoRLBridge:
         time_step: float = 1.0,
         default_headway: float = 360.0,
         update_freq: int = 10,
+        seed: Any = None,  # Added seed support
     ) -> None:
         self.root_dir = os.path.abspath(root_dir)
         self.sumo_cfg = sumo_cfg if os.path.isabs(sumo_cfg) else os.path.join(self.root_dir, sumo_cfg)
@@ -56,6 +104,7 @@ class SumoRLBridge:
         self.time_step = time_step
         self.default_headway = default_headway
         self.update_freq = update_freq
+        self.seed = seed
 
         self.initialized = False
         self.first_run = True
@@ -87,10 +136,12 @@ class SumoRLBridge:
 
         self.busline_edge_order = {}
         self.involved_tl_ID_l = []
-        self.line_headways = {}  # Store median headway per line
-
-    # region SUMO lifecycle
+        self.line_headways = {}  # Store median headway
     def reset(self) -> None:
+        # Unique state file for this process to avoid parallel collision
+        # Use absolute path to ensure libsumo finds it
+        self.state_file = os.path.abspath(f"sumo_start_state_{os.getpid()}.sbx")
+
         # Optimization: Load network once and reuse state
         if self.first_run:
             if self.initialized:
@@ -100,35 +151,57 @@ class SumoRLBridge:
             self._load_objects()
             # Save state for future resets
             if LIBSUMO:
-                traci.simulation.saveState("sumo_start_state.sbx")
+                with SuppressOutput():
+                    traci.simulation.saveState(self.state_file)
+                # Verify save
+                if not os.path.exists(self.state_file):
+                    # Try waiting briefly?
+                    time.sleep(0.1)
+                    if not os.path.exists(self.state_file):
+                        raise RuntimeError(f"Failed to save state file at {self.state_file}")
             self.first_run = False
         else:
             # Soft reset using saved state
+            state_loaded = False
             if LIBSUMO:
-                # Suppress "Loading state..." output
-                with open(os.devnull, 'w') as devnull:
-                    try:
-                        # Redirect stdout (fd 1) and stderr (fd 2) at the OS level
-                        # This is necessary because libsumo prints from C++
-                        old_stdout = os.dup(1)
-                        old_stderr = os.dup(2)
-                        os.dup2(devnull.fileno(), 1)
-                        os.dup2(devnull.fileno(), 2)
+                # Try to load state
+                try:
+                    # Redirect stdout/stderr to suppress noise
+                    with SuppressOutput():
                         try:
-                            traci.simulation.loadState("sumo_start_state.sbx")
-                        finally:
-                            os.dup2(old_stdout, 1)
-                            os.dup2(old_stderr, 2)
-                            os.close(old_stdout)
-                            os.close(old_stderr)
-                    except Exception:
-                        # Fallback if redirection fails
-                        traci.simulation.loadState("sumo_start_state.sbx")
+                            traci.simulation.loadState(self.state_file)
+                            state_loaded = True
+                        except Exception:
+                            state_loaded = False
+                except Exception:
+                    state_loaded = False
             else:
-                # Fallback for standard traci (if needed, though we focus on libsumo)
+                # For standard traci, we usually just restart or use load logic if robust
+                # But here, let's default to hard reset if we aren't using the optimization for standard traci explicitly
+                pass
+            
+            if not state_loaded:
+                # HARD RESET FALLBACK
+                # If loading state failed (e.g. file busy, IO error), we do a full restart
+                if LIBSUMO:
+                    # Force close libsumo to allow restart
+                    try:
+                        with SuppressOutput():
+                            traci.close()
+                    except Exception:
+                        pass
+                
                 self.close()
                 self._ensure_sumo_home()
                 self._start_traci()
+                # Re-save the state if needed? 
+                # If previously failed to save/load, maybe we try saving again this time.
+                if LIBSUMO:
+                    try:
+                        with SuppressOutput():
+                            traci.simulation.saveState(self.state_file)
+                    except Exception:
+                        pass # Ignore save failure, just run
             
             # Always reload objects to ensure fresh python state matching the simulation
             self._load_objects()
@@ -143,17 +216,26 @@ class SumoRLBridge:
         self.arrival_history.clear()
         self.depart_history.clear()
         
-        # Optimization: Track active agents locally to avoid expensive getIDList() calls
         self.active_bus_ids = set()
         self.active_passenger_ids = set()
         self.just_departed_buses = []
 
     def close(self) -> None:
-        # Optimization: Do NOT close traci if using libsumo reuse strategy
         if not LIBSUMO:
-            if traci.isLoaded():
-                traci.close()
+            if hasattr(traci, 'isLoaded') and traci.isLoaded():
+                with SuppressOutput():
+                    traci.close()
+            elif hasattr(traci, 'close'):
+                with SuppressOutput():
+                    traci.close()
         
+        # Cleanup state file on close
+        if hasattr(self, 'state_file') and os.path.exists(self.state_file):
+            try:
+                os.remove(self.state_file)
+            except OSError:
+                pass
+
         self.initialized = False
         self.active_bus_ids = set()
         self.active_passenger_ids = set()
@@ -166,19 +248,39 @@ class SumoRLBridge:
             sys.path.append(tools)
 
     def _start_traci(self) -> None:
-        # Optimization: If traci is already loaded, don't start it again
         if LIBSUMO and traci.isLoaded():
             return
 
-        if LIBSUMO:
-            # libsumo runs in-process, no binary needed, but argv[0] is expected
-            # Added --duration-log.disable and --log /dev/null to suppress verbose output
-            traci.start(["sumo", "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
-            self.sumo_binary = "libsumo"
+        cmd = ["sumo", "-c", self.sumo_cfg, 
+               "--no-warnings", 
+               "--duration-log.disable", 
+               "--log", "/dev/null",
+               "--tripinfo-output", "/dev/null",
+               "--fcd-output", "/dev/null",
+               "--summary-output", "/dev/null"]
+        
+        # Handle Seed
+        if self.seed == 'random':
+            cmd.append("--random")
+        elif isinstance(self.seed, int):
+            cmd.extend(["--seed", str(self.seed)])
         else:
-            binary = checkBinary('sumo-gui' if self.gui else 'sumo')
-            traci.start([binary, "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
-            self.sumo_binary = binary
+            # Default fixed seed (SUMO default)
+            pass
+
+        with SuppressOutput():
+            if LIBSUMO:
+                # libsumo runs in-process. 
+                # Note: libsumo doesn't always respect command line args for repetitive starts if not fully cleared?
+                # But spawn method ensures clean process.
+                traci.start(cmd)
+                self.sumo_binary = "libsumo"
+            else:
+                binary = checkBinary('sumo-gui' if self.gui else 'sumo')
+                # Replace 'sumo' with binary path
+                cmd[0] = binary
+                traci.start(cmd)
+                self.sumo_binary = binary
 
     def _load_objects(self) -> None:
         result = f_8_create_obj.create_obj_fun()
@@ -267,29 +369,15 @@ class SumoRLBridge:
         
         return events, self.done, departed
 
-    def apply_action(self, event: DecisionEvent, action_value: Any) -> None:
+    def apply_action(self, event: DecisionEvent, hold_value: float) -> None:
         if not self.initialized or self.done:
             return
-            
-        # Parse 2D Action: [Holding Time, Speed Ratio]
-        if hasattr(action_value, '__len__') and len(action_value) >= 2:
-            hold_value = float(action_value[0])
-            speed_ratio = float(action_value[1])
-        else:
-            hold_value = float(action_value)
-            speed_ratio = 1.0  # Fallback
-            
-        duration = max(event.base_stop_duration + hold_value, 0.0)
+        duration = max(event.base_stop_duration + float(hold_value), 0.0)
         bus_id = event.bus_id
         stop_id = event.stop_id
         stopping_place = event.metadata.get('stopping_place', stop_id)
         
         try:
-            # Physics Override Fix: setMaxSpeed only caps the vehicle mechanically,
-            # but remains bounded by the lane's physical speed limit.
-            # Using setSpeedFactor() instructs the driver to treat the lane speed limit multiplied by the factor.
-            traci.vehicle.setSpeedFactor(bus_id, speed_ratio)
-
             # Since we applied pre-emptive holding (duration=3600) in _collect_new_events,
             # the stop should still be active and at index 0.
             # We simply update it to the actual desired duration.
