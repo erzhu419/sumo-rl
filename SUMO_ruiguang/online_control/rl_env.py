@@ -92,7 +92,7 @@ class SumoBusHoldingEnv:
         self._time_period_index: Dict[int, int] = {}
 
         self.cat_cols = ["line_id", "bus_id", "station_id", "time_period", "direction"]
-        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time"]
+        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time", "gap"]
 
         self._state_buffers: Dict[str, Dict[str, List[List[float]]]] = defaultdict(lambda: defaultdict(list))
         self._reward_buffers: Dict[str, Dict[str, float]] = defaultdict(dict)
@@ -326,18 +326,8 @@ class SumoBusHoldingEnv:
         direction = int(event.direction)
 
         target_headway = self._line_headway.get(event.line_id, self.headway_fallback)
-        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time"]
-
-    def _register_event(self, event: DecisionEvent) -> None:
-        line_idx = self._line_index.setdefault(event.line_id, len(self._line_index))
-        if event.bus_id not in self._bus_index:
-            self._bus_index[event.bus_id] = len(self._bus_index)
-        bus_idx = self._bus_index[event.bus_id]
-        station_idx = self._encode_station(event.line_id, event.stop_id, event.stop_idx)
-        time_period_idx = self._encode_time_period(event.sim_time)
-        direction = int(event.direction)
-
-        target_headway = self._line_headway.get(event.line_id, self.headway_fallback)
+        gap = (event.target_forward_headway - event.forward_headway) if getattr(event, 'forward_bus_present', True) else 0.0
+        
         obs = [
             float(line_idx),
             float(bus_idx),
@@ -350,6 +340,7 @@ class SumoBusHoldingEnv:
             float(target_headway),
             float(event.base_stop_duration),
             float(event.sim_time),
+            float(gap),
         ]
 
         reward = self._compute_reward(event, target_headway)
