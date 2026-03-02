@@ -485,7 +485,10 @@ class SAC_Trainer():
             else:
                 log_scale_shift = np.log(30.0) # hold scale
         else:
-            log_scale_shift = np.log(30.0) + np.log(0.2) # hold and speed scale
+            if args.use_residual_control:
+                log_scale_shift = 0.0
+            else:
+                log_scale_shift = np.log(30.0) + np.log(0.2) # hold and speed scale
             
         self.target_entropy = -float(action_dim) + log_scale_shift
 
@@ -539,10 +542,15 @@ class SAC_Trainer():
         next_log_prob = next_log_prob.unsqueeze(0).repeat(self.soft_q_net.num_critics, 1)
         reg_norm_exp = reg_norm.unsqueeze(-1).repeat(1, args.batch_size)
         target_q_next = target_q_next - self.alpha * next_log_prob + args.weight_reg * reg_norm_exp
-        target_q_value = reward + (1 - done) * gamma * target_q_next.unsqueeze(-1)
+        
+        # Apply Double-Q / REDQ min-clipping across the ensemble to suppress Overestimation Bias
+        target_q_min = torch.min(target_q_next, dim=0, keepdim=True)[0]
+        target_q_value = reward + (1 - done) * gamma * target_q_min.unsqueeze(-1)
 
         ood_loss = predicted_q_value.std(0).mean()
-        q_value_loss = self.soft_q_criterion(predicted_q_value, target_q_value.squeeze(-1).detach())
+        # Expand the [1, batch_size] target to [num_critics, batch_size] explicitly to avoid PyTorch broadcasting warnings
+        expanded_target_q = target_q_value.squeeze(-1).expand_as(predicted_q_value).detach()
+        q_value_loss = self.soft_q_criterion(predicted_q_value, expanded_target_q)
         loss = q_value_loss + args.beta_ood * ood_loss
         return loss, predicted_q_value, ood_loss
 
@@ -747,7 +755,7 @@ step = 0
 step_trained = 0
 explore_steps = 0
 update_itr = 1
-DETERMINISTIC = False
+DETERMINISTIC = args.test
 hidden_dim = 32
 
 def format_action_for_log(action_val, use_1d, use_residual=False):
@@ -792,6 +800,21 @@ q_stds_episode = []
 tracemalloc.start()
 
 sac_trainer = SAC_Trainer(env, replay_buffer, hidden_dim=hidden_dim, action_range=action_range, ensemble_size=args.ensemble_size)
+
+if args.test:
+    model_dir_path = os.path.join(MODEL_DIR, f"sac_ensemble_SUMO_heuristic_guidance_{args.run_name}")
+    import glob
+    if os.path.exists(model_dir_path):
+        policy_files = glob.glob(os.path.join(model_dir_path, "checkpoint_episode_*_policy"))
+        if policy_files:
+            latest_file = max(policy_files, key=os.path.getctime)
+            prefix = latest_file.replace("_policy", "")
+            print(f"Loading latest model checkpoint for testing: {prefix}")
+            sac_trainer.load_model(prefix)
+        else:
+            print(f"Warning: --test flag is set but no policy checkpoints found in {model_dir_path}.")
+    else:
+        print(f"Warning: Model directory {model_dir_path} not found.")
 
 if __name__ == '__main__':
     if args.profile:
@@ -921,7 +944,6 @@ if __name__ == '__main__':
 
                                 episode_steps += 1
                                 step += 1
-                                episode_reward += current_reward
 
                             state_dict[line_id][bus_id] = history[1:]
                             # Subsequent Stops: Decision for Station N+1
@@ -987,6 +1009,11 @@ if __name__ == '__main__':
                                 env_action_dict[line_id][bus_id] = [0.0, action_val[0]]
                                 
                 state_dict, reward_dict, done, _ = safe_step(env, env_action_dict, render=render)
+                
+                # Correctly accumulate the reward ONCE per environment step
+                if reward_dict:
+                    step_r = sum(sum(buses.values()) for buses in reward_dict.values() if isinstance(buses, dict))
+                    episode_reward += step_r
                 
                 if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
                     step_trained = step
