@@ -682,7 +682,7 @@ def plot(rewards):
 
 # Evaluate policy is not fundamentally changed but can be added if needed, skipping for brevity or add if requested.
 
-replay_buffer_size = 1e6
+replay_buffer_size = 5e6
 replay_buffer = ReplayBuffer(replay_buffer_size)
 
 debug = False
@@ -756,7 +756,7 @@ step_trained = 0
 explore_steps = 0
 update_itr = 1
 DETERMINISTIC = args.test
-hidden_dim = 32
+hidden_dim = 48
 
 def format_action_for_log(action_val, use_1d, use_residual=False):
     if action_val is None:
@@ -986,12 +986,31 @@ if __name__ == '__main__':
                                     base_hold = 0.0
                                     base_speed = 1.2
                                 
-                                # 2. Apply 2D RL Residual Offset (-1 to 1)
+                                # 2. Apply V7 Relaxed 2D RL Residual Offset (-1 to 1) mapped to +/- 40s
                                 a_hold = action_val[0]
                                 a_speed = action_val[1]
                                 
-                                hold = min(60.0, max(0.0, base_hold + a_hold * 20.0))
-                                speed = min(1.2, max(0.1, base_speed + a_speed * 0.2))
+                                # Agent has authority to deviate by up to 40s from the baseline
+                                hold = min(60.0, max(0.0, base_hold + a_hold * 40.0))
+                                speed = min(1.2, max(0.1, base_speed + a_speed * 0.4))
+                                
+                                # 3. Compute the Soft Guidance Tax only ONCE when the decision is first made
+                                # Tax is charged on INTENT (the raw residual), not the physically clamped result,
+                                # to prevent the agent from hiding in the min(0) clipping bounds to avoid tax.
+                                if line_id in state_dict and bus_id in state_dict[line_id]:
+                                    dev_hold = abs(a_hold * 40.0)
+                                    dev_speed = abs(a_speed * 0.4)
+                                    
+                                    # Plan D: Annealing Guidance Tax (fades to 0 by episode 75)
+                                    C_tax = max(0.0, 1.0 - (eps / 75.0))
+                                    current_tax = C_tax * ((dev_hold * 1.5) + (dev_speed * 100.0))
+                                    
+                                    if 'pending_tax_dict' not in globals():
+                                        global pending_tax_dict
+                                        pending_tax_dict = {}
+                                    if line_id not in pending_tax_dict:
+                                        pending_tax_dict[line_id] = {}
+                                    pending_tax_dict[line_id][bus_id] = current_tax
                                     
                                 env_action_dict[line_id][bus_id] = [hold, speed]
 
@@ -1010,7 +1029,16 @@ if __name__ == '__main__':
                                 
                 state_dict, reward_dict, done, _ = safe_step(env, env_action_dict, render=render)
                 
-                # Correctly accumulate the reward ONCE per environment step
+                # Apply the guidance tax to the reward_dict so both the Replay Buffer and episode_reward see it
+                if args.use_residual_control and reward_dict and 'pending_tax_dict' in globals():
+                    for line_id, buses in reward_dict.items():
+                        if isinstance(buses, dict):
+                            for bus_id in buses.keys():
+                                if line_id in pending_tax_dict and bus_id in pending_tax_dict[line_id]:
+                                    reward_dict[line_id][bus_id] -= pending_tax_dict[line_id][bus_id]
+                                    del pending_tax_dict[line_id][bus_id] # Tax paid
+                
+                # Correctly accumulate the real, net reward ONCE per environment step
                 if reward_dict:
                     step_r = sum(sum(buses.values()) for buses in reward_dict.values() if isinstance(buses, dict))
                     episode_reward += step_r

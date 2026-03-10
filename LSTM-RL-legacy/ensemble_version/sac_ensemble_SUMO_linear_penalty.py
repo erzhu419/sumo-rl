@@ -40,6 +40,7 @@ import cProfile
 import pstats
 import io
 from copy import deepcopy
+from collections import defaultdict
 
 
 GPU = True
@@ -82,10 +83,11 @@ parser.add_argument("--ensemble_size", type=int, default=10, help="Number of mod
 parser.add_argument("--beta_bc", type=float, default=0.001, help="weight of behavior cloning loss")
 parser.add_argument("--beta", type=float, default=-2, help="weight of variance")
 parser.add_argument("--beta_ood", type=float, default=0.01, help="weight of OOD loss")
-parser.add_argument('--critic_actor_ratio', type=int, default=2, help="ratio of critic and actor training")
-parser.add_argument('--holding_only', action='store_true', help='Force 1D action space (Holding Time only) instead of 2D [Hold, Speed]')
-parser.add_argument('--speed_only', action='store_true', help='Force 1D action space (Speed Ratio only) instead of 2D [Hold, Speed]')
-
+parser.add_argument('--critic_actor_ratio', type=int, default=2, help='update ratio for critic and actor')
+parser.add_argument('--use_residual_control', action='store_true', help='Use V7 2D Residual Control mapped to base rules')
+parser.add_argument('--use_1d_mapping', action='store_true', help='Map 1D scalar action to 2D [Hold, Speed]')
+parser.add_argument('--holding_only', action='store_true', help='Only manipulate holding time (dim 0)')
+parser.add_argument('--speed_only', action='store_true', help='Only manipulate speed (dim 1)')
 args = parser.parse_args()
 
 
@@ -389,12 +391,19 @@ class PolicyNetwork(nn.Module):
             if args.speed_only:
                 scale = torch.tensor([0.2], device=device)
                 bias = torch.tensor([1.0], device=device)
+            elif args.use_1d_mapping or args.use_residual_control:
+                scale = torch.tensor([1.0], device=device)
+                bias = torch.tensor([0.0], device=device)
             else:
                 scale = torch.tensor([30.0], device=device)
                 bias = torch.tensor([30.0], device=device)
         else:
-            scale = torch.tensor([30.0, 0.2], device=device)
-            bias = torch.tensor([30.0, 1.0], device=device)
+            if args.use_residual_control:
+                scale = torch.tensor([1.0, 1.0], device=device)
+                bias = torch.tensor([0.0, 0.0], device=device)
+            else:
+                scale = torch.tensor([30.0, 0.2], device=device)
+                bias = torch.tensor([30.0, 1.0], device=device)
         action = scale * action_0 + bias
         
         # log_prob adjustment: log(det(J)) for linear transformation is log(scale)
@@ -417,12 +426,19 @@ class PolicyNetwork(nn.Module):
             if args.speed_only:
                 scale = torch.tensor([0.2], device=device)
                 bias = torch.tensor([1.0], device=device)
+            elif args.use_1d_mapping or args.use_residual_control:
+                scale = torch.tensor([1.0], device=device)
+                bias = torch.tensor([0.0], device=device)
             else:
                 scale = torch.tensor([30.0], device=device)
                 bias = torch.tensor([30.0], device=device)
         else:
-            scale = torch.tensor([30.0, 0.2], device=device)
-            bias = torch.tensor([30.0, 1.0], device=device)
+            if args.use_residual_control:
+                scale = torch.tensor([1.0, 1.0], device=device)
+                bias = torch.tensor([0.0, 0.0], device=device)
+            else:
+                scale = torch.tensor([30.0, 0.2], device=device)
+                bias = torch.tensor([30.0, 1.0], device=device)
         
         if deterministic:
             action_0 = torch.tanh(mean)
@@ -465,7 +481,8 @@ class SAC_Trainer():
 
         self.cat_cols = cat_cols
         self.num_cat_features = len(cat_cols)
-        self.num_cont_features = num_cont_features
+        # Extend continuous features by action_dim to include 'last_action'
+        self.num_cont_features = num_cont_features + action_dim
         self.station_feature_idx = cat_cols.index('station_id') if 'station_id' in cat_cols else None
         
         embedding_template = EmbeddingLayer(cat_code_dict, cat_cols, layer_norm=True, dropout=0.05)
@@ -649,7 +666,7 @@ def plot(rewards):
 
 # Evaluate policy is not fundamentally changed but can be added if needed, skipping for brevity or add if requested.
 
-replay_buffer_size = 1e6
+replay_buffer_size = 5e6
 replay_buffer = ReplayBuffer(replay_buffer_size)
 
 debug = False
@@ -715,7 +732,12 @@ trajectory_log_buffer = []
 action_log_buffer = []
 
 # action_dim = 2 # Forced 2D action for Speed Control
-action_dim = 1 if (args.holding_only or args.speed_only) else 2
+if args.use_1d_mapping:
+    action_dim = 1
+elif args.use_residual_control:
+    action_dim = 2
+else:
+    action_dim = 1 if (args.holding_only or args.speed_only) else 2
 action_range = 1.0
 
 step = 0
@@ -723,7 +745,7 @@ step_trained = 0
 explore_steps = 0
 update_itr = 1
 DETERMINISTIC = False
-hidden_dim = 32
+hidden_dim = 48
 
 rewards = []
 q_values = []
@@ -762,6 +784,9 @@ if __name__ == '__main__':
             episode_steps = 0
             training_steps = 0
             action_dict = build_action_template(state_dict)
+            # Track last actions to include in the state
+            last_action_history = defaultdict(lambda: defaultdict(lambda: np.zeros(action_dim, dtype=np.float32)))
+            
             episode_reward = 0
             station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
             
@@ -773,7 +798,10 @@ if __name__ == '__main__':
                             continue
                         if len(history) == 1:
                             if action_dict[line_id][bus_id] is None:
-                                state_vec = np.array(history[0])
+                                # Append previous action to numerical state features
+                                last_action = last_action_history[line_id][bus_id]
+                                state_vec = np.concatenate([history[0], last_action])
+                                
                                 if args.use_state_norm:
                                     state_vec = sac_trainer.state_norm(state_vec)
                                 action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
@@ -795,8 +823,22 @@ if __name__ == '__main__':
                                 action_log_buffer.append(log_entry)
 
                         elif len(history) >= 2:
-                            state_vec = np.array(history[0])
-                            next_state_vec = np.array(history[1])
+                            # state_vec = np.array(history[0])
+                            # next_state_vec = np.array(history[1])
+                            
+                            # Integrate last action into Both transition states
+                            prev_action = last_action_history[line_id][bus_id]
+                            # The action taken at State 1 that lead to State 2
+                            current_action = action_dict[line_id][bus_id]
+                            if current_action is None:
+                                current_action = np.zeros(action_dim, dtype=np.float32)
+                            elif np.isscalar(current_action):
+                                current_action = np.array([current_action], dtype=np.float32)
+                            else:
+                                current_action = np.array(current_action, dtype=np.float32).reshape(-1)
+                                
+                            state_vec = np.concatenate([history[0], prev_action])
+                            next_state_vec = np.concatenate([history[1], current_action])
                             
                             if history[0][station_feature_idx] != history[1][station_feature_idx]:
                                 if args.use_state_norm:
@@ -813,13 +855,7 @@ if __name__ == '__main__':
                                     scaled_reward = current_reward
 
                                 # Retrieve stored action
-                                stored_action = action_dict[line_id][bus_id]
-                                if stored_action is None:
-                                    stored_action = np.zeros(action_dim, dtype=np.float32)
-                                elif np.isscalar(stored_action):
-                                    stored_action = np.array([stored_action], dtype=np.float32)
-                                else:
-                                    stored_action = np.array(stored_action, dtype=np.float32).reshape(-1)
+                                stored_action = current_action
 
                                 # Push to buffer
                                 replay_buffer.push(state_vec_norm, stored_action, scaled_reward, next_state_vec_norm, done)
@@ -847,12 +883,14 @@ if __name__ == '__main__':
                                 episode_reward += current_reward
 
                             state_dict[line_id][bus_id] = history[1:]
-                            state_vec_next = np.array(state_dict[line_id][bus_id][0])
+                            state_vec_next = np.concatenate([state_dict[line_id][bus_id][0], current_action])
+                            
+                            # Shift action history for the next step prediction
+                            last_action_history[line_id][bus_id] = current_action
                             if args.use_state_norm:
                                 state_vec_next = sac_trainer.state_norm(state_vec_next)
-                                
-                            action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec_next).float(), deterministic=DETERMINISTIC)
-                            
+                            action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec_next).float(), deterministic=DETERMINISTIC)
+                            action_dict[line_id][bus_id] = action
                             # Action Logging (Case 2: Subsequent Stops)
                             new_action = action_dict[line_id][bus_id]
                             action_val = new_action
