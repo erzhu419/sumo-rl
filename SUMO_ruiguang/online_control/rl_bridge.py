@@ -245,6 +245,17 @@ class SumoRLBridge:
                     self.line_headways[line_id] = self.default_headway
                 self.line_headways[line_id] = self.default_headway
                 
+        # Parse physical capacity for all stations (assuming ~15m per bus slot)
+        self.station_capacities = {}
+        for stop_id in self.stop_obj_dic:
+            try:
+                start_pos = traci.busstop.getStartPos(stop_id)
+                end_pos = traci.busstop.getEndPos(stop_id)
+                length = max(end_pos - start_pos, 15.0)
+                self.station_capacities[stop_id] = int(length // 15.0)
+            except Exception:
+                self.station_capacities[stop_id] = 2  # Safe default if TraCI fails
+
         # Precalculate absolute distances of each stop from the start of its respective line
         for line_id, line in self.line_obj_dic.items():
             dist = 0.0
@@ -403,8 +414,48 @@ class SumoRLBridge:
         self.current_time = traci.simulation.getTime()
         self.steps += 1
 
+        self._check_station_capacity()
+
         self._cleanup_departed_buses()
         self._check_termination()
+
+    def _check_station_capacity(self):
+        """
+        Silent Sentinel: Enforce station capacity limits.
+        If a station is full and another bus is waiting to enter, forcibly evict the
+        oldest parked bus by truncating its holding duration to 0.
+        """
+        for stop_id, capacity in self.station_capacities.items():
+            try:
+                # Get buses currently parked at this stop
+                parked_buses = traci.busstop.getVehicleIDs(stop_id)
+                if len(parked_buses) >= capacity:
+                    stop_obj = self.stop_obj_dic.get(stop_id)
+                    if not stop_obj or not stop_obj.at_lane_s:
+                        continue
+                    
+                    # Check if there are buses waiting to enter
+                    vehicles_on_lane = traci.lane.getLastStepVehicleIDs(stop_obj.at_lane_s)
+                    waiting_buses = []
+                    for vid in vehicles_on_lane:
+                        if vid in parked_buses:
+                            continue
+                        if vid in self.bus_obj_dic:
+                            # If the bus is slowing down/queued
+                            speed = traci.vehicle.getSpeed(vid)
+                            if speed < 1.0:
+                                stops = traci.vehicle.getStops(vid, 1)
+                                if stops and (stops[0].stoppingPlaceID == stop_id or stops[0].lane == stop_obj.at_lane_s):
+                                    waiting_buses.append(vid)
+                                    
+                    # If full and someone is waiting, evict the first parked bus (longest waiter)
+                    if waiting_buses:
+                        oldest_bus_id = parked_buses[0]
+                        traci.vehicle.setStopParameter(oldest_bus_id, 0, "duration", "0")
+                        if getattr(self, 'debug', False):
+                            print(f"[Silent Sentinel] Station {stop_id} is full (capacity {capacity}). Evicted {oldest_bus_id} for waiting bus {waiting_buses[0]}.")
+            except Exception:
+                pass
 
     def _find_neighbors(self, line_id: str, current_bus_id: str) -> Tuple[Optional[Any], Optional[Any]]:
         # Find all buses on this line
