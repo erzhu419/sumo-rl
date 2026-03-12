@@ -90,6 +90,7 @@ parser.add_argument('--use_residual_control', action='store_true', help='Use V7 
 parser.add_argument('--use_1d_mapping', action='store_true', help='Map 1D scalar action to 2D [Hold, Speed]')
 parser.add_argument('--holding_only', action='store_true', help='Only manipulate holding time (dim 0)')
 parser.add_argument('--speed_only', action='store_true', help='Only manipulate speed (dim 1)')
+parser.add_argument('--bang_bang', action='store_true', help='Use Multi-Level Bang-Bang Control strategy')
 args = parser.parse_args()
 
 
@@ -935,17 +936,38 @@ if __name__ == '__main__':
                                     # Override action_dict to store base [0.0, 0.0] continuous intent
                                     action_dict[line_id][bus_id] = np.zeros(2, dtype=np.float32)
                                 else:
-                                    # 3. Step Function Triggers
-                                    # Holding: Binary Choice (Max Wait vs Go)
-                                    hold = 60.0 if a_hold > 0 else 0.0
+                                    # Holding: Continuous Mapping (0 to 120 seconds)
+                                    # Base network outputs [-1, 1]. Shift to [0, 2] * 60 -> [0, 120]
+                                    hold = np.clip((a_hold + 1.0) * 60.0, 0.0, 120.0)
                                     
-                                    # Speed: Ternary Choice (Max Accel vs Max Decel vs Keep)
-                                    if a_speed > 0.33:
-                                        speed = 1.2
-                                    elif a_speed < -0.33:
-                                        speed = 0.8
+                                    # Speed: Soft-Discrete mapping with exploration during training
+                                    if args.train:
+                                        # Convert continuous [-1, 1] intent to a probability distribution over 5 tiers
+                                        # Use softmax temperatures to favor the mathematically intended tier while 
+                                        # allowing neighboring tiers a chance to be sampled.
+                                        logits = np.array([
+                                            -abs(a_speed - (-0.8)), # 0.8 tier center (~ -0.8)
+                                            -abs(a_speed - (-0.4)), # 0.9 tier center (~ -0.4)
+                                            -abs(a_speed - 0.0),    # 1.0 tier center (~ 0.0)
+                                            -abs(a_speed - 0.4),    # 1.1 tier center (~ 0.4)
+                                            -abs(a_speed - 0.8)     # 1.2 tier center (~ 0.8)
+                                        ]) * 5.0 # Temperature scaling
+                                        
+                                        probs = np.exp(logits) / np.sum(np.exp(logits))
+                                        speed_options = [0.8, 0.9, 1.0, 1.1, 1.2]
+                                        speed = np.random.choice(speed_options, p=probs)
                                     else:
-                                        speed = 1.0
+                                        # Deterministic selection for evaluation
+                                        if a_speed > 0.6:
+                                            speed = 1.2
+                                        elif a_speed > 0.2:
+                                            speed = 1.1
+                                        elif a_speed > -0.2:
+                                            speed = 1.0
+                                        elif a_speed > -0.6:
+                                            speed = 0.9
+                                        else:
+                                            speed = 0.8
                                 env_action_dict[line_id][bus_id] = [hold, speed]
                             elif args.use_1d_mapping:
                                 a = action_val[0]

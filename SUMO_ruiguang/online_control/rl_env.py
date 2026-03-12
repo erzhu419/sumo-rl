@@ -37,6 +37,9 @@ class DecisionEvent:
     backward_bus_present: bool = True
     target_forward_headway: float = 360.0
     target_backward_headway: float = 360.0
+    co_line_forward_headway: float = 360.0
+    co_line_backward_headway: float = 360.0
+    segment_mean_speed: float = 10.0
     metadata: Dict[str, Any] = field(default_factory=dict)
     assigned_action: Optional[float] = None
 
@@ -92,7 +95,7 @@ class SumoBusHoldingEnv:
         self._time_period_index: Dict[int, int] = {}
 
         self.cat_cols = ["line_id", "bus_id", "station_id", "time_period", "direction"]
-        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time", "gap"]
+        self.continuous_features = ["forward_headway", "backward_headway", "waiting_passengers", "target_headway", "base_stop_duration", "sim_time", "gap", "co_line_forward_headway", "co_line_backward_headway", "segment_mean_speed"]
 
         self._state_buffers: Dict[str, Dict[str, List[List[float]]]] = defaultdict(lambda: defaultdict(list))
         self._reward_buffers: Dict[str, Dict[str, float]] = defaultdict(dict)
@@ -341,6 +344,9 @@ class SumoBusHoldingEnv:
             float(event.base_stop_duration),
             float(event.sim_time),
             float(gap),
+            float(event.co_line_forward_headway),
+            float(event.co_line_backward_headway),
+            float(event.segment_mean_speed),
         ]
 
         reward = self._compute_reward(event, target_headway)

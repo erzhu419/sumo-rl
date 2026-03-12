@@ -88,7 +88,7 @@ class SumoRLBridge:
         self.busline_edge_order = {}
         self.involved_tl_ID_l = []
         self.line_headways = {}  # Store median headway per line
-
+        self.line_stop_distances = defaultdict(dict)  # Absolute distance of each stop along each line
     # region SUMO lifecycle
     def reset(self) -> None:
         # Optimization: Load network once and reuse state
@@ -243,8 +243,14 @@ class SumoRLBridge:
                     self.line_headways[line_id] = float(np.median(diffs))
                 else:
                     self.line_headways[line_id] = self.default_headway
-            else:
                 self.line_headways[line_id] = self.default_headway
+                
+        # Precalculate absolute distances of each stop from the start of its respective line
+        for line_id, line in self.line_obj_dic.items():
+            dist = 0.0
+            for stop_id in line.stop_id_l:
+                dist += line.distance_between_stop_d.get(stop_id, 0.0)
+                self.line_stop_distances[line_id][stop_id] = dist
         # print(f"Computed Line Headways: {self.line_headways}")
 
     # endregion
@@ -506,6 +512,51 @@ class SumoRLBridge:
             direction = 1 if line_id.endswith('S') else 0
             waiting_passengers = len(traci.busstop.getPersonIDs(stop_id))
             
+            # 1. Segment Mean Speed
+            stop_internal_obj = self.stop_obj_dic.get(stop_id)
+            segment_mean_speed = 10.0
+            if stop_internal_obj and stop_internal_obj.at_lane_s:
+                try:
+                    segment_mean_speed = traci.lane.getLastStepMeanSpeed(stop_internal_obj.at_lane_s)
+                except Exception:
+                    pass
+            
+            # 2. Co-Line Headways
+            # Set a baseline value matching the scheduled headway of the current line
+            co_line_fwd = default_line_headway
+            co_line_bwd = default_line_headway
+            if stop_internal_obj:
+                my_pos = self.line_stop_distances[line_id].get(stop_id, bus_obj.distance_n)
+                # Find other lines sharing this stop
+                shared_lines = [l for l in stop_internal_obj.service_line_l if l != line_id]
+                fwd_dists = []
+                bwd_dists = []
+                for other_line in shared_lines:
+                    if stop_id not in self.line_stop_distances[other_line]:
+                        continue
+                    stop_pos_on_other_line = self.line_stop_distances[other_line][stop_id]
+                    # Find active buses on this other line
+                    for other_bus_id, other_bus in self.bus_obj_dic.items():
+                        if other_bus.belong_line_id_s == other_line and other_bus.bus_state_s != "No":
+                            # Relative distance
+                            dist_diff = stop_pos_on_other_line - other_bus.distance_n
+                            if dist_diff > 0: # other bus is before the stop (backward bus)
+                                bwd_dists.append(dist_diff)
+                            elif dist_diff < 0: # other bus has passed the stop (forward bus)
+                                fwd_dists.append(-dist_diff)
+                
+                # Convert spatial distance to temporal headway using current segment speed
+                # Limit effective speed to >= 1.0 m/s to prevent division by near-zero causing exploding values
+                effective_speed = max(segment_mean_speed, 1.0)
+                
+                # Cap the maximum returned headway to 2x the default headway (e.g. 720s) to prevent outliers
+                max_headway_cap = default_line_headway * 2.0
+                
+                if fwd_dists:
+                    co_line_fwd = min(min(fwd_dists) / effective_speed, max_headway_cap)
+                if bwd_dists:
+                    co_line_bwd = min(min(bwd_dists) / effective_speed, max_headway_cap)
+
             stop_data = traci.vehicle.getStops(bus_id, 1)
             stopping_place = stop_data[0].stoppingPlaceID if stop_data else stop_id
             
@@ -524,6 +575,9 @@ class SumoRLBridge:
                 backward_bus_present=bool(backward_bus),
                 target_forward_headway=target_forward,
                 target_backward_headway=target_backward,
+                co_line_forward_headway=co_line_fwd,
+                co_line_backward_headway=co_line_bwd,
+                segment_mean_speed=segment_mean_speed,
                 metadata={'arrive_time': arrive_time, 'stopping_place': stopping_place},
             )
             
