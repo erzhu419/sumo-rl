@@ -58,11 +58,13 @@ parser.add_argument('--use_gradient_clip', type=bool, default=True, help="Trick 
 parser.add_argument("--use_state_norm", type=bool, default=False, help="Trick 2:state normalization")
 parser.add_argument("--use_reward_norm", type=bool, default=False, help="Trick 3:reward normalization")
 parser.add_argument("--use_reward_scaling", type=bool, default=False, help="Trick 4:reward scaling")
-parser.add_argument("--gamma", type=float, default=0.99, help="Discount factor 0.99")
+parser.add_argument("--gamma", type=float, default=0.80, help="Discount factor 0.80")
 parser.add_argument("--training_freq", type=int, default=10, help="frequency of training the network")
 parser.add_argument("--plot_freq", type=int, default=1, help="frequency of plotting the result")
 parser.add_argument('--weight_reg', type=float, default=0.01, help='weight of regularization')
 parser.add_argument('--auto_entropy', type=bool, default=True, help='automatically updating alpha')
+parser.add_argument("--alpha", type=float, default=0.01, help="fixed entropy when auto_entropy is false")
+parser.add_argument("--warmup_steps", type=int, default=10000, help="DAW warmup steps with base rule actions")
 parser.add_argument("--maximum_alpha", type=float, default=0.6, help="max entropy weight")
 parser.add_argument("--batch_size", type=int, default=2048, help="batch size")
 parser.add_argument("--max_episodes", type=int, default=100, help="max episodes")
@@ -79,7 +81,7 @@ parser.add_argument('--passenger_update_freq', type=int, default=10, help='Frequ
 parser.add_argument('--profile', action='store_true', help='Enable cProfile performance analysis')
 
 # Ensemble args
-parser.add_argument("--ensemble_size", type=int, default=10, help="Number of models in the ensemble")
+parser.add_argument("--ensemble_size", type=int, default=2, help="Number of models in the ensemble (Twin-Q recommended)")
 parser.add_argument("--beta_bc", type=float, default=0.001, help="weight of behavior cloning loss")
 parser.add_argument("--beta", type=float, default=-2, help="weight of variance")
 parser.add_argument("--beta_ood", type=float, default=0.01, help="weight of OOD loss")
@@ -300,6 +302,7 @@ class VectorizedCritic(nn.Module):
         self.embedding_layer = embedding_layer
         self.critic = nn.Sequential(
             VectorizedLinear(state_dim + action_dim, hidden_dim, num_critics),
+            nn.LayerNorm(hidden_dim),
             nn.ReLU(),
             VectorizedLinear(hidden_dim, hidden_dim, num_critics),
             nn.ReLU(),
@@ -495,8 +498,8 @@ class SAC_Trainer():
         self.policy_net = PolicyNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone(), action_range).to(device)
         
         # SAC Entropy Temperature Tuning
-        # Initialize alpha to 0.1 (log_alpha = ln(0.1)) to avoid pure maximum-entropy uniform noise exploration at the start.
-        init_alpha = 0.1
+        # Initialize alpha to args.alpha if auto_entropy is False, else 0.1
+        init_alpha = 0.1 if args.auto_entropy else args.alpha
         self.alpha = init_alpha
         self.log_alpha = torch.tensor([np.log(init_alpha)], dtype=torch.float32, requires_grad=True, device=device)
         
@@ -521,7 +524,7 @@ class SAC_Trainer():
         running_ms = RunningMeanStd(shape=(self.num_cont_features,), init_mean=initial_mean, init_std=initial_std)
 
         self.state_norm = Normalization(num_categorical=self.num_cat_features, num_numerical=self.num_cont_features, running_ms=running_ms)
-        self.reward_scaling = RewardScaling(shape=1, gamma=0.99)
+        self.reward_scaling = RewardScaling(shape=1, gamma=args.gamma)
         
     def compute_q_loss(self, state, action, reward, next_state, done, new_next_action, next_log_prob, reg_norm, gamma):
         predicted_q_value = self.soft_q_net(state, action)
@@ -556,7 +559,7 @@ class SAC_Trainer():
     def compute_reg_norm(self, model):
         weight_norm, bias_norm = [], []
         for name, param in model.named_parameters():
-            if 'critic' in name:
+            if 'critic' in name and param.dim() == 3:
                 if 'weight' in name:
                     weight_norm.append(torch.norm(param, p=1, dim=[1, 2]))
                 elif 'bias' in name:
@@ -912,17 +915,57 @@ if __name__ == '__main__':
                 for line_id, buses in env_action_dict.items():
                     for bus_id, action_val in buses.items():
                         if action_val is not None:
-                            if args.holding_only:
+                            if args.use_residual_control:
+                                a_hold = action_val[0]
+                                a_speed = action_val[1]
+                                bus_state_history = state_dict.get(line_id, {}).get(bus_id, [])
+                                if len(bus_state_history) > 0:
+                                    gap = bus_state_history[0][11] # Index of newly added gap feature
+                                else:
+                                    gap = 0.0
+                                
+                                # 1. Base-Zero Baseline (Strictly No Holding, Normal Speed)
+                                base_hold = 0.0
+                                base_speed = 1.0
+
+                                # 2. Bang-Bang (Pseudo-Discrete) Action Mapping
+                                if step < args.warmup_steps:
+                                    hold = base_hold
+                                    speed = base_speed
+                                    # Override action_dict to store base [0.0, 0.0] continuous intent
+                                    action_dict[line_id][bus_id] = np.zeros(2, dtype=np.float32)
+                                else:
+                                    # 3. Step Function Triggers
+                                    # Holding: Binary Choice (Max Wait vs Go)
+                                    hold = 60.0 if a_hold > 0 else 0.0
+                                    
+                                    # Speed: Ternary Choice (Max Accel vs Max Decel vs Keep)
+                                    if a_speed > 0.33:
+                                        speed = 1.2
+                                    elif a_speed < -0.33:
+                                        speed = 0.8
+                                    else:
+                                        speed = 1.0
+                                env_action_dict[line_id][bus_id] = [hold, speed]
+                            elif args.use_1d_mapping:
+                                a = action_val[0]
+                                if a > 0:
+                                    env_action_dict[line_id][bus_id] = [a * 60.0, 1.0]
+                                elif a < 0:
+                                    env_action_dict[line_id][bus_id] = [0.0, 1.0 + abs(a) * 0.2]
+                                else:
+                                    env_action_dict[line_id][bus_id] = [0.0, 1.0]
+                            elif args.holding_only:
                                 env_action_dict[line_id][bus_id] = [action_val[0], 1.0]
                             elif args.speed_only:
                                 env_action_dict[line_id][bus_id] = [0.0, action_val[0]]
                                 
                 state_dict, reward_dict, done, _ = safe_step(env, env_action_dict, render=render)
                 
-                if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step:
+                if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and step_trained != step and step >= args.warmup_steps:
                     step_trained = step
                     for i in range(update_itr):
-                        _ = sac_trainer.update(args.batch_size, training_steps, reward_scale=10., auto_entropy=args.auto_entropy, target_entropy=sac_trainer.target_entropy)
+                        _ = sac_trainer.update(args.batch_size, training_steps, reward_scale=10., auto_entropy=args.auto_entropy, target_entropy=sac_trainer.target_entropy, gamma=args.gamma)
                         training_steps += 1
 
                 if len(action_log_buffer) > 50:

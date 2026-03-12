@@ -67,21 +67,18 @@ def main():
                         fwd_h = event.forward_headway
                         tgt_h = event.target_forward_headway
                         
-                        # Apply Hard Rules based on the prompt:
+                        # Apply Weak Stochastic Rules:
                         if fwd_h > tgt_h:
                             # Too slow / Behind schedule:
-                            # 对应 1D Mapping 中的 a < 0: holding=0, speed=1.0 ~ 1.2
+                            # Instead of fixed 1.2, use random acceleration (Expectation 1.1)
                             hold_time = 0.0
-                            speed_ratio = 1.2
+                            speed_ratio = np.random.uniform(1.0, 1.2)
                         else:
                             # Too fast / Catching up:
-                            # 对应 1D Mapping 中的 a > 0: holding=a*60, speed=1.0 
-                            # (原先的 Hard Rule 会降速到 0.8，为了对齐 1D Mapping，强制限制为 1.0)
-                            gap = tgt_h - fwd_h
-                            hold_time = min(60.0, gap) # Max hold capacity 60s
+                            # Instead of gap-based holding, use random holding (Expectation 30.0s)
+                            hold_time = np.random.uniform(0.0, 60.0)
                             speed_ratio = 1.0
                     else:
-                        # Fallback default if boundary limits are missing
                         hold_time = 0.0
                         speed_ratio = 1.0
 
