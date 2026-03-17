@@ -27,7 +27,7 @@ def main():
     bridge = build_bridge(
         root_dir=os.path.join(PROJECT_ROOT, 'SUMO_ruiguang/online_control'),
         gui=args.sumo_gui,
-        update_freq=10
+        update_freq=1  # Changed from 10 to 1 for high-precision passenger capturing
     )
     
     decision_provider = bridge.get('decision_provider')

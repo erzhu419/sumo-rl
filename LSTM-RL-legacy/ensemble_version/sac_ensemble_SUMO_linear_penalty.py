@@ -77,7 +77,7 @@ parser.add_argument('--sumo_root', type=str, default=os.path.join(PROJECT_ROOT, 
 parser.add_argument('--sumo_schedule', type=str, default='initialize_obj/save_obj_bus.add.xml', help='Path to schedule xml relative to --sumo_root')
 parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks')
 parser.add_argument('--sumo_gui', action='store_true', help='Launch SUMO with GUI (implies rendering)')
-parser.add_argument('--passenger_update_freq', type=int, default=10, help='Frequency of passenger/stop state updates (in steps)')
+parser.add_argument('--update_passenger_freq', type=int, default=1, help='Frequency of passenger/stop state updates (in steps, 1=high precision)')
 parser.add_argument('--profile', action='store_true', help='Enable cProfile performance analysis')
 
 # Ensemble args
@@ -91,6 +91,8 @@ parser.add_argument('--use_1d_mapping', action='store_true', help='Map 1D scalar
 parser.add_argument('--holding_only', action='store_true', help='Only manipulate holding time (dim 0)')
 parser.add_argument('--speed_only', action='store_true', help='Only manipulate speed (dim 1)')
 parser.add_argument('--bang_bang', action='store_true', help='Use Multi-Level Bang-Bang Control strategy')
+parser.add_argument('--traffic_scale', type=float, default=1.0, help='Multiplicative scale for social vehicle density (0.0=none, 1.0=normal)')
+parser.add_argument('--resume_checkpoint', type=str, default=None, help='Path to checkpoint to resume training from (e.g. model/run_name/checkpoint_episode_48)')
 args = parser.parse_args()
 
 
@@ -689,7 +691,12 @@ if use_sumo_env:
     module_name, _, attr_name = args.sumo_bridge.partition(':')
     bridge_module = importlib.import_module(module_name)
     factory = getattr(bridge_module, attr_name or 'build_bridge')
-    bridge = factory(root_dir=args.sumo_root, gui=getattr(args, 'sumo_gui', False) or render, update_freq=args.passenger_update_freq)
+    bridge = factory(
+        root_dir=args.sumo_root, 
+        gui=getattr(args, 'sumo_gui', False) or render, 
+        update_freq=args.update_passenger_freq,
+        scale=args.traffic_scale
+    )
     if isinstance(bridge, tuple):
         decision_provider = bridge[0]
         action_executor = bridge[1]
@@ -778,7 +785,21 @@ if __name__ == '__main__':
         profiler.enable()
 
     if args.train:
-        for eps in range(args.max_episodes):
+        start_episode = 0
+        if args.resume_checkpoint:
+            print(f"Resuming training from checkpoint: {args.resume_checkpoint}")
+            sac_trainer.load_model(args.resume_checkpoint)
+            # Try to infer start episode from filename if possible
+            try:
+                # E.g. checkpoint_episode_48 -> 49
+                base_name = os.path.basename(args.resume_checkpoint)
+                if 'episode_' in base_name:
+                    start_episode = int(base_name.split('episode_')[1]) + 1
+                    print(f"Inferred start episode: {start_episode}")
+            except Exception as e:
+                print(f"Could not infer start episode from {args.resume_checkpoint}. Starting from 0 but keeping weights.")
+
+        for eps in range(start_episode, args.max_episodes):
             episode_start_time = time.time()
             if eps != 0:
                 env.reset()

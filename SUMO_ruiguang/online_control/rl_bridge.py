@@ -16,16 +16,13 @@ if "SUMO_HOME" in os.environ:
 else:
     raise EnvironmentError("Please declare environment variable 'SUMO_HOME'!")
 
+import traci
+LIBSUMO_AVAILABLE = False
 try:
     import libsumo
-    sys.modules['traci'] = libsumo
-    import traci
-    print("Using libsumo for simulation (globally patched).")
-    LIBSUMO = True
+    LIBSUMO_AVAILABLE = True
 except ImportError:
-    import traci
-    print("Using traci for simulation.")
-    LIBSUMO = False
+    pass
 
 from sumolib import checkBinary
 import traci.constants as tc
@@ -48,6 +45,7 @@ class SumoRLBridge:
         time_step: float = 1.0,
         default_headway: float = 360.0,
         update_freq: int = 10,
+        scale: float = 1.0,
     ) -> None:
         self.root_dir = os.path.abspath(root_dir)
         self.sumo_cfg = sumo_cfg if os.path.isabs(sumo_cfg) else os.path.join(self.root_dir, sumo_cfg)
@@ -56,6 +54,7 @@ class SumoRLBridge:
         self.time_step = time_step
         self.default_headway = default_headway
         self.update_freq = update_freq
+        self.scale = scale
 
         self.initialized = False
         self.first_run = True
@@ -99,12 +98,12 @@ class SumoRLBridge:
             self._start_traci()
             self._load_objects()
             # Save state for future resets
-            if LIBSUMO:
+            if self.sumo_binary == "libsumo":
                 traci.simulation.saveState("sumo_start_state.sbx")
             self.first_run = False
         else:
             # Soft reset using saved state
-            if LIBSUMO:
+            if self.sumo_binary == "libsumo":
                 # Suppress "Loading state..." output
                 with open(os.devnull, 'w') as devnull:
                     try:
@@ -150,7 +149,7 @@ class SumoRLBridge:
 
     def close(self) -> None:
         # Optimization: Do NOT close traci if using libsumo reuse strategy
-        if not LIBSUMO:
+        if self.sumo_binary != "libsumo":
             if traci.isLoaded():
                 traci.close()
         
@@ -166,18 +165,23 @@ class SumoRLBridge:
             sys.path.append(tools)
 
     def _start_traci(self) -> None:
-        # Optimization: If traci is already loaded, don't start it again
-        if LIBSUMO and traci.isLoaded():
-            return
-
-        if LIBSUMO:
-            # libsumo runs in-process, no binary needed, but argv[0] is expected
-            # Added --duration-log.disable and --log /dev/null to suppress verbose output
-            traci.start(["sumo", "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
+        global traci
+        if self.gui:
+            # If GUI is requested, we MUST use standard traci
+            binary = checkBinary('sumo-gui')
+            traci.start([binary, "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null", "--scale", str(self.scale)])
+            self.sumo_binary = binary
+        elif LIBSUMO_AVAILABLE:
+            # Headless and libsumo available, patch traci globally for speed
+            import libsumo
+            sys.modules['traci'] = libsumo
+            traci = libsumo
+            traci.start(["sumo", "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null", "--scale", str(self.scale)])
             self.sumo_binary = "libsumo"
         else:
-            binary = checkBinary('sumo-gui' if self.gui else 'sumo')
-            traci.start([binary, "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null"])
+            # Headless fallback to standard traci
+            binary = checkBinary('sumo')
+            traci.start([binary, "-c", self.sumo_cfg, "--no-warnings", "--duration-log.disable", "--log", "/dev/null", "--scale", str(self.scale)])
             self.sumo_binary = binary
 
     def _load_objects(self) -> None:
@@ -243,7 +247,6 @@ class SumoRLBridge:
                     self.line_headways[line_id] = float(np.median(diffs))
                 else:
                     self.line_headways[line_id] = self.default_headway
-                self.line_headways[line_id] = self.default_headway
                 
         # Parse physical capacity for all stations (assuming ~15m per bus slot)
         self.station_capacities = {}
@@ -366,6 +369,8 @@ class SumoRLBridge:
         for person_id in departed_persons:
             if person_id in self.passenger_obj_dic:
                 self.active_passenger_ids.add(person_id)
+                # CRITICAL: Activate immediately so they are visible to buses (passable_line_l populated)
+                self.passenger_obj_dic[person_id].passenger_activate(simulation_current_time, self.line_obj_dic)
                 
         arrived_persons = traci.simulation.getArrivedPersonIDList()
         for person_id in arrived_persons:
@@ -380,9 +385,8 @@ class SumoRLBridge:
             # Iterate only active passengers
             for passenger_id in list(self.active_passenger_ids):
                 passenger_obj = self.passenger_obj_dic[passenger_id]
-                if passenger_obj.passenger_state_s == "No":
-                    passenger_obj.passenger_activate(simulation_current_time, self.line_obj_dic)
-                else:
+                # Note: passenger_activate is now handled immediately on departure
+                if passenger_obj.passenger_state_s != "No":
                     passenger_obj.passenger_run(simulation_current_time, self.line_obj_dic)
 
         # CRITICAL: Bus logic must run EVERY step to detect arrivals/departures correctly
@@ -452,8 +456,6 @@ class SumoRLBridge:
                     if waiting_buses:
                         oldest_bus_id = parked_buses[0]
                         traci.vehicle.setStopParameter(oldest_bus_id, 0, "duration", "0")
-                        if getattr(self, 'debug', False):
-                            print(f"[Silent Sentinel] Station {stop_id} is full (capacity {capacity}). Evicted {oldest_bus_id} for waiting bus {waiting_buses[0]}.")
             except Exception:
                 pass
 
@@ -699,8 +701,8 @@ class SumoRLBridge:
 
 
 
-def build_bridge(*, root_dir: str, sumo_cfg: str = "control_sim_traci_period.sumocfg", gui: bool = False, update_freq: int = 10) -> Dict[str, Callable]:
-    bridge = SumoRLBridge(root_dir=root_dir, sumo_cfg=sumo_cfg, gui=gui, update_freq=update_freq)
+def build_bridge(*, root_dir: str, sumo_cfg: str = "control_sim_traci_period.sumocfg", gui: bool = False, update_freq: int = 10, scale: float = 1.0) -> Dict[str, Callable]:
+    bridge = SumoRLBridge(root_dir=root_dir, sumo_cfg=sumo_cfg, gui=gui, update_freq=update_freq, scale=scale)
 
     def decision_provider() -> Tuple[List[DecisionEvent], bool]:
         return bridge.fetch_events()
