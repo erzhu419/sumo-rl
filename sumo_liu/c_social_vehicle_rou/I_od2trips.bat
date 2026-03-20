@@ -1,0 +1,2 @@
+od2trips -n 1_traffic_zone.taz.xml -d 2_estimate_social_vehicle.od.txt --timeline 0:3,1800:8,3600:14,5400:22,7200:20,9000:17,10800:12,12600:10,14400:10,162000:9,180000:0 --end 18000 --vtype Social_Vehicle --departlane 0 --departpos random_free --departspeed 0 --arrivalpos random -o 3_estimate_social_vehicle.odtrips.xml
+exit

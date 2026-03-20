@@ -1,0 +1,2 @@
+duarouter --net-file=../b_network/1_changsha_bus_network_with_signal_d.net.xml --additional-files=../b_network/3_bus_station.add.xml,../b_network/4_vehicle_type.add.xml --route-files=1_workday_passenger_flows.xml --end 18000 --randomize-flows=t --output-file=2_workday_passenger.rou.xml
+exit

@@ -67,7 +67,6 @@ class EmbeddingLayer(nn.Module):
         self.cat_names = ['line_id', 'bus_id', 'station_id', 'time_period', 'direction']
         
         # Hardcoded dims matching the saved model inspection
-        # line: 4, bus: 21, station: 1, time: 1, dir: 2
         manual_embed_dims = [4, 21, 1, 1, 2]
         
         self.embeddings = nn.ModuleDict()
@@ -110,7 +109,7 @@ class PolicyNetwork(nn.Module):
         self.action_range = action_range
 
     def forward(self, state):
-        num_cats = len(self.embedding_layer.cat_dims)
+        num_cats = 5 # original cat cols length is 5 from state
         cat_tensor = state[:, :num_cats]
         num_tensor = state[:, num_cats:]
         
@@ -127,7 +126,12 @@ class PolicyNetwork(nn.Module):
 
     def get_action(self, state, deterministic=True):
         mean, _ = self.forward(state)
-        return torch.tanh(mean).detach().cpu().numpy()
+        # V7 Action Mapping
+        action_0 = torch.tanh(mean)
+        scale = torch.tensor([30.0, 0.2], device=mean.device)
+        bias = torch.tensor([30.0, 1.0], device=mean.device)
+        action = scale * action_0 + bias
+        return action.detach().cpu().numpy()
 
 def collect_worker(worker_id, num_episodes, args, output_file):
     print(f"Worker {worker_id}: Starting collection of {num_episodes} episodes...")
@@ -147,8 +151,8 @@ def collect_worker(worker_id, num_episodes, args, output_file):
     if args.policy == 'expert':
         cat_dims = [12, 389, 1, 1, 2]
         embedding = EmbeddingLayer(cat_dims, layer_norm=True, dropout=0.0)
-        input_dim = 29 + 6 # 35 inputs for Best Result model
-        expert_net = PolicyNetwork(input_dim, 1, 32, embedding, action_range=1.0)
+        input_dim = 29 + 12 # 41 inputs for Episode 39 model
+        expert_net = PolicyNetwork(input_dim, 2, 48, embedding, action_range=1.0)
         try:
             state_dict = torch.load(args.model_path, map_location='cpu')
             expert_net.load_state_dict(state_dict)
@@ -217,9 +221,22 @@ def collect_worker(worker_id, num_episodes, args, output_file):
                 else:
                     action = np.random.uniform(0, 60, size=(1,))
             elif args.policy == 'expert':
-                obs_tensor = torch.FloatTensor(obs).unsqueeze(0)
+                # State currently has 15 elements: [5 cats, 10 continuous]
+                # Network expects [5 cats, 12 continuous]  (line idx 0 IS used)
+                # Pad with 2 zeros for the action dimension
+                obs_padded = np.pad(obs, (0, 2), 'constant', constant_values=0.0)
+                obs_tensor = torch.FloatTensor(obs_padded).unsqueeze(0)
                 a_t = expert_net.get_action(obs_tensor)[0]
-                action = (a_t + 1) / 2 * 60.0 
+                action = a_t
+            elif args.policy == 'heuristic':
+                tgt_h = obs[8]
+                fwd_h = obs[5]
+                # Default rules matching ac0be9 logic
+                if fwd_h > tgt_h:
+                    action = np.array([0.0, 1.2], dtype=np.float32)
+                else:
+                    gap = tgt_h - fwd_h
+                    action = np.array([min(60.0, gap), 1.0], dtype=np.float32) 
             else:
                 action = np.zeros((1,), dtype=np.float32)
 
@@ -372,7 +389,7 @@ def main():
     parser.add_argument("--episodes", type=int, default=250)
     parser.add_argument("--max_steps", type=int, default=86400)
     parser.add_argument("--output", type=str, default="offline_sumo/data/buffer.hdf5")
-    parser.add_argument("--policy", type=str, default="mixed", choices=["random", "zero", "mixed", "expert"])
+    parser.add_argument("--policy", type=str, default="mixed", choices=["random", "zero", "mixed", "expert", "heuristic"])
     parser.add_argument("--model_path", type=str, default="logs/sac_v2_bus_SUMO_best_result/sac_v2_episode_18_policy")
     parser.add_argument("--num_workers", type=int, default=10, help="Number of parallel workers")
     parser.add_argument("--save_interval", type=int, default=20, help="Save to disk every N episodes per worker")

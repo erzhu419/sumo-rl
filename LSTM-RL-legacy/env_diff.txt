@@ -1,0 +1,975 @@
+1c1
+< import psutil,tracemalloc
+---
+> import psutil, tracemalloc
+12a13,24
+> import math
+> import gc
+> import time
+> import sys
+> import os
+> 
+> PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+> sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+> if PROJECT_ROOT not in sys.path:
+>     sys.path.insert(0, PROJECT_ROOT)
+>     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+> 
+22c34
+< import libsumo as traci
+---
+> import traci
+25a38
+> from copy import deepcopy
+27,29d39
+< PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+< if PROJECT_ROOT not in sys.path:
+<     sys.path.insert(0, PROJECT_ROOT)
+49c59
+< parser.add_argument('--weight_reg', type=float, default=0.1, help='weight of regularization')
+---
+> parser.add_argument('--weight_reg', type=float, default=0.01, help='weight of regularization')
+51c61
+< parser.add_argument("--maximum_alpha", type=float, default=0.3, help="max entropy weight")
+---
+> parser.add_argument("--maximum_alpha", type=float, default=0.6, help="max entropy weight")
+54,55c64,65
+< parser.add_argument('--save_root', type=str, default='.', help='Base directory for saving models, logs, and figures')
+< parser.add_argument('--run_name', type=str, default='gpt_version', help='Optional identifier appended to save directories to avoid overwriting previous runs')
+---
+> parser.add_argument('--save_root', type=str, default=os.path.dirname(os.path.abspath(__file__)), help='Base directory for saving models, logs, and figures')
+> parser.add_argument('--run_name', type=str, default='ensemble_run', help='Optional identifier appended to save directories')
+61c71
+< parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks, format module:function')
+---
+> parser.add_argument('--sumo_bridge', type=str, default='SUMO_ruiguang.online_control.rl_bridge:build_bridge', help='Python entrypoint returning decision_provider/action_executor callbacks')
+64a75,82
+> 
+> # Ensemble args
+> parser.add_argument("--ensemble_size", type=int, default=10, help="Number of models in the ensemble")
+> parser.add_argument("--beta_bc", type=float, default=0.001, help="weight of behavior cloning loss")
+> parser.add_argument("--beta", type=float, default=-2, help="weight of variance")
+> parser.add_argument("--beta_ood", type=float, default=0.01, help="weight of OOD loss")
+> parser.add_argument('--critic_actor_ratio', type=int, default=2, help="ratio of critic and actor training")
+> 
+86,88c104,106
+<         self.last_episode_step = last_episode_step  # 预估每个 episode 的 step 数
+<         self.buffer = {}
+<         self.position = 0  # 用作 dict 的 key
+---
+>         self.last_episode_step = last_episode_step
+>         self.buffer = []
+>         self.position = 0
+91,99c109,114
+<         """添加新数据"""
+<         self.buffer[self.position] = (state, action, reward, next_state, done)
+<         self.position += 1
+< 
+<         # 当 buffer 过大时，删除最早的 episode 数据
+<         if len(self.buffer) > self.capacity:
+<             keys_to_remove = list(self.buffer.keys())[:self.last_episode_step]  # 找到最早的 N 条数据
+<             for key in keys_to_remove:
+<                 del self.buffer[key]  # 直接删除，提高性能
+---
+>         """Add new data to buffer, overwriting old if full"""
+>         if len(self.buffer) < self.capacity:
+>             self.buffer.append(None)
+>         
+>         self.buffer[int(self.position)] = (state, action, reward, next_state, done)
+>         self.position = (self.position + 1) % self.capacity
+102,103c117,119
+<         """随机采样 batch_size 大小的数据，确保数据格式正确"""
+<         batch = random.sample(list(self.buffer.values()), batch_size)  # 直接从 dict 的值采样
+---
+>         """Randomly sample batch_size elements in O(1)"""
+>         batch_indices = np.random.randint(0, len(self.buffer), size=batch_size)
+>         batch = [self.buffer[i] for i in batch_indices]
+105,113c121,123
+< 
+<         # 确保维度正确，防止 PyTorch 计算时出现广播错误
+<         states = np.stack(states)                      # (batch_size, state_dim)
+<         actions = np.stack(actions)                    # (batch_size, action_dim) 或 (batch_size,)
+<         rewards = np.array(rewards, dtype=np.float32)  # (batch_size,)
+<         next_states = np.stack(next_states)            # (batch_size, state_dim)
+<         dones = np.array(dones, dtype=np.float32)      # (batch_size,)
+< 
+<         return states, actions, rewards, next_states, dones
+---
+>         
+>         return np.stack(states), np.stack(actions), np.array(rewards, dtype=np.float32), \
+>                np.stack(next_states), np.array(dones, dtype=np.float32)
+226,239d235
+<     @classmethod
+<     def compute_output_dim(cls, cat_code_dict, cat_cols, embedding_dims=None) -> int:
+<         total = 0
+<         for col in cat_cols:
+<             codes = list(cat_code_dict[col].values())
+<             if len(codes) == 0:
+<                 continue
+<             cardinality = max(codes) + 1
+<             if embedding_dims and col in embedding_dims:
+<                 total += embedding_dims[col]
+<             else:
+<                 total += cls._suggest_dim(cardinality)
+<         return total
+< 
+266,268c262,267
+< class SoftQNetwork(nn.Module):
+<     def __init__(self, num_inputs, num_actions, hidden_size, embedding_layer, init_w=3e-3):
+<         super(SoftQNetwork, self).__init__()
+---
+> class VectorizedLinear(nn.Module):
+>     def __init__(self, in_features, out_features, ensemble_size):
+>         super().__init__()
+>         self.in_features = in_features
+>         self.out_features = out_features
+>         self.ensemble_size = ensemble_size
+270,274c269,280
+<         self.embedding_layer = embedding_layer
+<         self.linear1 = nn.Linear(num_inputs + num_actions, hidden_size)
+<         self.linear2 = nn.Linear(hidden_size, hidden_size)
+<         self.linear3 = nn.Linear(hidden_size, hidden_size)
+<         self.linear4 = nn.Linear(hidden_size, 1)
+---
+>         self.weight = nn.Parameter(torch.empty(ensemble_size, in_features, out_features))
+>         self.bias = nn.Parameter(torch.empty(ensemble_size, 1, out_features))
+> 
+>         self.reset_parameters()
+> 
+>     def reset_parameters(self):
+>         for i in range(self.ensemble_size):
+>             nn.init.kaiming_uniform_(self.weight[i], a=math.sqrt(5))
+> 
+>         fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight[0])
+>         bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+>         nn.init.uniform_(self.bias, -bound, bound)
+276,277c282,299
+<         self.linear4.weight.data.uniform_(-init_w, init_w)
+<         self.linear4.bias.data.uniform_(-init_w, init_w)
+---
+>     def forward(self, x):
+>         return x @ self.weight + self.bias
+> 
+> 
+> class VectorizedCritic(nn.Module):
+>     def __init__(self, state_dim, action_dim, hidden_dim, num_critics, embedding_layer):
+>         super().__init__()
+>         self.embedding_layer = embedding_layer
+>         self.critic = nn.Sequential(
+>             VectorizedLinear(state_dim + action_dim, hidden_dim, num_critics),
+>             nn.ReLU(),
+>             VectorizedLinear(hidden_dim, hidden_dim, num_critics),
+>             nn.ReLU(),
+>             VectorizedLinear(hidden_dim, hidden_dim, num_critics),
+>             nn.ReLU(),
+>             VectorizedLinear(hidden_dim, 1, num_critics),
+>         )
+>         self.num_critics = num_critics
+280,281c302,317
+<         cat_tensor = state[:, :len(self.embedding_layer.cat_cols)]  # Assuming first columns are categorical
+<         num_tensor = state[:, len(self.embedding_layer.cat_cols):]  # The rest are numerical
+---
+>         state_action = torch.cat([state, action], dim=-1)
+>         state_action = state_action.unsqueeze(0).repeat_interleave(self.num_critics, dim=0)
+>         q_values = self.critic(state_action).squeeze(-1)
+>         return q_values
+> 
+> 
+> class SoftQNetwork(VectorizedCritic):
+>     def __init__(self, state_dim, action_dim, hidden_dim, embedding_layer, ensemble_size=10):
+>         super().__init__(
+>             state_dim=state_dim,
+>             action_dim=action_dim,
+>             hidden_dim=hidden_dim,
+>             num_critics=ensemble_size,
+>             embedding_layer=embedding_layer
+>         )
+>         self.ensemble_size = ensemble_size
+283c319,321
+<         # cat_tensor = torch.clamp(cat_tensor, min=0, max=max(self.embedding_layer.cat_code_dict.values()))
+---
+>     def forward(self, state, action):
+>         cat_tensor = state[:, :len(self.embedding_layer.cat_cols)]
+>         num_tensor = state[:, len(self.embedding_layer.cat_cols):]
+285,292c323,324
+<         state_with_embeddings = torch.cat([embedding, num_tensor], dim=1)  # Concatenate embedding and numerical features
+<         x = torch.cat([state_with_embeddings, action], 1)
+< 
+<         x = F.relu(self.linear1(x))
+<         x = F.relu(self.linear2(x))
+<         x = F.relu(self.linear3(x))
+<         x = self.linear4(x)
+<         return x
+---
+>         state_with_embeddings = torch.cat([embedding, num_tensor], dim=1)
+>         return super().forward(state_with_embeddings, action)
+332d363
+<         # mean    = F.leaky_relu(self.mean_linear(x))
+339,341d369
+<         '''
+<         generate sampled action with state as input wrt the policy network;
+<         '''
+343c371
+<         std = log_std.exp()  # no clip in evaluation, clip affects gradients flow
+---
+>         std = log_std.exp()
+347,358c375,376
+<         action_0 = torch.tanh(mean + std * z.to(device))  # TanhNormal distribution as actions; reparameterization trick
+<         action = self.action_range/2 * action_0 + self.action_range/2  # bounded action
+<         # The log-likelihood here is for the TanhNorm distribution instead of only Gaussian distribution. \
+<         # The TanhNorm forces the Gaussian with infinite action range to be finite. \
+<         # For the three terms in this log-likelihood estimation: \
+<         # (1). the first term is the log probability of action as in common \
+<         # stochastic Gaussian action policy (without Tanh); \
+<         # (2). the second term is the caused by the Tanh(), \
+<         # as shown in appendix C. Enforcing Action Bounds of https://arxiv.org/pdf/1801.01290.pdf, \
+<         # the epsilon is for preventing the negative cases in log; \
+<         # (3). the third term is caused by the action range I used in this code is not (-1, 1) but with \
+<         # an arbitrary action range, which is slightly different from original paper.
+---
+>         action_0 = torch.tanh(mean + std * z.to(device))
+>         action = self.action_range/2 * action_0 + self.action_range/2
+360,363c378
+<         # both dims of normal.log_prob and -log(1-a**2) are (N,dim_of_action);
+<         # the Normal.log_prob outputs the same dim of input features instead of 1 dim probability,
+<         # needs sum up across the features dim to get 1 dim prob; or else use Multivariate Normal.
+<         log_prob = log_prob.sum(dim=1, keepdim=True)
+---
+>         log_prob = log_prob.sum(dim=1)
+367c382,384
+<         state = torch.FloatTensor(state).unsqueeze(0).to(device)
+---
+>         if getattr(state, 'dim', lambda: 0)() == 1:
+>             state = state.unsqueeze(0)
+>         state = state.float().to(device)
+377a395
+> 
+379c397
+<     def __init__(self, env, replay_buffer, hidden_dim, action_range):
+---
+>     def __init__(self, env, replay_buffer, hidden_dim, action_range, ensemble_size=10):
+399c417
+<         # 创建嵌入层模板，并为每个网络提供独立副本，避免目标网络与在线网络共享参数
+---
+>         
+401c419
+<         state_dim = embedding_template.output_dim + self.num_cont_features  # 状态维度 = 嵌入维度 + 数值特征维度
+---
+>         state_dim = embedding_template.output_dim + self.num_cont_features
+405,408c423,424
+<         self.soft_q_net1 = SoftQNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone()).to(device)
+<         self.soft_q_net2 = SoftQNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone()).to(device)
+<         self.target_soft_q_net1 = SoftQNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone()).to(device)
+<         self.target_soft_q_net2 = SoftQNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone()).to(device)
+---
+>         self.soft_q_net = SoftQNetwork(state_dim, action_dim, hidden_dim, embedding_template.clone(), ensemble_size=ensemble_size).to(device)
+>         self.target_soft_q_net = deepcopy(self.soft_q_net)
+411c427,428
+<         print('Soft Q Network (1,2): ', self.soft_q_net1)
+---
+>         
+>         print('Soft Q Network: ', self.soft_q_net)
+414,420c431
+<         for target_param, param in zip(self.target_soft_q_net1.parameters(), self.soft_q_net1.parameters()):
+<             target_param.data.copy_(param.data)
+<         for target_param, param in zip(self.target_soft_q_net2.parameters(), self.soft_q_net2.parameters()):
+<             target_param.data.copy_(param.data)
+< 
+<         self.soft_q_criterion1 = nn.MSELoss()
+<         self.soft_q_criterion2 = nn.MSELoss()
+---
+>         self.soft_q_criterion = nn.MSELoss()
+426,427c437
+<         self.soft_q_optimizer1 = optim.Adam(self.soft_q_net1.parameters(), lr=soft_q_lr)
+<         self.soft_q_optimizer2 = optim.Adam(self.soft_q_net2.parameters(), lr=soft_q_lr)
+---
+>         self.soft_q_optimizer = optim.Adam(self.soft_q_net.parameters(), lr=soft_q_lr)
+431d440
+<         # 初始化RunningMeanStd
+438a448,488
+>         
+>     def compute_q_loss(self, state, action, reward, next_state, done, new_next_action, next_log_prob, reg_norm, gamma):
+>         predicted_q_value = self.soft_q_net(state, action)
+>         target_q_next = self.target_soft_q_net(next_state, new_next_action)
+>         next_log_prob = next_log_prob.unsqueeze(0).repeat(self.soft_q_net.num_critics, 1)
+>         reg_norm_exp = reg_norm.unsqueeze(-1).repeat(1, args.batch_size)
+>         target_q_next = target_q_next - self.alpha * next_log_prob + args.weight_reg * reg_norm_exp
+>         target_q_value = reward + (1 - done) * gamma * target_q_next.unsqueeze(-1)
+> 
+>         ood_loss = predicted_q_value.std(0).mean()
+>         q_value_loss = self.soft_q_criterion(predicted_q_value, target_q_value.squeeze(-1).detach())
+>         loss = q_value_loss + args.beta_ood * ood_loss
+>         return loss, predicted_q_value, ood_loss
+> 
+>     def compute_policy_loss(self, state, action, new_action, log_prob, reg_norm):
+>         reg_norm_exp = reg_norm.unsqueeze(-1).repeat(1, args.batch_size)
+>         q_values_dist = self.soft_q_net(state, new_action) + args.weight_reg * reg_norm_exp - self.alpha * log_prob
+> 
+>         q_mean = q_values_dist.mean(dim=0)
+>         q_std = q_values_dist.std(dim=0)
+>         q_loss = -(q_mean + args.beta * q_std).mean()
+> 
+>         bc_loss = F.mse_loss(new_action, action.detach() if isinstance(action, torch.Tensor) else torch.tensor(action, device=device))
+>         loss = args.beta_bc * bc_loss + q_loss
+> 
+>         return loss, q_loss, q_std
+> 
+>     def compute_alpha_loss(self, log_prob, target_entropy):
+>         alpha_loss = -(self.log_alpha * (log_prob + target_entropy).detach()).mean()
+>         return alpha_loss
+> 
+>     def compute_reg_norm(self, model):
+>         weight_norm, bias_norm = [], []
+>         for name, param in model.named_parameters():
+>             if 'critic' in name:
+>                 if 'weight' in name:
+>                     weight_norm.append(torch.norm(param, p=1, dim=[1, 2]))
+>                 elif 'bias' in name:
+>                     bias_norm.append(torch.norm(param, p=1, dim=[1, 2]))
+>         reg_norm = torch.sum(torch.stack(weight_norm), dim=0) + torch.sum(torch.stack(bias_norm[:-1]), dim=0)
+>         return reg_norm
+440c490,491
+<     def update(self, batch_size,training_steps, reward_scale=10., auto_entropy=True, target_entropy=-2, gamma=0.99, soft_tau=1e-2):
+---
+>     def update(self, batch_size, training_steps, reward_scale=10., auto_entropy=True, target_entropy=-2, gamma=0.99, soft_tau=1e-2):
+>         global q_values, reg_norms1, reg_norms2, log_probs, alpha_values, ood_losses, q_stds
+442d492
+<         # print('sample:', state, action,  reward, done)
+447c497
+<         reward = torch.FloatTensor(reward).unsqueeze(1).to(device)  # reward is single value, unsqueeze() to add one dim to be [reward] at the sample dim;
+---
+>         reward = torch.FloatTensor(reward).unsqueeze(1).to(device)
+450,451d499
+<         predicted_q_value1 = self.soft_q_net1(state, action)
+<         predicted_q_value2 = self.soft_q_net2(state, action)
+454,459c502,508
+<         reward = reward_scale * (reward - reward.mean(dim=0)) / (reward.std(dim=0) + 1e-6)  # normalize with batch mean and std; plus a small number to prevent numerical problem
+<         # Updating alpha wrt entropy
+<         # alpha = 0.0  # trade-off between exploration (max entropy) and exploitation (max Q)
+<         if auto_entropy is True:
+<             alpha_loss = -(self.log_alpha * (log_prob + target_entropy).detach()).mean()
+<             # print('alpha loss: ',alpha_loss)
+---
+>         
+>         reward_std = reward.std(dim=0)
+>         reward_std = torch.where(reward_std < 1e-6, torch.tensor(1.0, device=device), reward_std)
+>         reward = reward_scale * (reward - reward.mean(dim=0)) / reward_std
+> 
+>         if auto_entropy:
+>             alpha_loss = self.compute_alpha_loss(log_prob, target_entropy)
+468,492c517
+<         # 计算 reg_norm
+<         reg_norm1, weight_norm1, bias_norm1 = 0, [], []
+<         reg_norm2, weight_norm2, bias_norm2 = 0, [], []
+< 
+<         for layer in self.target_soft_q_net1.children():
+<             if isinstance(layer, nn.Linear):
+<                 weight_norm1.append(torch.norm(layer.state_dict()['weight']) ** 2)
+<                 bias_norm1.append(torch.norm(layer.state_dict()['bias']) ** 2)
+< 
+<         reg_norm1 = torch.sqrt(torch.sum(torch.stack(weight_norm1)) + torch.sum(torch.stack(bias_norm1[0:-1])))
+< 
+<         for layer in self.target_soft_q_net2.children():
+<             if isinstance(layer, nn.Linear):
+<                 weight_norm2.append(torch.norm(layer.state_dict()['weight']) ** 2)
+<                 bias_norm2.append(torch.norm(layer.state_dict()['bias']) ** 2)
+< 
+<         reg_norm2 = torch.sqrt(torch.sum(torch.stack(weight_norm2)) + torch.sum(torch.stack(bias_norm2[0:-1])))
+< 
+< 
+<         # Training Q Function
+<         target_q_min = torch.min(self.target_soft_q_net1(next_state, new_next_action) - args.weight_reg * reg_norm1,
+<                                  self.target_soft_q_net2(next_state, new_next_action) - args.weight_reg * reg_norm2) - self.alpha * next_log_prob
+<         target_q_value = reward + (1 - done) * gamma * target_q_min  # if done==1, only reward
+<         q_value_loss1 = self.soft_q_criterion1(predicted_q_value1, target_q_value.detach())  # detach: no gradients for the variable
+<         q_value_loss2 = self.soft_q_criterion2(predicted_q_value2, target_q_value.detach())
+---
+>         reg_norm = self.compute_reg_norm(self.target_soft_q_net)
+494,495c519,521
+<         self.soft_q_optimizer1.zero_grad()
+<         q_value_loss1.backward(retain_graph=False)
+---
+>         q_value_loss, predicted_q_value, ood_loss = self.compute_q_loss(state, action, reward, next_state, done, new_next_action, next_log_prob, reg_norm, gamma)
+>         self.soft_q_optimizer.zero_grad()
+>         q_value_loss.backward(retain_graph=False)
+497,498c523,524
+<             torch.nn.utils.clip_grad_norm_(sac_trainer.soft_q_net1.parameters(), max_norm=1.0)  # Q 网络梯度裁剪
+<         self.soft_q_optimizer1.step()
+---
+>             torch.nn.utils.clip_grad_norm_(self.soft_q_net.parameters(), max_norm=1.0)
+>         self.soft_q_optimizer.step()
+500,510c526,528
+<         self.soft_q_optimizer2.zero_grad()
+<         q_value_loss2.backward(retain_graph=False)
+<         if args.use_gradient_clip:
+<             torch.nn.utils.clip_grad_norm_(sac_trainer.soft_q_net2.parameters(), max_norm=1.0)  # Q 网络梯度裁剪
+<         self.soft_q_optimizer2.step()
+< 
+<         predicted_new_q_value = torch.min(self.soft_q_net1(state, new_action) + args.weight_reg * reg_norm1, self.soft_q_net2(state, new_action)
+<                                           + args.weight_reg * reg_norm2)
+<         # Training Policy Function
+<         if training_steps % 2 == 0:
+<             policy_loss = (self.alpha * log_prob - predicted_new_q_value).mean()
+---
+>         if training_steps % args.critic_actor_ratio == 0:
+>             policy_loss, _, q_std = self.compute_policy_loss(state, action, new_action, log_prob, reg_norm)
+>             q_stds.append(q_std.mean().item())
+516,517c534,535
+<             # print('q loss: ', q_value_loss1.item(), q_value_loss2.item())
+<             # print('policy loss: ', policy_loss.item())
+---
+>         for target_param, param in zip(self.target_soft_q_net.parameters(), self.soft_q_net.parameters()):
+>             target_param.data.copy_(target_param.data * (1.0 - soft_tau) + param.data * soft_tau)
+519,531c537,545
+<         # Soft update the target value net
+<         for target_param, param in zip(self.target_soft_q_net1.parameters(), self.soft_q_net1.parameters()):
+<             target_param.data.copy_(  # copy data value into target parameters
+<                 target_param.data * (1.0 - soft_tau) + param.data * soft_tau
+<             )
+<         for target_param, param in zip(self.target_soft_q_net2.parameters(), self.soft_q_net2.parameters()):
+<             target_param.data.copy_(  # copy data value into target parameters
+<                 target_param.data * (1.0 - soft_tau) + param.data * soft_tau
+<             )
+<         # 记录 Q 值和 V 值用于绘图
+<         q_values.append(predicted_new_q_value.mean().item())
+<         reg_norms1.append(args.weight_reg * reg_norm1.item())
+<         reg_norms2.append(args.weight_reg * reg_norm2.item())
+---
+>         # Logging vars
+>         q_values.append(predicted_q_value.mean().item())
+>         if reg_norm.numel() > 1:
+>             reg_norms1.append(args.weight_reg * reg_norm[0].item())
+>             reg_norms2.append(args.weight_reg * reg_norm[1].item())
+>         else:
+>             reg_norms1.append(args.weight_reg * reg_norm.item())
+>             reg_norms2.append(args.weight_reg * reg_norm.item())
+>              
+533a548
+>         ood_losses.append(ood_loss.item())
+535c550
+<         return predicted_new_q_value.mean()
+---
+>         return predicted_q_value.mean()
+538,539c553
+<         torch.save(self.soft_q_net1.state_dict(), path + '_q1')
+<         torch.save(self.soft_q_net2.state_dict(), path + '_q2')
+---
+>         torch.save(self.soft_q_net.state_dict(), path + '_q')
+540a555
+>         torch.save(self.state_norm, path + '_norm')
+543,549c558,560
+<         self.soft_q_net1.load_state_dict(torch.load(path + '_q1', weights_only=True))
+<         self.soft_q_net2.load_state_dict(torch.load(path + '_q2', weights_only=True))
+<         self.policy_net.load_state_dict(torch.load(path + '_policy',weights_only=True))
+< 
+<         self.soft_q_net1.eval()
+<         self.soft_q_net1.eval()
+<         self.soft_q_net2.eval()
+---
+>         self.soft_q_net.load_state_dict(torch.load(path + '_q', weights_only=True))
+>         self.policy_net.load_state_dict(torch.load(path + '_policy', weights_only=True))
+>         self.soft_q_net.eval()
+553,607d563
+< def evaluate_policy(sac_trainer, env, num_eval_episodes=5, deterministic=True):
+<     """
+<     评估当前策略，返回多次评估的平均奖励和方差
+<     :param sac_trainer: SAC_Trainer实例
+<     :param env: 环境
+<     :param num_eval_episodes: 评估的episode数量
+<     :param deterministic: 是否使用确定性策略
+<     :return: (平均奖励, 奖励方差)
+<     """
+<     eval_rewards = []
+<     
+<     for eval_ep in range(num_eval_episodes):
+<         print(f"Evaluating episode {eval_ep + 1}/{num_eval_episodes}...")
+<         env.reset()
+<         state_dict, reward_dict, _ = safe_initialize_state(env, render=False)
+<         
+<         done = False
+<         episode_reward = 0
+<         action_dict = build_action_template(state_dict)
+<         station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
+<         
+<         while not done:
+<             action_dict = build_action_template(state_dict, action_dict)
+<             for line_id, buses in state_dict.items():
+<                 for bus_id, history in buses.items():
+<                     if len(history) == 0:
+<                         continue
+<                     if len(history) == 1:
+<                         if action_dict[line_id][bus_id] is None:
+<                             state_input = np.array(history[0])
+<                             state_tensor = torch.from_numpy(state_input).float()
+<                             a = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+<                             action_dict[line_id][bus_id] = a
+<                     elif len(history) >= 2:
+<                         if history[0][station_feature_idx] != history[1][station_feature_idx]:
+<                             episode_reward += get_reward_value(reward_dict, line_id, bus_id)
+<                         state_dict[line_id][bus_id] = history[1:]
+<                         state_input = np.array(state_dict[line_id][bus_id][0])
+<                         state_tensor = torch.from_numpy(state_input).float()
+<                         action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+< 
+<             state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=False)
+< 
+<         eval_rewards.append(episode_reward)
+<     
+<     if len(eval_rewards) > 0:
+<         mean_reward = np.mean(eval_rewards)
+<         reward_std = np.std(eval_rewards)
+<     else:
+<         mean_reward = 0.0
+<         reward_std = 0.0
+<     
+<     return mean_reward, reward_std
+< 
+< 
+614c570
+<     plt.title(f"Training Reward (weight_reg={args.weight_reg}, auto_entropy={args.auto_entropy}, reward_scaling={args.use_reward_scaling}, maximum_alpha={args.maximum_alpha})")
+---
+>     plt.title(f"Training Reward (weight_reg={args.weight_reg}, auto_entropy={args.auto_entropy})")
+617,619c573,575
+<     plt.plot(q_values_episode, label="Q-Value")
+<     plt.plot(reg_norms1_episode, label="Regularization Term1")
+<     plt.plot(reg_norms2_episode, label="Regularization Term2")
+---
+>     plt.plot(q_values_episode, label="Q-Value Mean")
+>     plt.plot(reg_norms1_episode, label="Reg Norm 1")
+>     plt.plot(reg_norms2_episode, label="Reg Norm 2")
+621a578,579
+>     plt.plot(ood_losses_episode, label="OOD Loss")
+>     plt.plot(q_stds_episode, label="Q Std")
+624c582
+<     plt.title(f"Q-Value & V-Value and log_prob & regularization Monitoring (weight_reg={args.weight_reg})")
+---
+>     plt.title(f"Monitoring (weight_reg={args.weight_reg})")
+628,629c586
+< 
+<     plt.savefig(os.path.join(PIC_DIR, f'sac_monitoring_weight_reg_{args.weight_reg}.png'))
+---
+>     plt.savefig(os.path.join(PIC_DIR, 'sac_monitoring.png'))
+631a589,590
+> # Evaluate policy is not fundamentally changed but can be added if needed, skipping for brevity or add if requested.
+> 
+651,653d609
+<     module_name, _, attr_name = args.sumo_bridge.partition(':')
+<     bridge_module = importlib.import_module(module_name)
+<     factory = getattr(bridge_module, attr_name or 'build_bridge')
+656,657c612,613
+<         decision_provider = bridge[0] if len(bridge) > 0 else None
+<         action_executor = bridge[1] if len(bridge) > 1 else None
+---
+>         decision_provider = bridge[0]
+>         action_executor = bridge[1]
+666,668c622,623
+<         raise ValueError("Bridge factory must return a tuple or dict with decision_provider/action_executor")
+<     if decision_provider is None or action_executor is None:
+<         raise ValueError("Bridge must provide decision_provider and action_executor")
+---
+>         raise ValueError("Bridge returns unsupported format")
+>         
+670,671d624
+<     import inspect
+<     # print(f"DEBUG_IMPORT: SumoBusHoldingEnv loaded from {inspect.getfile(SumoBusHoldingEnv)}", flush=True)
+692c645
+< with open("trajectory_log.csv", "w") as f:
+---
+> with open(os.path.join(LOG_DIR, "trajectory_log.csv"), "w") as f:
+696c649
+< with open("action_log.csv", "w") as f:
+---
+> with open(os.path.join(LOG_DIR, "action_log.csv"), "w") as f:
+706,707d658
+< # hyperparameters for RL training
+< 
+710,711c661
+< frame_idx = 0
+< explore_steps = 0  # for random action sampling in the beginning of training
+---
+> explore_steps = 0
+713d662
+< AUTO_ENTROPY = True
+717,736c666,681
+< rewards = []    # 记录奖励
+< q_values = []  # 记录 Q 值变化
+< reg_norms1 = []  # 记录正则化项1
+< reg_norms2 = []  # 记录正则化项2
+< log_probs = []  # 记录 log_prob
+< alpha_values = []  # 记录 alpha 值
+< 
+< q_values_episode = []  # 记录每个 episode 的 Q 值
+< reg_norms1_episode = []  # 记录每个 episode 的正则化项1
+< reg_norms2_episode = []  # 记录每个 episode 的正则化项2
+< log_probs_episode = []  # 记录每个 episode 的 log_prob
+< alpha_values_episode = []  # 记录每个 episode 的 alpha 值
+< 
+< # 创建用于存储评估结果的列表
+< eval_episodes = []      # 记录进行评估的 episode 编号
+< eval_mean_rewards = []  # 记录评估的平均奖励
+< eval_reward_stds = []   # 记录评估的奖励标准差
+< 
+< # 修改模型保存路径
+< model_path = MODEL_PREFIX
+---
+> rewards = []
+> q_values = []
+> reg_norms1 = []
+> reg_norms2 = []
+> log_probs = []
+> alpha_values = []
+> ood_losses = []
+> q_stds = []
+> 
+> q_values_episode = []
+> reg_norms1_episode = []
+> reg_norms2_episode = []
+> log_probs_episode = []
+> alpha_values_episode = []
+> ood_losses_episode = []
+> q_stds_episode = []
+740c685
+< sac_trainer = SAC_Trainer(env, replay_buffer, hidden_dim=hidden_dim, action_range=action_range)
+---
+> sac_trainer = SAC_Trainer(env, replay_buffer, hidden_dim=hidden_dim, action_range=action_range, ensemble_size=args.ensemble_size)
+748d692
+<         # training loop
+749a694
+>             episode_start_time = time.time()
+756c701
+<             training_steps = 0 # 记录已经训练了多少次
+---
+>             training_steps = 0
+760,761d704
+<             last_heartbeat_time = 0.0
+<             loop_count = 0
+776c719
+<                                     
+---
+> 
+778a722,723
+>                                 if action_val is None:
+>                                     action_val = 0.0
+780d724
+<                                 sim_time = history[0][-1]
+785,790c729
+<                                     
+<                                 if debug:
+<                                     # Format: From Algorithm, when no state, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+<                                     print(f'From Algorithm, when no state, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
+<                                     print()
+<     
+---
+> 
+795d733
+<                             # Check if station changed (valid transition)
+809c747
+<     
+---
+> 
+818c756,757
+<                                 
+---
+> 
+>                                 # Push to buffer
+821,828d759
+<                                 if debug:
+<                                     # Format: From Algorithm store, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+<                                     # Note: using history[0] (previous state) for station id and time to match the 'store' context
+<                                     store_time = history[0][-1]
+<                                     store_stop = history[0][station_feature_idx]
+<                                     # print(f'From Algorithm store, Bus id: {line_id}_{bus_id} , station id is: {int(store_stop)} , current time is: {store_time:.1f} , action is: {stored_action}, reward: {current_reward:.4f}')
+<                                     pass
+<                                     
+831,833c762
+<                                 action_val = stored_action
+<                                 if isinstance(action_val, (np.ndarray, list)):
+<                                     action_val = action_val[0]
+---
+>                                 action_val = stored_action[0] if isinstance(stored_action, (np.ndarray, list)) else stored_action
+840,842d768
+<                                 # DEBUG: Check for large negative rewards
+<                                 # if raw_reward < -100:
+<                                 #     print(f"DEBUG_REWARD: Line {line_id}, Bus {bus_id}, Step {step}, Reward {raw_reward:.2f}, EpReward {episode_reward:.2f}, Fwd {history[0][5]:.2f}, Bwd {history[0][6]:.2f}")
+847,868c773,777
+<     
+<                                 # Initializing Action for Next State
+<                                 state_dict[line_id][bus_id] = history[1:] # Shift history
+<                                 # Now history is history[1:] - [0] is the NEW state
+<                                 
+<                                 new_state_vec = np.array(state_dict[line_id][bus_id][0])
+<                                 if args.use_state_norm:
+<                                     new_state_vec_norm = sac_trainer.state_norm(new_state_vec)
+<                                 else:
+<                                     new_state_vec_norm = new_state_vec
+<     
+<                                 action = sac_trainer.policy_net.get_action(torch.from_numpy(new_state_vec_norm).float(), deterministic=DETERMINISTIC)
+<                                 action_dict[line_id][bus_id] = action
+<     
+<                                 # Action Logging (Case 2: Subsequent Stops - Initial Action)
+<                                 action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
+<                                 stop_id = state_dict[line_id][bus_id][0][station_feature_idx]
+<                                 sim_time = state_dict[line_id][bus_id][0][-1]
+<                                 fwd_h = state_dict[line_id][bus_id][0][5]
+<                                 bwd_h = state_dict[line_id][bus_id][0][6]
+<                                 log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+<                                 action_log_buffer.append(log_entry)
+---
+> 
+>                             state_dict[line_id][bus_id] = history[1:]
+>                             state_vec_next = np.array(state_dict[line_id][bus_id][0])
+>                             if args.use_state_norm:
+>                                 state_vec_next = sac_trainer.state_norm(state_vec_next)
+870,883c779,792
+<                                 if debug:
+<                                     # Format: From Algorithm run, Bus id: ... , station id is: ... , current time is: ... , action is: ... , reward: ...
+<                                     # print(f'From Algorithm run, Bus id: {line_id}_{bus_id} , station id is: {int(stop_id)} , current time is: {sim_time:.1f} , action is: {action_val:.4f}, reward: {get_reward_value(reward_dict, line_id, bus_id):.4f}')
+<                                     # print(f"DEBUG_SET: Bus {line_id}_{bus_id} key={line_id},{bus_id} Val={action} DictVal={action_dict.get(line_id, {}).get(bus_id)}")
+<                                     pass
+<                 
+<                 # DEBUG: Trace action_dict before step
+<                 if debug:
+<                     # for line_id, buses in action_dict.items():
+<                     #     for bus_id, action in buses.items():
+<                     #         if action is not None:
+<                     #             print(f"DEBUG_TRACE Pre-Step: Bus {line_id}_{bus_id} Action={action}")
+<                     pass
+<     
+---
+>                             action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec_next).float(), deterministic=DETERMINISTIC)
+>                             
+>                             # Action Logging (Case 2: Subsequent Stops)
+>                             new_action = action_dict[line_id][bus_id]
+>                             action_val = new_action[0] if isinstance(new_action, (np.ndarray, list)) else new_action
+>                             if action_val is None:
+>                                 action_val = 0.0
+>                             stop_id = state_dict[line_id][bus_id][0][station_feature_idx]
+>                             fwd_h = state_dict[line_id][bus_id][0][5]
+>                             bwd_h = state_dict[line_id][bus_id][0][6]
+>                             log_entry = f"{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n"
+>                             action_log_buffer.append(log_entry)
+> 
+> 
+885,895d793
+<     
+<                 # Heartbeat Logging (Simulation Time)
+<                 current_sim_time = None
+<                 # Try to get time from state_dict
+<                 for lines in state_dict.values():
+<                     for history in lines.values():
+<                         if len(history) > 0:
+<                             current_sim_time = history[0][-1]
+<                             break
+<                     if current_sim_time is not None:
+<                         break
+902,921d799
+<     
+<                     if done:
+<                         if args.use_reward_scaling:
+<                             sac_trainer.reward_scaling.reset()
+<                         replay_buffer.last_episode_step = episode_steps
+<                         break
+<             # 计算每个 episode 的平均 Q 值
+<             rewards.append(episode_reward)
+<             if training_steps > 0:
+<                 q_values_episode.append(np.mean(q_values[-training_steps:]))
+<                 reg_norms1_episode.append(np.mean(reg_norms1[-training_steps:]))
+<                 reg_norms2_episode.append(np.mean(reg_norms2[-training_steps:]))
+<                 log_probs_episode.append(np.mean(log_probs[-training_steps:]))
+<                 alpha_values_episode.append(np.mean(alpha_values[-training_steps:]))
+<             else:
+<                 q_values_episode.append(0.0)
+<                 reg_norms1_episode.append(0.0)
+<                 reg_norms2_episode.append(0.0)
+<                 log_probs_episode.append(0.0)
+<                 alpha_values_episode.append(0.0)
+923,930c801,819
+<             # Print Episode Summary (Matching original format)
+<             replay_buffer_usage = len(replay_buffer) / replay_buffer_size * 100
+<             print(
+<                 f"[SAC | max_alpha={args.maximum_alpha}] Episode: {eps} | Episode Reward: {episode_reward:.2f} "
+<                 f"| CPU Memory: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB | "
+<                 f"GPU Memory Allocated: {torch.cuda.memory_allocated() / 1024 ** 2:.2f} MB | "
+<                 f"Replay Buffer Usage: {replay_buffer_usage:.2f}% | "
+<                 f"Avg Q-Value: {q_values_episode[-1]:.2f}")
+---
+>                 if done:
+>                     replay_buffer.last_episode_step = episode_steps
+>                     break
+>             
+>             # Flush Logs to file periodically or at end of episode to avoid huge memory usage
+>             if trajectory_log_buffer:
+>                 with open(os.path.join(LOG_DIR, "trajectory_log.csv"), "a") as f:
+>                     f.writelines(trajectory_log_buffer)
+>                 trajectory_log_buffer.clear()
+>                 
+>             if action_log_buffer:
+>                 with open(os.path.join(LOG_DIR, "action_log.csv"), "a") as f:
+>                     f.writelines(action_log_buffer)
+>                 action_log_buffer.clear()
+>             
+>             def safe_mean(arr):
+>                 if len(arr) == 0:
+>                     return 0.0
+>                 return np.mean(arr)
+932,934c821,852
+<             if eps % args.plot_freq == 0:  # plot and model saving interval
+<                 if not os.path.exists(LOG_DIR):
+<                     os.makedirs(LOG_DIR, exist_ok=True)
+---
+>             rewards.append(episode_reward)
+>             
+>             num_added_q = len(q_values)
+>             num_added_stds = len(q_stds)
+>             
+>             if num_added_q > 0:
+>                 q_values_episode.append(safe_mean(q_values))
+>                 reg_norms1_episode.append(safe_mean(reg_norms1))
+>                 reg_norms2_episode.append(safe_mean(reg_norms2))
+>                 log_probs_episode.append(safe_mean(log_probs))
+>                 alpha_values_episode.append(safe_mean(alpha_values))
+>                 ood_losses_episode.append(safe_mean(ood_losses))
+>             else:
+>                 q_values_episode.append(0)
+>                 reg_norms1_episode.append(0)
+>                 reg_norms2_episode.append(0)
+>                 log_probs_episode.append(0)
+>                 alpha_values_episode.append(0)
+>                 ood_losses_episode.append(0)
+>                 
+>             if num_added_stds > 0:
+>                 q_stds_episode.append(safe_mean(q_stds))
+>             else:
+>                 q_stds_episode.append(0)
+>             
+>             q_values.clear()
+>             reg_norms1.clear()
+>             reg_norms2.clear()
+>             log_probs.clear()
+>             alpha_values.clear()
+>             ood_losses.clear()
+>             q_stds.clear()
+935a854
+>             if eps % args.plot_freq == 0:
+936a856
+>                 
+938c858
+<                 np.save(os.path.join(LOG_DIR, 'q_values.npy'), q_values_episode)
+---
+>                 np.save(os.path.join(LOG_DIR, 'q_values_episode.npy'), q_values_episode)
+942a863,864
+>                 np.save(os.path.join(LOG_DIR, 'ood_losses_episode.npy'), ood_losses_episode)
+>                 np.save(os.path.join(LOG_DIR, 'q_stds_episode.npy'), q_stds_episode)
+944,964c866,872
+<                 # 评估当前策略
+<                 mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=0, deterministic=True)
+<                 # print(f"评估结果 (Episode {eps}): 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
+<                 
+<                 # 记录评估结果
+<                 eval_episodes.append(eps)
+<                 eval_mean_rewards.append(mean_reward)
+<                 eval_reward_stds.append(reward_std)
+<                 
+<                 # 保存评估结果
+<                 np.save(os.path.join(LOG_DIR, 'eval_episodes.npy'), eval_episodes)
+<                 np.save(os.path.join(LOG_DIR, 'eval_mean_rewards.npy'), eval_mean_rewards)
+<                 np.save(os.path.join(LOG_DIR, 'eval_reward_stds.npy'), eval_reward_stds)
+<                 
+<                 # 保存带有episode信息的模型
+<                 model_name = f"{model_path}_episode_{eps}"
+<                 sac_trainer.save_model(os.path.join(LOG_DIR, f'sac_v2_episode_{eps}'))
+<                 sac_trainer.save_model(model_name)
+<                 # snapshot = tracemalloc.take_snapshot()
+<                 # for stat in snapshot.statistics('lineno')[:10]:
+<                 #     print(stat)  # 显示内存占用最大的10行
+---
+>                 sac_trainer.save_model(os.path.join(MODEL_DIR, f"checkpoint_episode_{eps}"))
+>                 if torch.cuda.is_available():
+>                     torch.cuda.empty_cache()
+>                 gc.collect()
+> 
+>             replay_buffer_usage = len(replay_buffer) / parser.parse_args().batch_size * 100 if parser.parse_args().batch_size > 0 else 0
+>             # Just approximate usage since replay buffer capacity isn't passed from args directly but initialized via replay_buffer_size = 1e6.
+966,993c874,880
+<           # 在训练结束时保存完整模型（包括critic和actor）
+<         sac_trainer.save_model(model_path)
+<         
+<         # 评估最终策略
+<         mean_reward, reward_std = evaluate_policy(sac_trainer, env, num_eval_episodes=0, deterministic=True)
+<         # print(f"最终评估结果: 平均奖励 = {mean_reward:.2f}, 标准差 = {reward_std:.2f}")
+<         
+<         # 记录最终评估结果
+<         final_eval_episode = args.max_episodes - 1
+<         eval_episodes.append(final_eval_episode)
+<         eval_mean_rewards.append(mean_reward)
+<         eval_reward_stds.append(reward_std)
+<         
+<         # 保存最终评估结果
+<         final_log_dir = LOG_DIR
+<         if not os.path.exists(final_log_dir):
+<             os.makedirs(final_log_dir, exist_ok=True)
+< 
+<         np.save(os.path.join(final_log_dir, 'rewards.npy'), rewards)
+<         np.save(os.path.join(final_log_dir, 'q_values.npy'), q_values_episode)
+<         np.save(os.path.join(final_log_dir, 'reg_norms1_episode.npy'), reg_norms1_episode)
+<         np.save(os.path.join(final_log_dir, 'reg_norms2_episode.npy'), reg_norms2_episode)
+<         np.save(os.path.join(final_log_dir, 'log_probs_episode.npy'), log_probs_episode)
+<         np.save(os.path.join(final_log_dir, 'alpha_values_episode.npy'), alpha_values_episode)
+< 
+<         np.save(os.path.join(final_log_dir, 'eval_episodes.npy'), eval_episodes)
+<         np.save(os.path.join(final_log_dir, 'eval_mean_rewards.npy'), eval_mean_rewards)
+<         np.save(os.path.join(final_log_dir, 'eval_reward_stds.npy'), eval_reward_stds)
+---
+>             episode_duration = time.time() - episode_start_time
+>             
+>             print(
+>                 f"Episode: {eps} | Episode Reward: {episode_reward} | Duration: {episode_duration:.2f}s "
+>                 f"| CPU Memory: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB | "
+>                 f"GPU Memory Allocated: {torch.cuda.memory_allocated() / 1024 ** 2:.2f} MB | "
+>                 f"Replay Buffer Usage: {replay_buffer_usage:.2f}%")
+995,1002c882
+<         # 保存带有最终episode信息的模型
+<         final_model_name = f"{model_path}_episode_final"
+<         sac_trainer.save_model(os.path.join(final_log_dir, 'sac_v2_episode_final'))
+<         sac_trainer.save_model(final_model_name)
+< 
+<     if args.test:
+<         sac_trainer.policy_net.load_state_dict(torch.load(model_path))
+<         for eps in range(10):
+---
+>         sac_trainer.save_model(os.path.join(MODEL_DIR, "final"))
+1004,1029c884,890
+<             done = False
+<             env.reset()
+<             episode_reward = 0
+<             action_dict = build_action_template(state_dict)
+<             station_feature_idx = sac_trainer.station_feature_idx if sac_trainer.station_feature_idx is not None else 1
+< 
+<             while not done:
+<                 action_dict = build_action_template(state_dict, action_dict)
+<                 for line_id, buses in state_dict.items():
+<                     for bus_id, history in buses.items():
+<                         if len(history) == 0:
+<                             continue
+<                         if len(history) == 1:
+<                             if action_dict[line_id][bus_id] is None:
+<                                 state_input = np.array(history[0])
+<                                 action = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
+<                                 action_dict[line_id][bus_id] = action
+<                         elif len(history) >= 2:
+<                             if history[0][station_feature_idx] != history[1][station_feature_idx]:
+<                                 episode_reward += get_reward_value(reward_dict, line_id, bus_id)
+<                             state_dict[line_id][bus_id] = history[1:]
+<                             state_input = np.array(state_dict[line_id][bus_id][0])
+<                             action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_input).float(), deterministic=DETERMINISTIC)
+< 
+<                 state_dict, reward_dict, done = safe_step(env, action_dict)
+<             print('Episode: ', eps, '| Episode Reward: ', episode_reward)
+---
+>     if args.profile:
+>         profiler.disable()
+>         s = io.StringIO()
+>         sortby = pstats.SortKey.CUMULATIVE
+>         ps = pstats.Stats(profiler, stream=s).sort_stats(sortby)
+>         ps.print_stats(30)
+>         print(s.getvalue())

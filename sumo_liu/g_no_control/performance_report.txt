@@ -1,0 +1,371 @@
+性能分析详细报告
+================================================================================
+
+按累积时间排序:
+----------------------------------------
+         259480761 function calls (259154600 primitive calls) in 716.733 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1682 to 50 due to restriction <50>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    239/1    0.001    0.000  717.181  717.181 <frozen importlib._bootstrap_external>:934(exec_module)
+    758/1    0.000    0.000  717.181  717.181 <frozen importlib._bootstrap>:233(_call_with_frames_removed)
+    239/1    0.001    0.000  717.181  717.181 {built-in method builtins.exec}
+        1   36.774   36.774  717.180  717.180 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/no_control_sim.py:1(<module>)
+    18000    0.040    0.000  493.122    0.027 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:131(simulationStep)
+    18000    0.116    0.000  493.082    0.027 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:196(simulationStep)
+    18000    0.053    0.000  492.851    0.027 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3712(step)
+    18000  492.798    0.027  492.798    0.027 {built-in method libsumo._libsumo.simulation_step}
+   975025   21.632    0.000   92.597    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/bus.py:104(bus_running)
+ 45036658   18.162    0.000   49.153    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/passenger.py:46(passenger_run)
+  1484630    0.369    0.000   44.753    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5269(getNextLinks)
+  1484630   44.384    0.000   44.384    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+ 25485414    3.776    0.000   18.055    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5882(getLaneID)
+ 25485414   14.279    0.000   14.279    0.000 {built-in method libsumo._libsumo.person_getLaneID}
+    18001    0.023    0.000   13.873    0.001 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5369(getIDList)
+    18001   13.850    0.001   13.850    0.001 {built-in method libsumo._libsumo.vehicle_getIDList}
+ 19637046    2.927    0.000   12.924    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5898(getVehicle)
+ 42107531   11.930    0.000   12.249    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/bus.py:47(_get_lane_length_cached)
+ 19637046    9.998    0.000    9.998    0.000 {built-in method libsumo._libsumo.person_getVehicle}
+    18001    0.021    0.000    8.816    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5942(getIDList)
+    18001    8.795    0.000    8.795    0.000 {built-in method libsumo._libsumo.person_getIDList}
+  4428246    0.700    0.000    6.331    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4098(getParameter)
+   221400    3.133    0.000    6.236    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/signal.py:60(update_queue_number)
+  4428246    5.630    0.000    5.630    0.000 {built-in method libsumo._libsumo.trafficlight_getParameter}
+   310240    0.092    0.000    5.081    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5261(getNextTLS)
+   310240    4.989    0.000    4.989    0.000 {built-in method libsumo._libsumo.vehicle_getNextTLS}
+        1    0.387    0.387    2.908    2.908 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:61(save_signal_data)
+ 10716504    1.720    0.000    2.520    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:86(__getattr__)
+  4002925    0.773    0.000    2.159    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5127(getLaneID)
+        4    0.000    0.000    1.979    0.495 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/xml/etree/ElementTree.py:694(write)
+      353    1.969    0.006    1.973    0.006 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/stop.py:44(get_passenger_arriver_rate)
+    49200    1.341    0.000    1.676    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/signal.py:40(update_signal_state)
+  2115900    0.334    0.000    1.607    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2974(getLastStepHaltingNumber)
+ 322267/4    0.808    0.000    1.525    0.381 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/xml/etree/ElementTree.py:865(_serialize_xml)
+   686609    0.345    0.000    1.394    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:82(wrapper)
+  4002925    1.386    0.000    1.386    0.000 {built-in method libsumo._libsumo.vehicle_getLaneID}
+  2115900    1.273    0.000    1.273    0.000 {built-in method libsumo._libsumo.lane_getLastStepHaltingNumber}
+   221400    0.607    0.000    1.199    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:83(<listcomp>)
+        1    0.051    0.051    1.098    1.098 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:122(save_bus_data)
+   686609    0.261    0.000    1.049    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/traci/_vehicle.py:877(isAtBusStop)
+  1010096    1.018    0.000    1.018    0.000 {method 'keys' of 'dict' objects}
+  1923252    0.430    0.000    0.958    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5163(getLanePosition)
+ 12838060    0.916    0.000    0.916    0.000 {built-in method builtins.getattr}
+   686609    0.175    0.000    0.788    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5277(getStopState)
+        1    0.078    0.078    0.735    0.735 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:189(save_passenger_data)
+  1276642    0.282    0.000    0.713    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5091(getSpeed)
+   975025    0.238    0.000    0.639    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5285(getDistance)
+   686609    0.613    0.000    0.613    0.000 {built-in method libsumo._libsumo.vehicle_getStopState}
+        1    0.000    0.000    0.578    0.578 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:95(start)
+        1    0.000    0.000    0.556    0.556 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:209(start)
+
+
+
+
+按自身时间排序:
+----------------------------------------
+         259480761 function calls (259154600 primitive calls) in 716.733 seconds
+
+   Ordered by: internal time
+   List reduced from 1682 to 50 due to restriction <50>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    18000  492.798    0.027  492.798    0.027 {built-in method libsumo._libsumo.simulation_step}
+  1484630   44.384    0.000   44.384    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+        1   36.774   36.774  717.180  717.180 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/no_control_sim.py:1(<module>)
+   975025   21.632    0.000   92.597    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/bus.py:104(bus_running)
+ 45036658   18.162    0.000   49.153    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/passenger.py:46(passenger_run)
+ 25485414   14.279    0.000   14.279    0.000 {built-in method libsumo._libsumo.person_getLaneID}
+    18001   13.850    0.001   13.850    0.001 {built-in method libsumo._libsumo.vehicle_getIDList}
+ 42107531   11.930    0.000   12.249    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/bus.py:47(_get_lane_length_cached)
+ 19637046    9.998    0.000    9.998    0.000 {built-in method libsumo._libsumo.person_getVehicle}
+    18001    8.795    0.000    8.795    0.000 {built-in method libsumo._libsumo.person_getIDList}
+  4428246    5.630    0.000    5.630    0.000 {built-in method libsumo._libsumo.trafficlight_getParameter}
+   310240    4.989    0.000    4.989    0.000 {built-in method libsumo._libsumo.vehicle_getNextTLS}
+ 25485414    3.776    0.000   18.055    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5882(getLaneID)
+   221400    3.133    0.000    6.236    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/signal.py:60(update_queue_number)
+ 19637046    2.927    0.000   12.924    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5898(getVehicle)
+      353    1.969    0.006    1.973    0.006 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/stop.py:44(get_passenger_arriver_rate)
+ 10716504    1.720    0.000    2.520    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:86(__getattr__)
+  4002925    1.386    0.000    1.386    0.000 {built-in method libsumo._libsumo.vehicle_getLaneID}
+    49200    1.341    0.000    1.676    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/signal.py:40(update_signal_state)
+  2115900    1.273    0.000    1.273    0.000 {built-in method libsumo._libsumo.lane_getLastStepHaltingNumber}
+  1010096    1.018    0.000    1.018    0.000 {method 'keys' of 'dict' objects}
+ 12838060    0.916    0.000    0.916    0.000 {built-in method builtins.getattr}
+ 322267/4    0.808    0.000    1.525    0.381 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/xml/etree/ElementTree.py:865(_serialize_xml)
+  4002925    0.773    0.000    2.159    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5127(getLaneID)
+  4428246    0.700    0.000    6.331    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4098(getParameter)
+   686609    0.613    0.000    0.613    0.000 {built-in method libsumo._libsumo.vehicle_getStopState}
+   221400    0.607    0.000    1.199    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:83(<listcomp>)
+        1    0.556    0.556    0.556    0.556 {built-in method libsumo._libsumo.simulation_start}
+  1923252    0.529    0.000    0.529    0.000 {built-in method libsumo._libsumo.vehicle_getLanePosition}
+  1276642    0.432    0.000    0.432    0.000 {built-in method libsumo._libsumo.vehicle_getSpeed}
+  1923252    0.430    0.000    0.958    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5163(getLanePosition)
+  4451097    0.421    0.000    0.421    0.000 {method 'append' of 'list' objects}
+      389    0.408    0.001    0.408    0.001 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:137(<listcomp>)
+   975025    0.401    0.000    0.401    0.000 {built-in method libsumo._libsumo.vehicle_getDistance}
+  1662059    0.400    0.000    0.400    0.000 {method 'write' of '_io.TextIOWrapper' objects}
+        1    0.387    0.387    2.908    2.908 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:61(save_signal_data)
+      389    0.385    0.001    0.385    0.001 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/save_data.py:134(<listcomp>)
+  1484630    0.369    0.000   44.753    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5269(getNextLinks)
+   686609    0.345    0.000    1.394    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:82(wrapper)
+  2115900    0.334    0.000    1.607    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2974(getLastStepHaltingNumber)
+  2115900    0.307    0.000    0.420    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:47(__getattr__)
+  2434276    0.287    0.000    0.287    0.000 {method 'join' of 'str' objects}
+  1276642    0.282    0.000    0.713    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5091(getSpeed)
+        4    0.280    0.070    0.409    0.102 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/xml/etree/ElementTree.py:804(_namespaces)
+    30032    0.276    0.000    0.287    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sim_obj/passenger.py:33(passenger_activate)
+   686609    0.261    0.000    1.049    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/traci/_vehicle.py:877(isAtBusStop)
+   470200    0.246    0.000    0.246    0.000 {built-in method libsumo._libsumo.inductionloop_getTimeSinceDetection}
+   975025    0.238    0.000    0.639    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5285(getDistance)
+   107720    0.184    0.000    0.319    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:38(getLength)
+   686609    0.175    0.000    0.788    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5277(getStopState)
+
+
+
+
+SUMO API调用统计:
+----------------------------------------
+         259480761 function calls (259154600 primitive calls) in 716.733 seconds
+
+   Random listing order was used
+   List reduced from 1682 to 13 due to restriction <'sumo_adapter'>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.186    0.186 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:1(<module>)
+        1    0.000    0.000    0.578    0.578 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:95(start)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:35(__init__)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:67(__init__)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:52(__init__)
+        1    0.000    0.000    0.104    0.104 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:123(close)
+  2115900    0.307    0.000    0.420    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:47(__getattr__)
+ 10716504    1.720    0.000    2.520    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:86(__getattr__)
+    18000    0.040    0.000  493.122    0.027 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:131(simulationStep)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:34(CachedLaneAPI)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:51(CachedEdgeAPI)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:66(CachedVehicleAPI)
+   107720    0.184    0.000    0.319    0.000 /home/erzhu419/mine_code/sumo-rl/sumo_liu/g_no_control/sumo_adapter.py:38(getLength)
+
+
+         259480761 function calls (259154600 primitive calls) in 716.733 seconds
+
+   Random listing order was used
+   List reduced from 1682 to 213 due to restriction <'sumo\\.'>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1217(TraCIStage)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6943(rerouter)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3417(polygon)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1240(TraCIReservation)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1277(TraCICollision)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1313(TraCISignalConstraint)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1349(TraCIJunctionFoe)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2015(edge)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1141(TraCINextStopData)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1043(TraCIConnection)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:859(TraCIPhase)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2413(inductionloop)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1184(TraCIBestLanesData)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2579(junction)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2689(lanearea)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2867(lane)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3113(multientryexit)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3255(poi)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2243(gui)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4015(trafficlight)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4782(vehicletype)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3563(route)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3669(simulation)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5859(person)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6273(calibrator)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6423(busstop)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6549(parkingarea)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6675(chargingstation)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6825(overheadwire)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:7037(meandata)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:7131(variablespeedsign)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:7229(routeprobe)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5084(vehicle)
+        1    0.001    0.001    0.034    0.034 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.SwigPyIterator_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.StringVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.IntVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.DoubleVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.StringStringPair_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.IntStringPair_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.IntIntPair_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.StringDoublePair_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.StringDoublePairVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIException_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.FatalTraCIError_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIResult_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIPosition_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIRoadPosition_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIColor_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIPositionVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIInt_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIDouble_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIString_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIStringList_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIDoubleList_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIIntList_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIStringDoublePairList_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIPhase_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIPhaseVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCILogic_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCILogicVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCILink_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCILinkVectorVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIConnection_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIConnectionVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIVehicleData_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIVehicleDataVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCINextTLSData_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCINextTLSDataVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCINextStopData_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCINextStopDataVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIBestLanesData_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIBestLanesDataVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIStage_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIReservation_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIReservationVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCICollision_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCICollisionVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCISignalConstraint_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCISignalConstraintVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIJunctionFoe_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIJunctionFoeVectorWrapped_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCILogicVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIStageVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCINextStopDataVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCIReservationVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCISignalConstraintVector_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.TraCICollisionVector_swigregister}
+        1    0.002    0.002    0.002    0.002 {built-in method libsumo._libsumo.edge_getIDList}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.edge_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.gui_swigregister}
+   470200    0.246    0.000    0.246    0.000 {built-in method libsumo._libsumo.inductionloop_getTimeSinceDetection}
+     2899    0.002    0.000    0.002    0.000 {built-in method libsumo._libsumo.inductionloop_getLastIntervalMeanSpeed}
+     2899    0.004    0.000    0.004    0.000 {built-in method libsumo._libsumo.inductionloop_getLastIntervalVehicleNumber}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.inductionloop_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.junction_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.lanearea_swigregister}
+    15144    0.006    0.000    0.006    0.000 {built-in method libsumo._libsumo.lane_getLength}
+  2115900    1.273    0.000    1.273    0.000 {built-in method libsumo._libsumo.lane_getLastStepHaltingNumber}
+        1    0.003    0.003    0.003    0.003 {built-in method libsumo._libsumo.lane_getIDList}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.lane_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.multientryexit_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.poi_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.polygon_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.route_swigregister}
+        1    0.556    0.556    0.556    0.556 {built-in method libsumo._libsumo.simulation_start}
+    18000  492.798    0.027  492.798    0.027 {built-in method libsumo._libsumo.simulation_step}
+        1    0.103    0.103    0.103    0.103 {built-in method libsumo._libsumo.simulation_close}
+    18000    0.021    0.000    0.021    0.000 {built-in method libsumo._libsumo.simulation_getTime}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.simulation_swigregister}
+      246    0.001    0.000    0.001    0.000 {built-in method libsumo._libsumo.trafficlight_getAllProgramLogics}
+  4428246    5.630    0.000    5.630    0.000 {built-in method libsumo._libsumo.trafficlight_getParameter}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.trafficlight_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.vehicletype_swigregister}
+  1276642    0.432    0.000    0.432    0.000 {built-in method libsumo._libsumo.vehicle_getSpeed}
+  4002925    1.386    0.000    1.386    0.000 {built-in method libsumo._libsumo.vehicle_getLaneID}
+  1923252    0.529    0.000    0.529    0.000 {built-in method libsumo._libsumo.vehicle_getLanePosition}
+    26346    0.017    0.000    0.017    0.000 {built-in method libsumo._libsumo.vehicle_getPersonNumber}
+    12834    0.053    0.000    0.053    0.000 {built-in method libsumo._libsumo.vehicle_getPersonIDList}
+   310240    4.989    0.000    4.989    0.000 {built-in method libsumo._libsumo.vehicle_getNextTLS}
+  1484630   44.384    0.000   44.384    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+   686609    0.613    0.000    0.613    0.000 {built-in method libsumo._libsumo.vehicle_getStopState}
+   975025    0.401    0.000    0.401    0.000 {built-in method libsumo._libsumo.vehicle_getDistance}
+    18001   13.850    0.001   13.850    0.001 {built-in method libsumo._libsumo.vehicle_getIDList}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.vehicle_swigregister}
+ 25485414   14.279    0.000   14.279    0.000 {built-in method libsumo._libsumo.person_getLaneID}
+ 19637046    9.998    0.000    9.998    0.000 {built-in method libsumo._libsumo.person_getVehicle}
+    18001    8.795    0.000    8.795    0.000 {built-in method libsumo._libsumo.person_getIDList}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.person_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.calibrator_swigregister}
+    13173    0.055    0.000    0.055    0.000 {built-in method libsumo._libsumo.busstop_getPersonIDs}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.busstop_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.parkingarea_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.chargingstation_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.overheadwire_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.rerouter_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.meandata_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.variablespeedsign_swigregister}
+        1    0.000    0.000    0.000    0.000 {built-in method libsumo._libsumo.routeprobe_swigregister}
+    15144    0.002    0.000    0.008    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2882(getLength)
+  2115900    0.334    0.000    1.607    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2974(getLastStepHaltingNumber)
+        1    0.000    0.000    0.556    0.556 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3680(start)
+        1    0.000    0.000    0.103    0.103 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3720(close)
+    18000    0.040    0.000    0.061    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3736(getTime)
+    18000    0.053    0.000  492.851    0.027 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3712(step)
+      246    0.000    0.000    0.001    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4026(getAllProgramLogics)
+  4428246    0.700    0.000    6.331    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:4098(getParameter)
+    18001    0.023    0.000   13.873    0.001 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5369(getIDList)
+  1276642    0.282    0.000    0.713    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5091(getSpeed)
+  4002925    0.773    0.000    2.159    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5127(getLaneID)
+  1923252    0.430    0.000    0.958    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5163(getLanePosition)
+    26346    0.010    0.000    0.027    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5203(getPersonNumber)
+    12834    0.007    0.000    0.060    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5207(getPersonIDList)
+   310240    0.092    0.000    5.081    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5261(getNextTLS)
+  1484630    0.369    0.000   44.753    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5269(getNextLinks)
+   686609    0.175    0.000    0.788    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5277(getStopState)
+   975025    0.238    0.000    0.639    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5285(getDistance)
+ 25485414    3.776    0.000   18.055    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5882(getLaneID)
+ 19637046    2.927    0.000   12.924    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5898(getVehicle)
+    18001    0.021    0.000    8.816    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5942(getIDList)
+    13173    0.013    0.000    0.067    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:6458(getPersonIDs)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:737(TraCIPositionVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:803(TraCIStringList)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:817(TraCIDoubleList)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:831(TraCIIntList)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:845(TraCIStringDoublePairList)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:999(TraCILogicVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1029(TraCILinkVectorVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1064(TraCIConnectionVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1096(TraCIVehicleDataVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1127(TraCINextTLSDataVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1170(TraCINextStopDataVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1203(TraCIBestLanesDataVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1263(TraCIReservationVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1299(TraCICollisionVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1335(TraCISignalConstraintVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1371(TraCIJunctionFoeVectorWrapped)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:646(TraCIException)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:656(FatalTraCIError)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:666(TraCIResult)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1700(TraCIReservationVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1805(TraCISignalConstraintVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1910(TraCICollisionVector)
+        1    0.000    0.000    0.002    0.002 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2130(getIDList)
+        1    0.000    0.000    0.003    0.003 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3002(getIDList)
+   470200    0.070    0.000    0.315    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2448(getTimeSinceDetection)
+     2899    0.001    0.000    0.002    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2476(getLastIntervalMeanSpeed)
+     2899    0.001    0.000    0.005    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2480(getLastIntervalVehicleNumber)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:56(_SwigNonDynamicMeta)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:701(TraCIRoadPosition)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1013(TraCILink)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:62(SwigPyIterator)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:437(StringStringPair)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:463(IntStringPair)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:489(IntIntPair)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:515(StringDoublePair)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:751(TraCIInt)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:981(TraCILogic)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1078(TraCIVehicleData)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:769(TraCIDouble)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:786(TraCIString)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:122(StringVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:227(IntVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:332(DoubleVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:541(StringDoublePairVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:720(TraCIColor)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:876(TraCIPhaseVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1110(TraCINextTLSData)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1385(TraCILogicVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1490(TraCIStageVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:1595(TraCINextStopDataVector)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:40(_swig_setattr_nondynamic_class_variable)
+        1    0.000    0.000    0.000    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:682(TraCIPosition)
+
+

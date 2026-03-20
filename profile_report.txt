@@ -1,0 +1,125 @@
+Analysis of sumo-rl3.pstat:
+----------------------------------------
+Top 50 by Cumulative Time (tottime + subcalls):
+Mon Dec  1 20:42:55 2025    sumo-rl3.pstat
+
+         89673475 function calls (88025624 primitive calls) in 474.555 seconds
+
+   Ordered by: cumulative time
+   List reduced from 11803 to 50 due to restriction <50>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  474.583  474.583 /home/erzhu419/.pycharm_helpers/profiler/prof_util.py:15(execfile)
+   2990/1    0.172    0.000  474.574  474.574 {built-in method builtins.exec}
+        1    2.036    2.036  474.573  474.573 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:1(<module>)
+     8559    0.044    0.000  399.570    0.047 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:173(safe_step)
+     8559    0.077    0.000  399.526    0.047 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:190(step)
+     8560    0.064    0.000  398.473    0.047 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:222(_advance_until_state)
+     8560    0.054    0.000  397.978    0.046 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:274(_pull_events)
+     8560    0.019    0.000  397.917    0.046 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:549(decision_provider)
+     8560    0.088    0.000  397.898    0.046 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:232(fetch_events)
+     8560    0.111    0.000  397.793    0.046 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:282(_advance_until_event)
+    18000    5.669    0.000  397.682    0.022 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:286(_advance_one_step)
+    18000    0.175    0.000  295.326    0.016 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:196(simulationStep)
+    18000    0.043    0.000  295.021    0.016 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:3712(step)
+    18000  294.978    0.016  294.978    0.016 {built-in method libsumo._libsumo.simulation_step}
+  1337311   34.948    0.000   84.853    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:137(bus_running)
+      690    1.275    0.002   36.905    0.053 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:440(update)
+    12569    1.894    0.000   26.775    0.002 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:366(get_action)
+  1252729    5.378    0.000   21.918    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:55(_get_next_links)
+    91215    0.039    0.000   15.626    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5269(getNextLinks)
+    91215   15.587    0.000   15.587    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+250486/103163    0.421    0.000   13.252    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/torch/nn/modules/module.py:1507(_wrapped_call_impl)
+250486/103163    0.727    0.000   13.082    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/torch/nn/modules/module.py:1513(_call_impl)
+    13949    0.879    0.000   12.840    0.001 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:319(forward)
+    53507   11.980    0.000   12.015    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+      690    1.995    0.003   11.135    0.016 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:101(sample)
+    59340    9.665    0.000    9.665    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+    18089    1.487    0.000    8.370    0.000 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:240(forward)
+   258243    0.080    0.000    7.279    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5261(getNextTLS)
+   258243    7.199    0.000    7.199    0.000 {built-in method libsumo._libsumo.vehicle_getNextTLS}
+7651/4892    2.028    0.000    6.552    0.001 {built-in method numpy.core._multiarray_umath.implement_array_function}
+     2070    0.009    0.000    6.532    0.003 <__array_function__ internals>:177(stack)
+  4680058    0.905    0.000    6.343    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2882(getLength)
+     2070    0.037    0.000    5.665    0.003 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/numpy/core/shape_base.py:383(stack)
+  4680058    5.438    0.000    5.438    0.000 {built-in method libsumo._libsumo.lane_getLength}
+  2344/19    0.013    0.000    4.720    0.248 <frozen importlib._bootstrap>:1165(_find_and_load)
+  2339/18    0.010    0.000    4.720    0.262 <frozen importlib._bootstrap>:1120(_find_and_load_unlocked)
+  2177/21    0.008    0.000    4.716    0.225 <frozen importlib._bootstrap>:666(_load_unlocked)
+  2112/20    0.005    0.000    4.716    0.236 <frozen importlib._bootstrap_external>:934(exec_module)
+  5135/34    0.003    0.000    4.710    0.139 <frozen importlib._bootstrap>:233(_call_with_frames_removed)
+  2584850    1.867    0.000    4.684    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/passenger.py:42(passenger_run)
+     1380    0.320    0.000    4.326    0.003 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:338(evaluate)
+    18000    2.416    0.000    3.695    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:412(_collect_new_events)
+  644/110    0.002    0.000    3.527    0.032 {built-in method builtins.__import__}
+   100254    0.330    0.000    3.469    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/torch/nn/modules/linear.py:115(forward)
+  6785698    3.213    0.000    3.213    0.000 {method 'index' of 'list' objects}
+ 2375/609    0.004    0.000    3.199    0.005 <frozen importlib._bootstrap>:1207(_handle_fromlist)
+   100254    3.081    0.000    3.081    0.000 {built-in method torch._C._nn.linear}
+     4140    0.190    0.000    3.015    0.001 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:279(forward)
+  1104544    1.034    0.000    2.903    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:82(wrapper)
+     2070    2.710    0.001    2.710    0.001 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/numpy/core/shape_base.py:470(<listcomp>)
+
+
+----------------------------------------
+Top 50 by Total Time (internal time only):
+Mon Dec  1 20:42:55 2025    sumo-rl3.pstat
+
+         89673475 function calls (88025624 primitive calls) in 474.555 seconds
+
+   Ordered by: internal time
+   List reduced from 11803 to 50 due to restriction <50>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    18000  294.978    0.016  294.978    0.016 {built-in method libsumo._libsumo.simulation_step}
+  1337311   34.948    0.000   84.853    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:137(bus_running)
+    91215   15.587    0.000   15.587    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+    53507   11.980    0.000   12.015    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+    59340    9.665    0.000    9.665    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+   258243    7.199    0.000    7.199    0.000 {built-in method libsumo._libsumo.vehicle_getNextTLS}
+    18000    5.669    0.000  397.682    0.022 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:286(_advance_one_step)
+  4680058    5.438    0.000    5.438    0.000 {built-in method libsumo._libsumo.lane_getLength}
+  1252729    5.378    0.000   21.918    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:55(_get_next_links)
+  6785698    3.213    0.000    3.213    0.000 {method 'index' of 'list' objects}
+   100254    3.081    0.000    3.081    0.000 {built-in method torch._C._nn.linear}
+     2070    2.710    0.001    2.710    0.001 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/numpy/core/shape_base.py:470(<listcomp>)
+    18000    2.416    0.000    3.695    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:412(_collect_new_events)
+     2415    2.137    0.001    2.137    0.001 {method 'run_backward' of 'torch._C._EngineBase' objects}
+        1    2.036    2.036  474.573  474.573 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:1(<module>)
+7651/4892    2.028    0.000    6.552    0.001 {built-in method numpy.core._multiarray_umath.implement_array_function}
+      690    1.995    0.003   11.135    0.016 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:101(sample)
+  1966471    1.908    0.000    1.908    0.000 {built-in method libsumo._libsumo.person_getLaneID}
+    12569    1.894    0.000   26.775    0.002 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:366(get_action)
+  2584850    1.867    0.000    4.684    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/passenger.py:42(passenger_run)
+    90445    1.841    0.000    1.841    0.000 {built-in method torch.embedding}
+  3149340    1.697    0.000    1.697    0.000 {built-in method libsumo._libsumo.vehicle_getLaneID}
+   105774    1.657    0.000    1.657    0.000 {built-in method torch.clamp}
+    18089    1.487    0.000    8.370    0.000 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:240(forward)
+      690    1.275    0.002   36.905    0.053 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:440(update)
+1150805/21340    1.133    0.000    2.167    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/copy.py:128(deepcopy)
+  1104544    1.041    0.000    1.041    0.000 {built-in method libsumo._libsumo.vehicle_getStopState}
+  1104544    1.034    0.000    2.903    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/__init__.py:82(wrapper)
+      690    1.030    0.001    1.973    0.003 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/random.py:385(sample)
+    40/38    0.989    0.025    0.992    0.026 {built-in method _imp.create_dynamic}
+    18089    0.966    0.000    0.966    0.000 {built-in method torch.layer_norm}
+    68216    0.953    0.000    0.953    0.000 {built-in method torch.relu}
+   635400    0.935    0.000    2.119    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/stop.py:79(update_stop_state)
+  4680058    0.905    0.000    6.343    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:2882(getLength)
+    13949    0.879    0.000   12.840    0.001 /home/erzhu419/mine_code/sumo-rl/LSTM-RL/sac_v2_bus.py:319(forward)
+  1582785    0.875    0.000    0.875    0.000 {built-in method libsumo._libsumo.vehicle_getSpeed}
+    52383    0.855    0.000    0.855    0.000 {built-in method numpy.array}
+  1337311    0.848    0.000    0.848    0.000 {built-in method libsumo._libsumo.vehicle_getDistance}
+    40318    0.824    0.000    0.824    0.000 {built-in method torch.cat}
+   698022    0.805    0.000    0.805    0.000 {built-in method libsumo._libsumo.busstop_getPersonIDs}
+     2070    0.801    0.000    0.801    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/numpy/core/shape_base.py:462(<setcomp>)
+250486/103163    0.727    0.000   13.082    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/torch/nn/modules/module.py:1513(_call_impl)
+    12569    0.725    0.000    0.725    0.000 {method 'cpu' of 'torch._C.TensorBase' objects}
+     2070    0.708    0.000    0.932    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/numpy/core/shape_base.py:458(<listcomp>)
+  4570148    0.676    0.000    0.676    0.000 {method 'keys' of 'dict' objects}
+      353    0.663    0.002    0.665    0.002 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/stop.py:43(get_passenger_arriver_rate)
+  1413121    0.642    0.000    0.936    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/random.py:235(_randbelow_with_getrandbits)
+   108534    0.599    0.000    0.599    0.000 {method 'long' of 'torch._C.TensorBase' objects}
+  3149340    0.585    0.000    2.282    0.000 /home/erzhu419/anaconda3/envs/sumo-rl/lib/python3.11/site-packages/libsumo/libsumo.py:5127(getLaneID)
+    18001    0.554    0.000    0.671    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:496(_cleanup_departed_buses)
+
+

@@ -37,6 +37,10 @@ class DecisionEvent:
     backward_bus_present: bool = True
     target_forward_headway: float = 360.0
     target_backward_headway: float = 360.0
+    gap: float = 0.0
+    co_line_forward_headway: float = 360.0
+    co_line_backward_headway: float = 360.0
+    segment_mean_speed: float = 10.0
     metadata: Dict[str, Any] = field(default_factory=dict)
     assigned_action: Optional[float] = None
 

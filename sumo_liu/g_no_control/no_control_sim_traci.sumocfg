@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="../b_network/1_changsha_bus_network_with_signal_d.net.xml"/>
+        <additional-files value="../b_network/3_bus_station.add.xml, ../b_network/5_E1_signal_detector_no.add.xml, ../b_network/6_E1_edge_detector_no.add.xml"/>
+        <route-files value="../c_social_vehicle_rou/5_estimate_social_vehicle.rou.xml, ../d_bus_rou/2_bus_timetable.rou.xml, ../e_passenger_rou/2_workday_passenger.rou.xml, ../e_passenger_rou/2_transfer_passenger.rou.xml"/>
+    </input>
+
+    <output>
+        <statistic-output value="output_file/statistic_output.xml"/>
+        <tripinfo-output.write-unfinished value="t"/>
+    </output>
+
+    <report>
+        <duration-log.statistics value="t"/>
+    </report>
+
+    <time>
+        <begin value="0"/>
+        <end value="18000"/>
+    </time>
+
+    <gui_only>
+        <start value="t"/>
+        <quit-on-end value="t"/>
+    </gui_only>
+
+</configuration>

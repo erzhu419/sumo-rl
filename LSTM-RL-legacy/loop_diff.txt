@@ -1,0 +1,87 @@
+--- v_loop.txt	2026-02-21 12:05:08.708172686 +0800
++++ e_loop.txt	2026-02-21 12:05:08.708172686 +0800
+@@ -6,15 +6,73 @@
+                 continue
+             if len(history) == 1:
+                 if action_dict[line_id][bus_id] is None:
+-                    state_input = np.array(history[0])
+-                    state_tensor = torch.from_numpy(state_input).float()
+-                    a = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+-                    action_dict[line_id][bus_id] = a
++                    state_vec = np.array(history[0])
++                    if args.use_state_norm:
++                        state_vec = sac_trainer.state_norm(state_vec)
++                    action = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec).float(), deterministic=DETERMINISTIC)
++                    action_dict[line_id][bus_id] = action
++                    action_val = action[0] if isinstance(action, (np.ndarray, list)) else action
++                    if action_val is None:
++                        action_val = 0.0
++                    stop_id = history[0][station_feature_idx]
++                    fwd_h = history[0][5]
++                    bwd_h = history[0][6]
++                    log_entry = f'{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n'
++                    action_log_buffer.append(log_entry)
+             elif len(history) >= 2:
++                state_vec = np.array(history[0])
++                next_state_vec = np.array(history[1])
+                 if history[0][station_feature_idx] != history[1][station_feature_idx]:
+-                    episode_reward += get_reward_value(reward_dict, line_id, bus_id)
++                    if args.use_state_norm:
++                        state_vec_norm = sac_trainer.state_norm(state_vec)
++                        next_state_vec_norm = sac_trainer.state_norm(next_state_vec)
++                    else:
++                        state_vec_norm = state_vec
++                        next_state_vec_norm = next_state_vec
++                    current_reward = get_reward_value(reward_dict, line_id, bus_id)
++                    if args.use_reward_scaling:
++                        scaled_reward = sac_trainer.reward_scaling(current_reward)
++                    else:
++                        scaled_reward = current_reward
++                    stored_action = action_dict[line_id][bus_id]
++                    if stored_action is None:
++                        stored_action = np.zeros(action_dim, dtype=np.float32)
++                    elif np.isscalar(stored_action):
++                        stored_action = np.array([stored_action], dtype=np.float32)
++                    else:
++                        stored_action = np.array(stored_action, dtype=np.float32).reshape(-1)
++                    replay_buffer.push(state_vec_norm, stored_action, scaled_reward, next_state_vec_norm, done)
++                    raw_reward = current_reward
++                    action_val = stored_action[0] if isinstance(stored_action, (np.ndarray, list)) else stored_action
++                    s_stop = history[0][station_feature_idx]
++                    ns_stop = history[1][station_feature_idx]
++                    s_fwd_h = history[0][5]
++                    s_bwd_h = history[0][6]
++                    log_entry = f'{line_id},{bus_id},{step},{s_stop},{ns_stop},{action_val:.4f},{raw_reward:.4f},{s_fwd_h:.2f},{s_bwd_h:.2f}\n'
++                    trajectory_log_buffer.append(log_entry)
++                    episode_steps += 1
++                    step += 1
++                    episode_reward += current_reward
+                 state_dict[line_id][bus_id] = history[1:]
+-                state_input = np.array(state_dict[line_id][bus_id][0])
+-                state_tensor = torch.from_numpy(state_input).float()
+-                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+-    state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=False)
+\ No newline at end of file
++                state_vec_next = np.array(state_dict[line_id][bus_id][0])
++                if args.use_state_norm:
++                    state_vec_next = sac_trainer.state_norm(state_vec_next)
++                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(torch.from_numpy(state_vec_next).float(), deterministic=DETERMINISTIC)
++                new_action = action_dict[line_id][bus_id]
++                action_val = new_action[0] if isinstance(new_action, (np.ndarray, list)) else new_action
++                if action_val is None:
++                    action_val = 0.0
++                stop_id = state_dict[line_id][bus_id][0][station_feature_idx]
++                fwd_h = state_dict[line_id][bus_id][0][5]
++                bwd_h = state_dict[line_id][bus_id][0][6]
++                log_entry = f'{line_id},{bus_id},{step},{stop_id},{action_val:.4f},{fwd_h:.2f},{bwd_h:.2f}\n'
++                action_log_buffer.append(log_entry)
++    state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=render)
++    if len(replay_buffer) > args.batch_size and len(replay_buffer) % args.training_freq == 0 and (step_trained != step):
++        step_trained = step
++        for i in range(update_itr):
++            _ = sac_trainer.update(args.batch_size, training_steps, reward_scale=10.0, auto_entropy=args.auto_entropy, target_entropy=-1.0 * action_dim)
++            training_steps += 1
++    if done:
++        replay_buffer.last_episode_step = episode_steps
++        break
+\ No newline at end of file

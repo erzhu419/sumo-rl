@@ -1,0 +1,26 @@
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Traceback (most recent call last):
+  File "/home/erzhu419/mine_code/sumo-rl/offline_sumo/RORL/debug_env.py", line 32, in test_env
+    obs = env.reset()
+          ^^^^^^^^^^^
+  File "/home/erzhu419/mine_code/sumo-rl/offline_sumo/envs/sumo_env.py", line 75, in reset
+    self.bridge.reset()
+  File "/home/erzhu419/mine_code/sumo-rl/offline_sumo/envs/bridge_v2.py", line 107, in reset
+    self._start_traci()
+  File "/home/erzhu419/mine_code/sumo-rl/offline_sumo/envs/bridge_v2.py", line 178, in _start_traci
+    if LIBSUMO and traci.isLoaded():
+                   ^^^^^^^^^^^^^^
+AttributeError: module 'traci' has no attribute 'isLoaded'
+Using libsumo as traci as requested by environment variable.
+Offline Bridge: 'traci' imported, but has no start(). Treating as Libsumo.
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Testing Env...
+Env created.
+Traci imported from: /usr/share/sumo/tools/traci/__init__.py
+Traci dir: ['SUMO_WHEEL_HOME', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '_lane', '_person', '_simulation', '_trafficlight', '_vehicle', '_vehicletype', 'absolute_import', 'connection', 'constants', 'domain', 'exceptions', 'os', 'step', 'storage', 'sys', 'warnings']
+Env reset failed: module 'traci' has no attribute 'isLoaded'

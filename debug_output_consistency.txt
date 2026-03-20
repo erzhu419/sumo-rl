@@ -1,0 +1,153 @@
+pygame 2.6.1 (SDL 2.28.4, Python 3.8.20)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+Using libsumo as traci as requested by environment variable.
+cuda:0
+Using libsumo for simulation (globally patched).
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+DEBUG_IMPORT: SumoBusHoldingEnv loaded from /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py
+Warning: Ignoring attribute 'attributes' for option 'fcd-output'
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (340ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (7ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.
+[33mWARN: gym.spaces.Box autodetected dtype as <class 'numpy.float32'>. Please provide explicit dtype.[0m
+Soft Q Network (1,2):  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=36, out_features=32, bias=True)
+  (linear2): Linear(in_features=32, out_features=32, bias=True)
+  (linear3): Linear(in_features=32, out_features=32, bias=True)
+  (linear4): Linear(in_features=32, out_features=1, bias=True)
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=35, out_features=32, bias=True)
+  (linear2): Linear(in_features=32, out_features=32, bias=True)
+  (linear3): Linear(in_features=32, out_features=32, bias=True)
+  (linear4): Linear(in_features=32, out_features=32, bias=True)
+  (mean_linear): Linear(in_features=32, out_features=1, bias=True)
+  (log_std_linear): Linear(in_features=32, out_features=1, bias=True)
+)
+From Algorithm, when no state, Bus id: 7S_7S_1 , station id is: 0 , current time is: 23.0 , action is: 37.3167, reward: 100.0000
+
+Simulation: Bus id: 7S_7S_1 , station id: 0 , dwelling time is: 37.3167
+current time is:  0
+From Algorithm, when no state, Bus id: 7X_7X_1 , station id is: 0 , current time is: 28.0 , action is: 5.2793, reward: 100.0000
+
+Simulation: Bus id: 7X_7X_1 , station id: 0 , dwelling time is: 5.2793
+current time is:  0
+Simulation: Bus id: 7X_7X_1 , station id: 1 , dwelling time is: 36.5646
+Simulation: Bus id: 7S_7S_1 , station id: 1 , dwelling time is: 46.8692
+Heartbeat: Step 2, Episode Steps 2, Sim Time 186.0
+Simulation: Bus id: 7X_7X_1 , station id: 2 , dwelling time is: 38.3283
+Simulation: Bus id: 7S_7S_1 , station id: 2 , dwelling time is: 4.2068
+Heartbeat: Step 4, Episode Steps 4, Sim Time 306.0
+Simulation: Bus id: 7S_7S_1 , station id: 3 , dwelling time is: 20.6037
+Simulation: Bus id: 7X_7X_1 , station id: 3 , dwelling time is: 20.4883
+Simulation: Bus id: 7S_7S_1 , station id: 4 , dwelling time is: 13.1747
+Simulation: Bus id: 7X_7X_1 , station id: 4 , dwelling time is: 56.6787
+Heartbeat: Step 8, Episode Steps 8, Sim Time 435.0
+Simulation: Bus id: 7S_7S_1 , station id: 5 , dwelling time is: 5.1234
+From Algorithm, when no state, Bus id: 7S_7S_2 , station id is: 0 , current time is: 502.0 , action is: 40.5278, reward: 99.5000
+
+Simulation: Bus id: 7S_7S_2 , station id: 0 , dwelling time is: 40.5278
+Simulation: Bus id: 7S_7S_1 , station id: 6 , dwelling time is: 8.4528
+Heartbeat: Step 10, Episode Steps 10, Sim Time 544.0
+Simulation: Bus id: 7S_7S_1 , station id: 7 , dwelling time is: 7.2094
+From Algorithm, when no state, Bus id: 7X_7X_2 , station id is: 0 , current time is: 628.0 , action is: 7.6686, reward: 100.0000
+
+Simulation: Bus id: 7X_7X_2 , station id: 0 , dwelling time is: 7.6686
+Simulation: Bus id: 7S_7S_2 , station id: 1 , dwelling time is: 46.4201
+Simulation: Bus id: 7X_7X_1 , station id: 5 , dwelling time is: 0.4480
+Simulation: Bus id: 7S_7S_1 , station id: 8 , dwelling time is: 59.0928
+Heartbeat: Step 14, Episode Steps 14, Sim Time 656.0
+Simulation: Bus id: 7X_7X_1 , station id: 6 , dwelling time is: 50.9346
+Simulation: Bus id: 7S_7S_2 , station id: 2 , dwelling time is: 57.7958
+Simulation: Bus id: 7X_7X_2 , station id: 1 , dwelling time is: 32.9291
+Simulation: Bus id: 7X_7X_1 , station id: 7 , dwelling time is: 44.3082
+Simulation: Bus id: 7S_7S_1 , station id: 9 , dwelling time is: 58.5158
+Heartbeat: Step 19, Episode Steps 19, Sim Time 756.0
+Simulation: Bus id: 7S_7S_2 , station id: 3 , dwelling time is: 5.3552
+Simulation: Bus id: 7X_7X_2 , station id: 2 , dwelling time is: 47.0835
+Simulation: Bus id: 7S_7S_1 , station id: 10 , dwelling time is: 28.8767
+Heartbeat: Step 22, Episode Steps 22, Sim Time 861.0
+Simulation: Bus id: 7S_7S_2 , station id: 4 , dwelling time is: 51.7771
+Simulation: Bus id: 7X_7X_1 , station id: 8 , dwelling time is: 30.4192
+Heartbeat: Step 24, Episode Steps 24, Sim Time 983.0
+From Algorithm, when no state, Bus id: 7S_7S_3 , station id is: 0 , current time is: 983.0 , action is: 12.1982, reward: 99.5000
+
+Simulation: Bus id: 7S_7S_3 , station id: 0 , dwelling time is: 12.1982
+Simulation: Bus id: 7S_7S_1 , station id: 11 , dwelling time is: 57.7727
+Simulation: Bus id: 7S_7S_2 , station id: 5 , dwelling time is: 38.5836
+Simulation: Bus id: 7X_7X_2 , station id: 3 , dwelling time is: 38.7394
+Simulation: Bus id: 7X_7X_1 , station id: 9 , dwelling time is: 2.4715
+Simulation: Bus id: 7X_7X_1 , station id: 10 , dwelling time is: 48.5201
+Simulation: Bus id: 7S_7S_3 , station id: 1 , dwelling time is: 53.4199
+Simulation: Bus id: 7S_7S_2 , station id: 6 , dwelling time is: 17.9455
+Simulation: Bus id: 7X_7X_2 , station id: 4 , dwelling time is: 2.6840
+Simulation: Bus id: 7S_7S_1 , station id: 12 , dwelling time is: 34.9557
+Heartbeat: Step 33, Episode Steps 33, Sim Time 1113.0
+Simulation: Bus id: 7S_7S_2 , station id: 7 , dwelling time is: 45.5232
+Simulation: Bus id: 7X_7X_2 , station id: 5 , dwelling time is: 58.6033
+Simulation: Bus id: 7S_7S_3 , station id: 2 , dwelling time is: 3.5446
+Simulation: Bus id: 7S_7S_1 , station id: 13 , dwelling time is: 33.9548
+Simulation: Bus id: 7X_7X_1 , station id: 11 , dwelling time is: 33.1804
+Heartbeat: Step 38, Episode Steps 38, Sim Time 1220.0
+From Algorithm, when no state, Bus id: 122S_122S_1 , station id is: 0 , current time is: 1220.0 , action is: 59.6118, reward: 100.0000
+
+Simulation: Bus id: 122S_122S_1 , station id: 0 , dwelling time is: 59.6118
+From Algorithm, when no state, Bus id: 7X_7X_3 , station id is: 0 , current time is: 1228.0 , action is: 12.0768, reward: 100.0000
+
+Simulation: Bus id: 7X_7X_3 , station id: 0 , dwelling time is: 12.0768
+Simulation: Bus id: 7S_7S_3 , station id: 3 , dwelling time is: 34.8849
+DEBUG_REWARD: Line 7S, Bus 7S_2, Step 39, Reward -112.00, EpReward 1458.18, Fwd 578.00, Bwd 456.00
+Simulation: Bus id: 7S_7S_2 , station id: 8 , dwelling time is: 32.1848
+Simulation: Bus id: 7X_7X_2 , station id: 6 , dwelling time is: 46.0405
+Simulation: Bus id: 122S_122S_1 , station id: 1 , dwelling time is: 12.5764
+Simulation: Bus id: 7S_7S_1 , station id: 14 , dwelling time is: 55.1036
+Simulation: Bus id: 7X_7X_1 , station id: 12 , dwelling time is: 12.3829
+Simulation: Bus id: 7X_7X_3 , station id: 1 , dwelling time is: 48.5454
+Simulation: Bus id: 122S_122S_1 , station id: 2 , dwelling time is: 44.1450
+Simulation: Bus id: 7S_7S_3 , station id: 4 , dwelling time is: 25.9738
+Simulation: Bus id: 7S_7S_2 , station id: 9 , dwelling time is: 6.4360
+Simulation: Bus id: 7X_7X_2 , station id: 7 , dwelling time is: 17.3127
+Simulation: Bus id: 7X_7X_1 , station id: 13 , dwelling time is: 1.2500
+Heartbeat: Step 50, Episode Steps 50, Sim Time 1363.0
+Simulation: Bus id: 122S_122S_1 , station id: 3 , dwelling time is: 36.3174
+Simulation: Bus id: 7X_7X_1 , station id: 14 , dwelling time is: 57.0637
+From Algorithm, when no state, Bus id: 7S_7S_4 , station id is: 0 , current time is: 1461.0 , action is: 54.0114, reward: 41.0000
+
+Simulation: Bus id: 7S_7S_4 , station id: 0 , dwelling time is: 54.0114
+Simulation: Bus id: 7S_7S_3 , station id: 5 , dwelling time is: 59.7018
+Simulation: Bus id: 7X_7X_3 , station id: 2 , dwelling time is: 7.9594
+Simulation: Bus id: 7S_7S_2 , station id: 10 , dwelling time is: 12.7925
+Simulation: Bus id: 7X_7X_2 , station id: 8 , dwelling time is: 27.1311
+Simulation: Bus id: 7S_7S_1 , station id: 15 , dwelling time is: 11.1995
+Heartbeat: Step 57, Episode Steps 57, Sim Time 1473.0
+Simulation: Bus id: 7S_7S_2 , station id: 11 , dwelling time is: 2.4295

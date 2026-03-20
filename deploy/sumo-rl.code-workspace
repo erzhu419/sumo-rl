@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../RORL"
+		},
+		{
+			"path": "../../LSTM-RL"
+		}
+	],
+	"settings": {}
+}

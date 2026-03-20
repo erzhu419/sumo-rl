@@ -1,0 +1,28 @@
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (359ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (5ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.
+Loading state from 'state.sbx' ... done (25ms).
+Simulation ended at time: 0.00.
+Reason: Libsumo requested termination.
+Performance:
+ Duration: 0.10s
+ Real time factor: 0
+ UPS: 27058.823529
+Vehicles:
+ Inserted: 0 (Loaded: 173)
+ Running: 0
+ Waiting: 0
+Statistics (avg of 0):
+ RouteLength: 0.00
+ Speed: 0.00
+ Duration: 0.00
+ WaitingTime: 0.00
+ TimeLoss: 0.00
+ DepartDelay: 0.00
+ DepartDelayWaiting: 0.00

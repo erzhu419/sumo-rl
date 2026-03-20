@@ -1,0 +1,20 @@
+while not done:
+    action_dict = build_action_template(state_dict, action_dict)
+    for line_id, buses in state_dict.items():
+        for bus_id, history in buses.items():
+            if len(history) == 0:
+                continue
+            if len(history) == 1:
+                if action_dict[line_id][bus_id] is None:
+                    state_input = np.array(history[0])
+                    state_tensor = torch.from_numpy(state_input).float()
+                    a = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+                    action_dict[line_id][bus_id] = a
+            elif len(history) >= 2:
+                if history[0][station_feature_idx] != history[1][station_feature_idx]:
+                    episode_reward += get_reward_value(reward_dict, line_id, bus_id)
+                state_dict[line_id][bus_id] = history[1:]
+                state_input = np.array(state_dict[line_id][bus_id][0])
+                state_tensor = torch.from_numpy(state_input).float()
+                action_dict[line_id][bus_id] = sac_trainer.policy_net.get_action(state_tensor, deterministic=deterministic)
+    state_dict, reward_dict, done, _ = safe_step(env, action_dict, render=False)

@@ -42,11 +42,11 @@ class SumoBusHoldingEnv(gym.Env):
         )
 
         # Observation Space (Matching rl_env.py)
-        # 11 features: [line_idx, bus_idx, station_idx, time_idx, dir, fwd_h, bwd_h, wait, target, duration, time]
+        # 15 features: [line_idx, bus_idx, station_idx, time_idx, dir, f_h, b_h, wait, target, duration, time, gap, co_line_f_h, co_line_b_h, seg_mean_speed]
         self.observation_space = spaces.Box(
             low=-np.inf, 
             high=np.inf, 
-            shape=(11,), 
+            shape=(15,), 
             dtype=np.float32
         )
 
@@ -66,6 +66,11 @@ class SumoBusHoldingEnv(gym.Env):
         self._line_map = {}
         self._bus_map = {}
         self._station_map = {}
+
+        # Line-level median headway (matching training rl_env.py _line_headway)
+        # Will be populated after first reset when bridge._load_objects() is called
+        self._line_headway = {}
+        self._headway_fallback = 360.0
     
     def reset(self):
         """
@@ -78,8 +83,9 @@ class SumoBusHoldingEnv(gym.Env):
         self.done = False
         self.last_event = None
         
-        # Clear maps on reset if needed, or keep persistent
-        # self._line_map.clear() 
+        # Sync line_headways from bridge (computed in bridge._load_objects)
+        if hasattr(self.bridge, 'line_headways') and self.bridge.line_headways:
+            self._line_headway = dict(self.bridge.line_headways)
         
         return self._advance_to_next_decision()
 
@@ -162,7 +168,10 @@ class SumoBusHoldingEnv(gym.Env):
         station_idx = self._get_id(self._station_map, station_key)
         time_idx = int(event.sim_time // 3600)
 
-        # Vector matching rl_env.py
+        # Vector matching rl_env.py (15 features)
+        # obs[8] = target_headway: use line-level median (matching training _line_headway)
+        target_headway = self._line_headway.get(event.line_id, self._headway_fallback)
+        gap = (event.target_forward_headway - event.forward_headway) if getattr(event, 'forward_bus_present', True) else 0.0
         obs = np.array([
             float(line_idx),
             float(bus_idx),
@@ -172,9 +181,13 @@ class SumoBusHoldingEnv(gym.Env):
             float(event.forward_headway),
             float(event.backward_headway),
             float(event.waiting_passengers),
-            float(event.target_forward_headway), # Using target as feature
+            float(target_headway),
             float(event.base_stop_duration),
             float(event.sim_time),
+            float(gap),
+            float(event.co_line_forward_headway),
+            float(event.co_line_backward_headway),
+            float(event.segment_mean_speed),
         ], dtype=np.float32)
         return obs
 

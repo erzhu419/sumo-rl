@@ -1,0 +1,48 @@
+{
+  "os": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-debian-bookworm-sid",
+  "python": "3.7.12",
+  "startedAt": "2026-01-11T16:24:24.041456Z",
+  "args": [
+    "--batch_size",
+    "256",
+    "--learning_rate",
+    "3e-4"
+  ],
+  "program": "offline_sumo/train/train_cql.py",
+  "codePath": "offline_sumo/train/train_cql.py",
+  "git": {
+    "remote": "https://github.com/erzhu419/sumo-rl.git",
+    "commit": "0f69c21bb52fcde10c53e14ddfbfc87fe1a72a3a"
+  },
+  "email": "erzhu419@gmail.com",
+  "root": "/home/erzhu419/mine_code/sumo-rl",
+  "host": "FATHERSUCKERMSI",
+  "username": "erzhu419",
+  "executable": "/home/erzhu419/anaconda3/envs/PBRL/bin/python",
+  "codePathLocal": "offline_sumo/train/train_cql.py",
+  "cpu_count": 16,
+  "cpu_count_logical": 32,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1081101176832",
+      "used": "226375757824"
+    }
+  },
+  "memory": {
+    "total": "31365128192"
+  },
+  "cpu": {
+    "count": 16,
+    "countLogical": 32
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memoryTotal": "8585740288",
+      "architecture": "Ada"
+    }
+  ],
+  "cudaVersion": "13.1"
+}
