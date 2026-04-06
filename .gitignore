@@ -86,6 +86,7 @@ celerybeat-schedule
 .venv
 env/
 !LSTM-RL/env/
+!LSTM-RL-legacy/env/
 venv/
 ENV/
 env.bak/
@@ -125,7 +126,7 @@ offline_sumo/data
 offline_sumo/logs
 tensorboard/
 sumo_liu/g_no_control/output_file
-SUMO_ruiguang/online_control/initialize_obj
+# SUMO_ruiguang/online_control/initialize_obj  # UN-IGNORED: critical for headway computation
 SUMO_ruiguang/online_control/output_file
 deploy/logs/sac_v2_bus_SUMO_best_result
 deploy/offline_sumo/logs
@@ -144,18 +145,19 @@ deploy/SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.alt.
 deploy/SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml
 LSTM-RL-legacy/ensemble_version/model/sac_ensemble_SUMO_linear_penalty_ensemble_run
 deploy/offline_sumo/RORL/logs/rorl_20260113-144650
-SUMO_ruiguang/b_network/3_bus_station.add.xml
-SUMO_ruiguang/b_network/4_vehicle_type.add.xml
-SUMO_ruiguang/b_network/5g_changsha_bus_network_with_signal_d.net.xml
-SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml
-SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle.rou.alt.xml
-SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle.rou.xml
-SUMO_ruiguang/d_bus_rou/2_bus_timetable.rou.xml
-SUMO_ruiguang/e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.alt.xml
-SUMO_ruiguang/e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml
-SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.alt.xml
-SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml
-SUMO_ruiguang/online_control/intersection_delay/a_sorted_busline_edge.xml
+# UN-IGNORED for reproducibility: critical SUMO simulation input data
+# SUMO_ruiguang/b_network/3_bus_station.add.xml
+# SUMO_ruiguang/b_network/4_vehicle_type.add.xml
+# SUMO_ruiguang/b_network/5g_changsha_bus_network_with_signal_d.net.xml
+# SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml
+# SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle.rou.alt.xml
+# SUMO_ruiguang/c_social_vehicle_rou/5_design_social_vehicle.rou.xml
+# SUMO_ruiguang/d_bus_rou/2_bus_timetable.rou.xml
+# SUMO_ruiguang/e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.alt.xml
+# SUMO_ruiguang/e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml
+# SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.alt.xml
+# SUMO_ruiguang/e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml
+# SUMO_ruiguang/online_control/intersection_delay/a_sorted_busline_edge.xml
 SUMO_ruiguang/output_file/report_log.xml
 wandb_logs_backup/latest-run
 wandb_logs_backup/run-20260112_002424-b86emq8h/run-b86emq8h.wandb
