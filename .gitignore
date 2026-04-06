@@ -236,3 +236,24 @@ LSTM-RL-legacy/ensemble_version/generate_eval_workers4.py
 LSTM-RL-legacy/ensemble_version/generate_eval_workers5.py
 LSTM-RL-legacy/ensemble_version/generate_eval_workers6.py
 !LSTM-RL-legacy/ensemble_version/pic/sac_ensemble_SUMO_linear_penalty_ensemble_run
+
+# ── Generated data / models / snapshots (not source) ──
+*.sbx
+*.Zone.Identifier
+LSTM-RL-legacy/ensemble_version/_ablation_*/
+LSTM-RL-legacy/ensemble_version/best model/
+LSTM-RL-legacy/ensemble_version/eval_workers/
+LSTM-RL-legacy/ensemble_version/_recover_workers/
+LSTM-RL-legacy/ensemble_version/train_standalone_*.log
+LSTM-RL-legacy/ensemble_version/full_rewards_*.png
+_standalone_c9f82e8/
+_standalone_f543609/
+reference/
+
+# SUMO large binary / route data (input data, tracked elsewhere)
+SUMO_ruiguang/b_network/
+SUMO_ruiguang/c_social_vehicle_rou/
+SUMO_ruiguang/d_bus_rou/
+SUMO_ruiguang/e_passenger_rou/
+SUMO_ruiguang/online_control/initialize_obj/*.xml
+SUMO_ruiguang/online_control/intersection_delay/
