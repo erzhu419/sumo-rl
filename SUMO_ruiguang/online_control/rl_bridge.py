@@ -418,7 +418,8 @@ class SumoRLBridge:
         self.current_time = traci.simulation.getTime()
         self.steps += 1
 
-        self._check_station_capacity()
+        if self.steps % self.update_freq == 0:
+            self._check_station_capacity()
 
         self._cleanup_departed_buses()
         self._check_termination()

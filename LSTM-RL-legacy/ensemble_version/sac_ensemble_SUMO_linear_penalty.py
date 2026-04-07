@@ -475,7 +475,9 @@ class SAC_Trainer():
         # Fetch from global action_dim instead of hardcoding
         # The true log_prob is shifted down by log(det(J)) = log(scale). We must offset target_entropy UP
         # so target = -action_dim + sum(log(scale)), to make log_prob + target_entropy > 0 
-        if action_dim == 1:
+        if args.use_residual_control:
+            log_scale_shift = 0.0  # scale=[1,1], so log(1)+log(1)=0
+        elif action_dim == 1:
             if args.speed_only:
                 log_scale_shift = np.log(0.2) # speed scale
             else:
@@ -639,8 +641,8 @@ class SAC_Trainer():
         torch.save(self.state_norm, path + '_norm')
 
     def load_model(self, path):
-        self.soft_q_net.load_state_dict(torch.load(path + '_q', weights_only=True))
-        self.policy_net.load_state_dict(torch.load(path + '_policy', weights_only=True))
+        self.soft_q_net.load_state_dict(torch.load(path + '_q', map_location=device, weights_only=False))
+        self.policy_net.load_state_dict(torch.load(path + '_policy', map_location=device, weights_only=False))
         self.soft_q_net.eval()
         self.policy_net.eval()
 
@@ -789,6 +791,9 @@ if __name__ == '__main__':
         if args.resume_checkpoint:
             print(f"Resuming training from checkpoint: {args.resume_checkpoint}")
             sac_trainer.load_model(args.resume_checkpoint)
+            # Skip warmup when resuming — policy is already partially trained
+            step = max(step, args.warmup_steps)
+            print(f"Resume: step counter advanced to {step} (skipping warmup)")
             # Try to infer start episode from filename if possible
             try:
                 # E.g. checkpoint_episode_48 -> 49
