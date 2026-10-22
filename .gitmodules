@@ -1,0 +1,12 @@
+[submodule "H2O"]
+	path = H2O
+	url = https://github.com/erzhu419/H2O.git
+[submodule "H2Oplus"]
+	path = H2Oplus
+	url = https://github.com/erzhu419/H2Oplus.git
+[submodule "residual-rl"]
+	path = LSTM-RL-legacy/ensemble_version/residual-rl
+	url = https://github.com/erzhu419/residual-rl.git
+[submodule "temp_lstm_rl"]
+	path = temp_lstm_rl
+	url = https://github.com/erzhu419/LSTM-RL.git

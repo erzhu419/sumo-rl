@@ -9,6 +9,20 @@
 
 # SUMO-RL
 
+## Bus Control Research
+
+The bus-control study, manuscript, and reproducibility records are in the
+[H2Oplus](https://github.com/erzhu419/H2Oplus) submodule. Clone this research
+branch with its dependencies:
+
+```bash
+git clone --branch berth --recurse-submodules https://github.com/erzhu419/sumo-rl.git
+```
+
+Large replay datasets, checkpoints, generated scenario XML, and deployment
+copies are not included in Git. Their metadata and experiment records are
+retained; executing the experiments requires the corresponding original inputs.
+
 <!-- start intro -->
 
 SUMO-RL provides a simple interface to instantiate Reinforcement Learning (RL) environments with [SUMO](https://github.com/eclipse/sumo) for Traffic Signal Control.
