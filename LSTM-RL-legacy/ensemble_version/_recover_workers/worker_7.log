@@ -1,0 +1,85 @@
+Warning: Ignoring attribute 'attributes' for option 'fcd-output'
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (507ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.
+Using libsumo as traci as requested by environment variable.
+cuda:0
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+[33mWARN: gym.spaces.Box autodetected dtype as <class 'numpy.float32'>. Please provide explicit dtype.[0m
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): LayerNorm((48,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): VectorizedLinear()
+    (4): ReLU()
+    (5): VectorizedLinear()
+    (6): ReLU()
+    (7): VectorizedLinear()
+  )
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=41, out_features=48, bias=True)
+  (linear2): Linear(in_features=48, out_features=48, bias=True)
+  (linear3): Linear(in_features=48, out_features=48, bias=True)
+  (linear4): Linear(in_features=48, out_features=48, bias=True)
+  (mean_linear): Linear(in_features=48, out_features=2, bias=True)
+  (log_std_linear): Linear(in_features=48, out_features=2, bias=True)
+)
+  eval metrics failed: too many values to unpack (expected 2)
+W7 ep 7: reward=-1162338.97 steps=11611 q=0.00 reg1=13.2827
+  eval metrics failed: too many values to unpack (expected 2)
+W7 ep 23: reward=-1129786.53 steps=11588 q=0.00 reg1=16.2798
+  eval metrics failed: too many values to unpack (expected 2)
+W7 ep 39: reward=-1162747.40 steps=11600 q=0.00 reg1=17.8816
+Simulation ended at time: 18000.00.
+Reason: Libsumo requested termination.
+Statistics (avg of 269754):
+ RouteLength: 3536.69
+ Speed: 9.51
+ Duration: 387.24
+ WaitingTime: 75.90
+ TimeLoss: 119.72
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 38908 walks):
+ RouteLength: 13.92
+ Duration: 3.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 41051 rides):
+ WaitingTime: 345.88
+ RouteLength: 5974.31
+ Duration: 1446.26
+ Bus: 37780
+ Aborted: 3271
+W7 DONE. Saved to /home/erzhu419/mine_code/sumo-rl/LSTM-RL-legacy/ensemble_version/_recover_workers/results_7.json

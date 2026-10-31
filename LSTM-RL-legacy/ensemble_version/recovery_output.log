@@ -1,0 +1,70 @@
+nohup: ignoring input
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+/usr/share/sumo/tools/traci/__init__.py:42: UserWarning: Could not import libsumo using /home/erzhu419/anaconda3/bin/python3, falling back to pure python traci (/lib/libgdal.so.30: undefined symbol: TIFFReadRGBATileExt, version LIBTIFF_4.0).
+  warnings.warn("Could not import libsumo using %s, falling back to pure python traci (%s)." %
+***Starting server on port 40017 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (305ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (14ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+cpu
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+ Retrying in 1 seconds
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): LayerNorm((48,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): VectorizedLinear()
+    (4): ReLU()
+    (5): VectorizedLinear()
+    (6): ReLU()
+    (7): VectorizedLinear()
+  )
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=41, out_features=48, bias=True)
+  (linear2): Linear(in_features=48, out_features=48, bias=True)
+  (linear3): Linear(in_features=48, out_features=48, bias=True)
+  (linear4): Linear(in_features=48, out_features=48, bias=True)
+  (mean_linear): Linear(in_features=48, out_features=2, bias=True)
+  (log_std_linear): Linear(in_features=48, out_features=2, bias=True)
+)
+Traceback (most recent call last):
+  File "/home/erzhu419/mine_code/sumo-rl/LSTM-RL-legacy/ensemble_version/run_recovery_quick.py", line 13, in <module>
+    from env.sim import SumoEnv as SumoRLEnv
+ImportError: cannot import name 'SumoEnv' from 'env.sim' (/home/erzhu419/mine_code/sumo-rl/LSTM-RL-legacy/env/sim.py)
+Step #0.00Error: tcpip::Socket::recvAndCheck @ recv: peer shutdown
+Quitting (on error).

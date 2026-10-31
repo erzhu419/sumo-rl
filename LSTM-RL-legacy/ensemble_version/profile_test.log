@@ -1,0 +1,100 @@
+nohup: ignoring input
+Using libsumo as traci as requested by environment variable.
+cuda:0
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+[33mWARN: gym.spaces.Box autodetected dtype as <class 'numpy.float32'>. Please provide explicit dtype.[0m
+Warning: Ignoring attribute 'attributes' for option 'fcd-output'
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (371ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (5ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): LayerNorm((48,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): VectorizedLinear()
+    (4): ReLU()
+    (5): VectorizedLinear()
+    (6): ReLU()
+    (7): VectorizedLinear()
+  )
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=41, out_features=48, bias=True)
+  (linear2): Linear(in_features=48, out_features=48, bias=True)
+  (linear3): Linear(in_features=48, out_features=48, bias=True)
+  (linear4): Linear(in_features=48, out_features=48, bias=True)
+  (mean_linear): Linear(in_features=48, out_features=2, bias=True)
+  (log_std_linear): Linear(in_features=48, out_features=2, bias=True)
+)
+Alpha Loss: -7.4605, log_prob: -1.2401, target_ent: -2.0000, Alpha: 0.1000
+[2K[2KEpisode: 0 | Episode Reward: -1981344.1544546862 | Duration: 1357.83s | CPU Memory: 1590.87 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 0.24%
+         246151470 function calls (240032550 primitive calls) in 1310.412 seconds
+
+   Ordered by: cumulative time
+   List reduced from 2194 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     8441    0.054    0.000  752.562    0.089 sac_ensemble_SUMO_linear_penalty.py:196(safe_step)
+     8441    0.108    0.000  752.508    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:199(step)
+     8441    0.080    0.000  750.305    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:249(_advance_until_state)
+     8441    0.057    0.000  749.113    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_env.py:301(_pull_events)
+     8441    0.015    0.000  749.053    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:708(decision_provider)
+     8441    0.123    0.000  749.039    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:273(fetch_events)
+     8441    0.140    0.000  748.902    0.089 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:337(_advance_until_event)
+    17976   34.207    0.002  748.762    0.042 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/rl_bridge.py:341(_advance_one_step)
+    17976    0.219    0.000  495.904    0.028 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/libsumo/__init__.py:196(simulationStep)
+    17976    0.083    0.000  495.437    0.028 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/libsumo/libsumo.py:3712(step)
+    17976  495.354    0.028  495.354    0.028 {built-in method libsumo._libsumo.simulation_step}
+    12175    4.622    0.000  450.871    0.037 sac_ensemble_SUMO_linear_penalty.py:421(get_action)
+    28049  214.232    0.008  214.232    0.008 {method 'to' of 'torch._C.TensorBase' objects}
+    50313  141.023    0.003  141.023    0.003 {built-in method torch.tensor}
+  1038025   47.027    0.000  111.756    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:137(bus_running)
+    12175   67.575    0.006   67.575    0.006 {method 'cpu' of 'torch._C.TensorBase' objects}
+ 24033865   23.215    0.000   63.474    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/passenger.py:42(passenger_run)
+      137    0.309    0.002   33.769    0.246 sac_ensemble_SUMO_linear_penalty.py:575(update)
+ 16516516    3.579    0.000   29.503    0.000 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/libsumo/libsumo.py:5882(getLaneID)
+   962146    6.133    0.000   28.319    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/bus.py:55(_get_next_links)
+    12449    1.620    0.000   27.665    0.002 sac_ensemble_SUMO_linear_penalty.py:368(forward)
+  6345528   10.376    0.000   27.662    0.000 /home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/sim_obj/stop.py:79(update_stop_state)
+   511012   24.883    0.000   27.094    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
+ 16516516   25.924    0.000   25.924    0.000 {built-in method libsumo._libsumo.person_getLaneID}
+180597/87623    0.367    0.000   21.311    0.000 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/torch/nn/modules/module.py:1549(_wrapped_call_impl)
+180597/87623    0.738    0.000   21.129    0.000 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/torch/nn/modules/module.py:1555(_call_impl)
+    88974    0.062    0.000   21.086    0.000 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/site-packages/libsumo/libsumo.py:5269(getNextLinks)
+    88974   21.024    0.000   21.024    0.000 {built-in method libsumo._libsumo.vehicle_getNextLinks}
+4773772/20597    6.223    0.000   20.868    0.001 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/copy.py:128(deepcopy)
+120296/20597    2.456    0.000   20.347    0.001 /home/erzhu419/anaconda3/envs/LSTM-RL/lib/python3.8/copy.py:226(_deepcopy_dict)
+
+
+

@@ -1,0 +1,70 @@
+nohup: ignoring input
+Using libsumo as traci as requested by environment variable.
+cuda:0
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+[33mWARN: gym.spaces.Box autodetected dtype as <class 'numpy.float32'>. Please provide explicit dtype.[0m
+Warning: Ignoring attribute 'attributes' for option 'fcd-output'
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (1231ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (5ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): LayerNorm((48,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): VectorizedLinear()
+    (4): ReLU()
+    (5): VectorizedLinear()
+    (6): ReLU()
+    (7): VectorizedLinear()
+  )
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=41, out_features=48, bias=True)
+  (linear2): Linear(in_features=48, out_features=48, bias=True)
+  (linear3): Linear(in_features=48, out_features=48, bias=True)
+  (linear4): Linear(in_features=48, out_features=48, bias=True)
+  (mean_linear): Linear(in_features=48, out_features=2, bias=True)
+  (log_std_linear): Linear(in_features=48, out_features=2, bias=True)
+)
+Alpha Loss: -6.9501, log_prob: -1.0184, target_ent: -2.0000, Alpha: 0.1000
+[2K[2KEpisode: 0 | Episode Reward: -2000972.075260824 | Duration: 1005.95s | CPU Memory: 1590.33 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 0.24%
+Alpha Loss: -7.9053, log_prob: -1.3731, target_ent: -2.0000, Alpha: 0.0960
+[2K[2KEpisode: 1 | Episode Reward: -2753972.916145622 | Duration: 1438.96s | CPU Memory: 1689.61 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 0.48%
+Alpha Loss: -6.9932, log_prob: -0.7017, target_ent: -2.0000, Alpha: 0.0751
+[2K[2KEpisode: 2 | Episode Reward: -1210798.9076520363 | Duration: 1428.21s | CPU Memory: 1712.03 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 0.72%
+Alpha Loss: -3.3410, log_prob: 0.7857, target_ent: -2.0000, Alpha: 0.0638
+[2K[2KEpisode: 3 | Episode Reward: -1126842.9730683316 | Duration: 1422.18s | CPU Memory: 1737.97 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 0.96%
+Alpha Loss: 0.8251, log_prob: 2.2911, target_ent: -2.0000, Alpha: 0.0588
+[2K[2KEpisode: 4 | Episode Reward: -1135814.6782191377 | Duration: 1364.02s | CPU Memory: 1792.19 MB | GPU Memory Allocated: 17.04 MB | Replay Buffer Usage: 1.21%
+Alpha Loss: -0.3046, log_prob: 1.8912, target_ent: -2.0000, Alpha: 0.0608

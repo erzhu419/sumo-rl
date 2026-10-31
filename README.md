@@ -23,6 +23,14 @@ Large replay datasets, checkpoints, generated scenario XML, and deployment
 copies are not included in Git. Their metadata and experiment records are
 retained; executing the experiments requires the corresponding original inputs.
 
+The current submission is the complete
+[T-ITS manuscript package](https://github.com/erzhu419/H2Oplus/tree/master/paper/TITS_Bus_Holding),
+including its PDF, editable source, figures, and compact endpoint summaries.
+Small historical training/evaluation logs and CSV/JSON summaries are retained
+alongside their original experiment directories in this repository and its
+submodules. Large trajectory/action dumps, model weights, replay datasets,
+deployment copies, and caches remain outside this publication.
+
 <!-- start intro -->
 
 SUMO-RL provides a simple interface to instantiate Reinforcement Learning (RL) environments with [SUMO](https://github.com/eclipse/sumo) for Traffic Signal Control.

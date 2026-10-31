@@ -1,0 +1,234 @@
+nohup: ignoring input
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+/usr/share/sumo/tools/traci/__init__.py:42: UserWarning: Could not import libsumo using /home/erzhu419/anaconda3/bin/python, falling back to pure python traci (/lib/libgdal.so.30: undefined symbol: TIFFReadRGBATileExt, version LIBTIFF_4.0).
+  warnings.warn("Could not import libsumo using %s, falling back to pure python traci (%s)." %
+***Starting server on port 51715 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (431ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.63
+ Speed: 9.51
+ Duration: 383.21
+ WaitingTime: 76.59
+ TimeLoss: 120.73
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 301.96
+ RouteLength: 5483.79
+ Duration: 890.88
+ Bus: 13294
+ Aborted: 2653
+cpu
+Using traci for simulation.
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+ Retrying in 1 seconds
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): ReLU()
+    (2): VectorizedLinear()
+    (3): ReLU()
+    (4): VectorizedLinear()
+    (5): ReLU()
+    (6): VectorizedLinear()
+  )
+)
+Policy Network:  PolicyNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (linear1): Linear(in_features=38, out_features=32, bias=True)
+  (linear2): Linear(in_features=32, out_features=32, bias=True)
+  (linear3): Linear(in_features=32, out_features=32, bias=True)
+  (linear4): Linear(in_features=32, out_features=32, bias=True)
+  (mean_linear): Linear(in_features=32, out_features=2, bias=True)
+  (log_std_linear): Linear(in_features=32, out_features=2, bias=True)
+)
+Alpha Loss: 6.7635, log_prob: 3.1456, target_ent: -0.2082, Alpha: 0.1000
+[2K***Starting server on port 54151 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (309ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (15ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.78
+ Speed: 9.51
+ Duration: 383.56
+ WaitingTime: 76.90
+ TimeLoss: 121.17
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 300.48
+ RouteLength: 5509.67
+ Duration: 884.80
+ Bus: 13346
+ Aborted: 2601
+[2KEpisode: 0 | Episode Reward: -779169.4940519899 | Duration: 2923.29s | CPU Memory: 612.64 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 1.25%
+ Retrying in 1 seconds
+Alpha Loss: -2.1631, log_prob: -0.6649, target_ent: -0.2082, Alpha: 0.0840
+[2K***Starting server on port 60077 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (357ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (15ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.85
+ Speed: 9.51
+ Duration: 382.71
+ WaitingTime: 76.28
+ TimeLoss: 120.62
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 298.64
+ RouteLength: 5523.03
+ Duration: 871.01
+ Bus: 13354
+ Aborted: 2593
+[2KEpisode: 1 | Episode Reward: -725134.3922279578 | Duration: 3361.65s | CPU Memory: 776.80 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 2.50%
+ Retrying in 1 seconds
+Alpha Loss: -1.7949, log_prob: -0.4526, target_ent: -0.2082, Alpha: 0.0661
+[2K***Starting server on port 52727 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (707ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (18ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.79
+ Speed: 9.50
+ Duration: 384.79
+ WaitingTime: 77.81
+ TimeLoss: 122.63
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 300.39
+ RouteLength: 5511.71
+ Duration: 879.46
+ Bus: 13333
+ Aborted: 2614
+[2KEpisode: 2 | Episode Reward: -741654.9193634704 | Duration: 3656.35s | CPU Memory: 827.15 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 3.75%
+ Retrying in 1 seconds
+Alpha Loss: -0.2040, log_prob: 0.1351, target_ent: -0.2082, Alpha: 0.0614
+[2K***Starting server on port 33751 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (337ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (14ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.76
+ Speed: 9.50
+ Duration: 383.00
+ WaitingTime: 76.53
+ TimeLoss: 120.80
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 301.17
+ RouteLength: 5511.16
+ Duration: 877.35
+ Bus: 13338
+ Aborted: 2609
+[2KEpisode: 3 | Episode Reward: -763862.8521415343 | Duration: 3474.60s | CPU Memory: 848.40 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 5.00%
+ Retrying in 1 seconds
+Alpha Loss: 0.4005, log_prob: 0.3524, target_ent: -0.2082, Alpha: 0.0621
+[2K***Starting server on port 46147 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (286ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (16ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Error: tcpip::Socket::recvAndCheck @ recv: Connection reset by peer
+Quitting (on error).

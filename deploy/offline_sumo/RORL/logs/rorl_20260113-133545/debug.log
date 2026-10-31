@@ -1,0 +1,120 @@
+2026-01-13 13:52:47.925336 CST | Epoch 0 finished
+------------------------------------  -----------------
+replay_buffer/size                          3.5117e+06
+policy_trainer/Q OOD Loss                   0
+policy_trainer/q_ood_uncertainty_reg        0
+policy_trainer/QFs Loss                     0.884873
+policy_trainer/Policy Loss                 -0.667762
+policy_trainer/Qs Predictions Mean         -0.00116716
+policy_trainer/Qs Predictions Std           0.00484905
+policy_trainer/Qs Targets Mean             -0.126576
+policy_trainer/Qs Targets Std               0.932267
+policy_trainer/Log Pis Mean                -0.673537
+policy_trainer/Log Pis Std                  0.214342
+policy_trainer/Policy mu Mean              -2.92459e-05
+policy_trainer/Policy mu Std                0.000304788
+policy_trainer/Policy log std Mean          0.000722743
+policy_trainer/Policy log std Std           0.000256027
+policy_trainer/Policy std                   1.00072
+policy_trainer/Alpha                        1
+policy_trainer/Alpha Loss                  -0
+evaluation/num steps total              12989
+evaluation/num paths total                  1
+evaluation/path length Mean             12989
+evaluation/path length Std                  0
+evaluation/Rewards Mean                   -70.9668
+evaluation/Rewards Std                     83.9595
+evaluation/Returns Mean               -921788
+evaluation/Returns Std                      0
+evaluation/Actions Mean                    -6.06826e-05
+evaluation/Actions Std                      0.000302372
+evaluation/Num Paths                        1
+evaluation/Average Returns            -921788
+time/evaluation sampling (s)             1047.72
+time/logging (s)                            0.0126508
+time/saving (s)                             2.13122e-05
+time/training (s)                          35.5893
+time/epoch (s)                           1083.32
+time/total (s)                           1085.32
+Epoch                                       0
+------------------------------------  -----------------
+2026-01-13 14:10:10.121581 CST | Epoch 1 finished
+------------------------------------  -----------------
+replay_buffer/size                          3.5117e+06
+policy_trainer/Q OOD Loss                   0
+policy_trainer/q_ood_uncertainty_reg        0
+policy_trainer/QFs Loss                     0.782423
+policy_trainer/Policy Loss                 -0.58028
+policy_trainer/Qs Predictions Mean         -0.177353
+policy_trainer/Qs Predictions Std           0.0390546
+policy_trainer/Qs Targets Mean             -0.177344
+policy_trainer/Qs Targets Std               0.887096
+policy_trainer/Log Pis Mean                -0.686116
+policy_trainer/Log Pis Std                  0.126141
+policy_trainer/Policy mu Mean              -4.75847e-05
+policy_trainer/Policy mu Std                0.000422371
+policy_trainer/Policy log std Mean         -0.130912
+policy_trainer/Policy log std Std           0.0180037
+policy_trainer/Policy std                   0.877436
+policy_trainer/Alpha                        0.982974
+policy_trainer/Alpha Loss                  -0.0289547
+evaluation/num steps total              25989
+evaluation/num paths total                  2
+evaluation/path length Mean             13000
+evaluation/path length Std                  0
+evaluation/Rewards Mean                   -69.2038
+evaluation/Rewards Std                     75.236
+evaluation/Returns Mean               -899649
+evaluation/Returns Std                      0
+evaluation/Actions Mean                    -8.69534e-05
+evaluation/Actions Std                      0.000419721
+evaluation/Num Paths                        1
+evaluation/Average Returns            -899649
+time/evaluation sampling (s)             1065.56
+time/logging (s)                            0.0141028
+time/saving (s)                             1.3534e-05
+time/training (s)                          38.5918
+time/epoch (s)                           1104.17
+time/total (s)                           2189.5
+Epoch                                       1
+------------------------------------  -----------------
+2026-01-13 14:28:16.931392 CST | Epoch 2 finished
+------------------------------------  -----------------
+replay_buffer/size                          3.5117e+06
+policy_trainer/Q OOD Loss                   0
+policy_trainer/q_ood_uncertainty_reg        0
+policy_trainer/QFs Loss                     0.661496
+policy_trainer/Policy Loss                 -0.429984
+policy_trainer/Qs Predictions Mean         -0.319506
+policy_trainer/Qs Predictions Std           0.112556
+policy_trainer/Qs Targets Mean             -0.312996
+policy_trainer/Qs Targets Std               0.823077
+policy_trainer/Log Pis Mean                -0.688184
+policy_trainer/Log Pis Std                  0.134793
+policy_trainer/Policy mu Mean               0.000728376
+policy_trainer/Policy mu Std                0.000442219
+policy_trainer/Policy log std Mean         -0.132276
+policy_trainer/Policy log std Std           0.0153787
+policy_trainer/Policy std                   0.876202
+policy_trainer/Alpha                        0.966259
+policy_trainer/Alpha Loss                  -0.0579438
+evaluation/num steps total              38966
+evaluation/num paths total                  3
+evaluation/path length Mean             12977
+evaluation/path length Std                  0
+evaluation/Rewards Mean                   -73.5218
+evaluation/Rewards Std                     86.4388
+evaluation/Returns Mean               -954092
+evaluation/Returns Std                      0
+evaluation/Actions Mean                     0.00070085
+evaluation/Actions Std                      0.000434749
+evaluation/Num Paths                        1
+evaluation/Average Returns            -954092
+time/evaluation sampling (s)             1114.86
+time/logging (s)                            0.0086978
+time/saving (s)                             1.31852e-05
+time/training (s)                          36.4248
+time/epoch (s)                           1151.29
+time/total (s)                           3340.8
+Epoch                                       2
+------------------------------------  -----------------

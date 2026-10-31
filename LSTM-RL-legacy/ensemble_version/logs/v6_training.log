@@ -1,0 +1,1248 @@
+Warning: Ignoring attribute 'attributes' for option 'fcd-output'
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (746ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (19ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.25.0 started via libsumo with time: 0.00.pygame 2.6.1 (SDL 2.28.4, Python 3.8.20)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+Using libsumo as traci as requested by environment variable.
+cuda:0
+Using libsumo for simulation (globally patched).
+Warning: c_8_subfunction_for_gurobi_test module not found, some functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+Warning: gurobipy module not found, optimization functionality may be limited
+[33mWARN: gym.spaces.Box autodetected dtype as <class 'numpy.float32'>. Please provide explicit dtype.[0m
+Soft Q Network:  SoftQNetwork(
+  (embedding_layer): EmbeddingLayer(
+    (embeddings): ModuleDict(
+      (line_id): Embedding(12, 4)
+      (bus_id): Embedding(389, 21)
+      (station_id): Embedding(1, 1)
+      (time_period): Embedding(1, 1)
+      (direction): Embedding(2, 2)
+    )
+    (layer_norm): LayerNorm((29,), eps=1e-05, elementwise_affine=True)
+    (dropout): Dropout(p=0.05, inplace=False)
+  )
+  (critic): Sequential(
+    (0): VectorizedLinear()
+    (1): ReLU()
+    (2): VectorizedLinear()
+    (3): ReLU()
+    (4): VectorizedLinear()
+    (5): ReLU()
+    (6): VectorizedStep #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.0[2KEpisode: 3 | Episode Reward: -791531.9623261059 | Duration: 707.65s | CPU Memory: 1726.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 5.02%
+Alpha Loss: 1.4494, log_prob: 2.5775, target_ent: -2.0000, Alpha: 0.0813
+[2K[2KEpisode: 4 | Episode Reward: -729986.4963969435 | Duration: 718.02s | CPU Memory: 1779.80 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 6.28%
+Alpha Loss: 1.1250, log_prob: 2.4823, target_ent: -2.0000, Alpha: 0.0970
+[2K[2KEpisode: 5 | Episode Reward: -768127.5625712433 | Duration: 697.98s | CPU Memory: 1802.30 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 7.54%
+Alpha Loss: 0.5006, log_prob: 2.2323, target_ent: -2.0000, Alpha: 0.1159
+[2K[2KEpisode: 6 | Episode Reward: -801555.4507718765 | Duration: 765.56s | CPU Memory: 1824.55 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 8.80%
+Alpha Loss: 0.2754, log_prob: 2.1366, target_ent: -2.0000, Alpha: 0.1331
+[2K[2KEpisode: 7 | Episode Reward: -791596.8806724031 | Duration: 839.72s | CPU Memory: 1847.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 10.06%
+Alpha Loss: 0.0096, log_prob: 2.0050, target_ent: -2.0000, Alpha: 0.1469
+[2K[2KEpisode: 8 | Episode Reward: -754578.1536568188 | Duration: 789.79s | CPU Memory: 1869.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 11.31%
+Alpha Loss: 0.3728, log_prob: 2.1999, target_ent: -2.0000, Alpha: 0.1549
+[2K[2KEpisode: 9 | Episode Reward: -786878.2410999658 | Duration: 809.15s | CPU Memory: 1890.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 12.57%
+Alpha Loss: 0.1819, log_prob: 2.0985, target_ent: -2.0000, Alpha: 0.1578
+[2K[2KEpisode: 10 | Episode Reward: -780203.7971014607 | Duration: 784.67s | CPU Memory: 1912.55 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 13.83%
+Alpha Loss: -0.1054, log_prob: 1.9425, target_ent: -2.0000, Alpha: 0.1600
+[2K[2KEpisode: 11 | Episode Reward: -859789.9440124859 | Duration: 771.99s | CPU Memory: 1935.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 15.08%
+Alpha Loss: 0.6278, log_prob: 2.3409, target_ent: -2.0000, Alpha: 0.1586
+[2K[2KEpisode: 12 | Episode Reward: -753617.9430688184 | Duration: 770.75s | CPU Memory: 1956.30 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 16.34%
+Alpha Loss: -0.3902, log_prob: 1.7889, target_ent: -2.0000, Alpha: 0.1575
+[2K[2KEpisode: 13 | Episode Reward: -792080.4746825835 | Duration: 785.50s | CPU Memory: 1978.80 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 17.60%
+Alpha Loss: 0.2726, log_prob: 2.1465, target_ent: -2.0000, Alpha: 0.1555
+[2K[2KEpisode: 14 | Episode Reward: -771874.771308162 | Duration: 784.85s | CPU Memory: 1999.55 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 18.85%
+Alpha Loss: 0.1897, log_prob: 2.1013, target_ent: -2.0000, Alpha: 0.1536
+[2K[2KEpisode: 15 | Episode Reward: -800005.4838728112 | Duration: 777.42s | CPU Memory: 2021.30 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 20.11%
+Alpha Loss: -0.0710, log_prob: 1.9623, target_ent: -2.0000, Alpha: 0.1525
+[2K[2KEpisode: 16 | Episode Reward: -797622.4279921788 | Duration: 852.25s | CPU Memory: 2044.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 21.36%
+Alpha Loss: -0.0832, log_prob: 1.9564, target_ent: -2.0000, Alpha: 0.1485
+[2K[2KEpisode: 17 | Episode Reward: -805625.1235231347 | Duration: 857.85s | CPU Memory: 2129.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 22.62%
+Alpha Loss: -0.0152, log_prob: 1.9922, target_ent: -2.0000, Alpha: 0.1442
+[2K[2KEpisode: 18 | Episode Reward: -751011.625315866 | Duration: 832.22s | CPU Memory: 2151.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 23.87%
+Alpha Loss: 0.0187, log_prob: 2.0095, target_ent: -2.0000, Alpha: 0.1406
+[2K[2KEpisode: 19 | Episode Reward: -758147.1531807381 | Duration: 796.48s | CPU Memory: 2173.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 25.13%
+Alpha Loss: -0.3245, log_prob: 1.8339, target_ent: -2.0000, Alpha: 0.1418
+[2K[2KEpisode: 20 | Episode Reward: -782721.397134524 | Duration: 777.93s | CPU Memory: 2195.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 26.38%
+Alpha Loss: -0.0030, log_prob: 1.9985, target_ent: -2.0000, Alpha: 0.1441
+[2K[2KEpisode: 21 | Episode Reward: -767545.4988644414 | Duration: 805.72s | CPU Memory: 2217.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 27.64%
+Alpha Loss: 0.0801, log_prob: 2.0421, target_ent: -2.0000, Alpha: 0.1494
+[2K[2KEpisode: 22 | Episode Reward: -749316.8049240535 | Duration: 820.81s | CPU Memory: 2238.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 28.89%
+Alpha Loss: 0.2392, log_prob: 2.1288, target_ent: -2.0000, Alpha: 0.1562
+[2K[2KEpisode: 23 | Episode Reward: -732224.3130546673 | Duration: 828.45s | CPU Memory: 2261.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 30.14%
+Alpha Loss: 0.2161, log_prob: 2.1195, target_ent: -2.0000, Alpha: 0.1639
+[2K[2KEpisode: 24 | Episode Reward: -747007.8262394711 | Duration: 815.29s | CPU Memory: 2282.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 31.39%
+Alpha Loss: 0.0032, log_prob: 2.0018, target_ent: -2.0000, Alpha: 0.1698
+[2K[2KEpisode: 25 | Episode Reward: -709697.6552194824 | Duration: 839.13s | CPU Memory: 2304.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 32.65%
+Alpha Loss: -0.1954, log_prob: 1.8886, target_ent: -2.0000, Alpha: 0.1731
+[2K[2KEpisode: 26 | Episode Reward: -748337.1324266726 | Duration: 805.42s | CPU Memory: 2326.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 33.90%
+Alpha Loss: 0.0946, log_prob: 2.0546, target_ent: -2.0000, Alpha: 0.1768
+[2K[2KEpisode: 27 | Episode Reward: -727815.000356071 | Duration: 825.45s | CPU Memory: 2347.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 35.15%
+Alpha Loss: 0.1782, log_prob: 2.1040, target_ent: -2.0000, Alpha: 0.1801
+[2K[2KEpisode: 28 | Episode Reward: -719335.0534283852 | Duration: 842.52s | CPU Memory: 2370.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 36.40%
+Alpha Loss: -0.1297, log_prob: 1.9238, target_ent: -2.0000, Alpha: 0.1825
+[2K[2KEpisode: 29 | Episode Reward: -774415.7714351731 | Duration: 840.05s | CPU Memory: 2393.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 37.66%
+Alpha Loss: -0.0801, log_prob: 1.9531, target_ent: -2.0000, Alpha: 0.1811
+[2K[2KEpisode: 30 | Episode Reward: -720827.0744028677 | Duration: 829.19s | CPU Memory: 2414.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 38.91%
+Alpha Loss: -0.0470, log_prob: 1.9725, target_ent: -2.0000, Alpha: 0.1804
+[2K[2KEpisode: 31 | Episode Reward: -723578.0741104566 | Duration: 867.45s | CPU Memory: 2435.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 40.16%
+Alpha Loss: -0.3886, log_prob: 1.7763, target_ent: -2.0000, Alpha: 0.1760
+[2K[2KEpisode: 32 | Episode Reward: -753463.9906339766 | Duration: 845.91s | CPU Memory: 2457.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 41.41%
+Alpha Loss: 0.1233, log_prob: 2.0703, target_ent: -2.0000, Alpha: 0.1731
+[2K[2KEpisode: 33 | Episode Reward: -753699.9018099636 | Duration: 859.31s | CPU Memory: 2479.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 42.67%
+Alpha Loss: -0.3615, log_prob: 1.7975, target_ent: -2.0000, Alpha: 0.1678
+[2K[2KEpisode: 34 | Episode Reward: -724808.9253114177 | Duration: 889.28s | CPU Memory: 2501.36 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 43.92%
+Alpha Loss: 0.1570, log_prob: 2.0862, target_ent: -2.0000, Alpha: 0.1619
+[2K[2KEpisode: 35 | Episode Reward: -741542.1091110929 | Duration: 869.30s | CPU Memory: 2522.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 45.17%
+Alpha Loss: 0.5470, log_prob: 2.2976, target_ent: -2.0000, Alpha: 0.1591
+[2K[2KEpisode: 36 | Episode Reward: -715949.6988950764 | Duration: 955.24s | CPU Memory: 2544.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 46.42%
+Alpha Loss: -0.0112, log_prob: 1.9939, target_ent: -2.0000, Alpha: 0.1589
+[2K[2KEpisode: 37 | Episode Reward: -763314.8968048614 | Duration: 978.51s | CPU Memory: 2571.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 47.68%
+Alpha Loss: 0.0054, log_prob: 2.0029, target_ent: -2.0000, Alpha: 0.1572
+[2K[2KEpisode: 38 | Episode Reward: -731865.5929805886 | Duration: 896.86s | CPU Memory: 2588.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 48.93%
+Alpha Loss: -0.3111, log_prob: 1.8332, target_ent: -2.0000, Alpha: 0.1549
+[2K[2KEpisode: 39 | Episode Reward: -708771.4920521821 | Duration: 873.66s | CPU Memory: 2610.05 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 50.18%
+Alpha Loss: -0.1664, log_prob: 1.9115, target_ent: -2.0000, Alpha: 0.1526
+[2K[2KEpisode: 40 | Episode Reward: -737784.9697037704 | Duration: 873.24s | CPU Memory: 2632.80 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 51.43%
+Alpha Loss: 0.1321, log_prob: 2.0696, target_ent: -2.0000, Alpha: 0.1499
+[2K[2KEpisode: 41 | Episode Reward: -877547.7131730841 | Duration: 852.53s | CPU Memory: 2654.80 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 52.68%
+Alpha Loss: 0.1253, log_prob: 2.0654, target_ent: -2.0000, Alpha: 0.1471
+[2K[2KEpisode: 42 | Episode Reward: -796462.0059475556 | Duration: 830.47s | CPU Memory: 2804.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 53.93%
+Alpha Loss: -0.0793, log_prob: 1.9588, target_ent: -2.0000, Alpha: 0.1456
+[2K[2KEpisode: 43 | Episode Reward: -713473.4610221343 | Duration: 812.77s | CPU Memory: 2825.81 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 55.18%
+Alpha Loss: -0.3873, log_prob: 1.7996, target_ent: -2.0000, Alpha: 0.1447
+[2K[2KEpisode: 44 | Episode Reward: -738171.6421218418 | Duration: 846.42s | CPU Memory: 2847.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 56.43%
+Alpha Loss: -0.0319, log_prob: 1.9834, target_ent: -2.0000, Alpha: 0.1459
+[2K[2KEpisode: 45 | Episode Reward: -739641.5028399746 | Duration: 821.14s | CPU Memory: 2869.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 57.69%
+Alpha Loss: -0.1480, log_prob: 1.9236, target_ent: -2.0000, Alpha: 0.1442
+[2K[2KEpisode: 46 | Episode Reward: -773037.0583251078 | Duration: 813.34s | CPU Memory: 2891.06 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 58.94%
+Alpha Loss: -0.0098, log_prob: 1.9949, target_ent: -2.0000, Alpha: 0.1434
+[2K[2KEpisode: 47 | Episode Reward: -727199.9957032612 | Duration: 833.18s | CPU Memory: 2912.81 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 60.19%
+Alpha Loss: 0.1258, log_prob: 2.0646, target_ent: -2.0000, Alpha: 0.1426
+[2K[2KEpisode: 48 | Episode Reward: -791085.6485945397 | Duration: 824.02s | CPU Memory: 2935.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 61.44%
+Alpha Loss: 0.1372, log_prob: 2.0704, target_ent: -2.0000, Alpha: 0.1425
+[2K[2KEpisode: 49 | Episode Reward: -799298.5293140745 | Duration: 822.62s | CPU Memory: 2957.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 62.69%
+Alpha Loss: 0.2993, log_prob: 2.1534, target_ent: -2.0000, Alpha: 0.1421
+[2K[2KEpisode: 50 | Episode Reward: -715238.2516003782 | Duration: 832.57s | CPU Memory: 2978.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 63.94%
+Alpha Loss: -0.3314, log_prob: 1.8305, target_ent: -2.0000, Alpha: 0.1416
+[2K[2KEpisode: 51 | Episode Reward: -738527.8810055155 | Duration: 836.55s | CPU Memory: 3000.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 65.19%
+Alpha Loss: 0.2860, log_prob: 2.1462, target_ent: -2.0000, Alpha: 0.1413
+[2K[2KEpisode: 52 | Episode Reward: -709475.7809675422 | Duration: 841.89s | CPU Memory: 3022.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 66.44%
+Alpha Loss: 0.3436, log_prob: 2.1751, target_ent: -2.0000, Alpha: 0.1405
+[2K[2KEpisode: 53 | Episode Reward: -776870.3007539473 | Duration: 852.83s | CPU Memory: 3044.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 67.69%
+Alpha Loss: -0.0234, log_prob: 1.9880, target_ent: -2.0000, Alpha: 0.1408
+[2K[2KEpisode: 54 | Episode Reward: -761585.8002417956 | Duration: 846.76s | CPU Memory: 3067.06 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 68.94%
+Alpha Loss: 0.1776, log_prob: 2.0912, target_ent: -2.0000, Alpha: 0.1427
+[2K[2KEpisode: 55 | Episode Reward: -738482.0021092084 | Duration: 835.07s | CPU Memory: 3087.81 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 70.19%
+Alpha Loss: 0.3357, log_prob: 2.1726, target_ent: -2.0000, Alpha: 0.1430
+[2K[2KEpisode: 56 | Episode Reward: -804909.4715440305 | Duration: 827.63s | CPU Memory: 3110.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 71.44%
+Alpha Loss: 0.1958, log_prob: 2.1011, target_ent: -2.0000, Alpha: 0.1443
+[2K[2KEpisode: 57 | Episode Reward: -773192.0198240527 | Duration: 827.33s | CPU Memory: 3132.06 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 72.69%
+Alpha Loss: 0.0583, log_prob: 2.0301, target_ent: -2.0000, Alpha: 0.1443
+[2K[2KEpisode: 58 | Episode Reward: -781745.483578233 | Duration: 834.13s | CPU Memory: 3154.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 73.94%
+Alpha Loss: -0.2611, log_prob: 1.8646, target_ent: -2.0000, Alpha: 0.1454
+[2K[2KEpisode: 59 | Episode Reward: -729424.7053867903 | Duration: 839.98s | CPU Memory: 3175.31 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 75.19%
+Alpha Loss: -0.3217, log_prob: 1.8340, target_ent: -2.0000, Alpha: 0.1440
+[2K[2KEpisode: 60 | Episode Reward: -732360.2029107218 | Duration: 840.55s | CPU Memory: 3197.56 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 76.43%
+Alpha Loss: 0.3398, log_prob: 2.1747, target_ent: -2.0000, Alpha: 0.1430
+[2K[2KEpisode: 61 | Episode Reward: -779197.6386471818 | Duration: 858.88s | CPU Memory: 3219.35 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 77.68%
+Alpha Loss: 0.0691, log_prob: 2.0356, target_ent: -2.0000, Alpha: 0.1440
+[2K[2KEpisode: 62 | Episode Reward: -759299.8805693217 | Duration: 856.26s | CPU Memory: 3240.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 78.93%
+Alpha Loss: 0.4021, log_prob: 2.2082, target_ent: -2.0000, Alpha: 0.1450
+[2K[2KEpisode: 63 | Episode Reward: -754556.4384724523 | Duration: 836.32s | CPU Memory: 3263.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 80.18%
+Alpha Loss: -0.1513, log_prob: 1.9214, target_ent: -2.0000, Alpha: 0.1459
+[2K[2KEpisode: 64 | Episode Reward: -805267.7160855124 | Duration: 849.91s | CPU Memory: 3284.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 81.42%
+Alpha Loss: 0.0305, log_prob: 2.0160, target_ent: -2.0000, Alpha: 0.1482
+[2K[2KEpisode: 65 | Episode Reward: -735980.916016832 | Duration: 857.54s | CPU Memory: 3304.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 82.67%
+Alpha Loss: 0.0780, log_prob: 2.0410, target_ent: -2.0000, Alpha: 0.1494
+[2K[2KEpisode: 66 | Episode Reward: -783521.886406507 | Duration: 853.51s | CPU Memory: 3327.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 83.91%
+Alpha Loss: -0.1286, log_prob: 1.9313, target_ent: -2.0000, Alpha: 0.1536
+[2K[2KEpisode: 67 | Episode Reward: -802297.4228081598 | Duration: 849.26s | CPU Memory: 3349.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 85.16%
+Alpha Loss: -0.1727, log_prob: 1.9064, target_ent: -2.0000, Alpha: 0.1578
+[2K[2KEpisode: 68 | Episode Reward: -843414.7873609193 | Duration: 848.81s | CPU Memory: 3373.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 86.40%
+Alpha Loss: 0.4201, log_prob: 2.2324, target_ent: -2.0000, Alpha: 0.1641
+[2K[2KEpisode: 69 | Episode Reward: -782782.7279156963 | Duration: 862.03s | CPU Memory: 3392.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 87.64%
+Alpha Loss: -0.1894, log_prob: 1.8935, target_ent: -2.0000, Alpha: 0.1688
+[2K[2KEpisode: 70 | Episode Reward: -787036.2619770602 | Duration: 848.08s | CPU Memory: 3414.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 88.88%
+Alpha Loss: 0.4913, log_prob: 2.2777, target_ent: -2.0000, Alpha: 0.1705
+[2K[2KEpisode: 71 | Episode Reward: -805144.0982303766 | Duration: 866.35s | CPU Memory: 3436.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 90.13%
+Alpha Loss: -0.0053, log_prob: 1.9969, target_ent: -2.0000, Alpha: 0.1763
+[2K[2KEpisode: 72 | Episode Reward: -769028.4592047007 | Duration: 864.60s | CPU Memory: 3458.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 91.37%
+Alpha Loss: -0.1193, log_prob: 1.9306, target_ent: -2.0000, Alpha: 0.1794
+[2K[2KEpisode: 73 | Episode Reward: -773223.4605265461 | Duration: 863.85s | CPU Memory: 3479.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 92.61%
+Alpha Loss: 0.0690, log_prob: 2.0404, target_ent: -2.0000, Alpha: 0.1816
+[2K[2KEpisode: 74 | Episode Reward: -783969.2724895077 | Duration: 844.17s | CPU Memory: 3500.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 93.85%
+Alpha Loss: 0.0626, log_prob: 2.0371, target_ent: -2.0000, Alpha: 0.1851
+[2K[2KEpisode: 75 | Episode Reward: -781326.0657415441 | Duration: 843.41s | CPU Memory: 3522.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 95.09%
+Alpha Loss: 0.0052, log_prob: 2.0031, target_ent: -2.0000, Alpha: 0.1852
+[2K[2KEpisode: 76 | Episode Reward: -783691.7366121069 | Duration: 810.93s | CPU Memory: 3543.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 96.33%
+Alpha Loss: 0.0723, log_prob: 2.0434, target_ent: -2.0000, Alpha: 0.1889
+[2K[2KEpisode: 77 | Episode Reward: -814301.7861286593 | Duration: 834.65s | CPU Memory: 3565.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 97.56%
+Alpha Loss: 0.1034, log_prob: 2.0623, target_ent: -2.0000, Alpha: 0.1902
+[2K[2KEpisode: 78 | Episode Reward: -781801.5794870597 | Duration: 838.61s | CPU Memory: 3586.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 98.80%
+Alpha Loss: 0.0889, log_prob: 2.0530, target_ent: -2.0000, Alpha: 0.1869
+Alpha Loss: -0.3108, log_prob: 1.8129, target_ent: -2.0000, Alpha: 0.1899
+[2K[2KEpisode: 79 | Episode Reward: -803877.4238571927 | Duration: 859.69s | CPU Memory: 3608.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.4220, log_prob: 1.7461, target_ent: -2.0000, Alpha: 0.1897
+Alpha Loss: 0.5196, log_prob: 2.3143, target_ent: -2.0000, Alpha: 0.1915
+Alpha Loss: 0.1299, log_prob: 2.0799, target_ent: -2.0000, Alpha: 0.1967
+Alpha Loss: -0.1518, log_prob: 1.9060, target_ent: -2.0000, Alpha: 0.1989
+Alpha Loss: -0.0187, log_prob: 1.9884, target_ent: -2.0000, Alpha: 0.1985
+Alpha Loss: 0.2144, log_prob: 2.1331, target_ent: -2.0000, Alpha: 0.1998
+Alpha Loss: -0.1553, log_prob: 1.9017, target_ent: -2.0000, Alpha: 0.2060
+Alpha Loss: 0.0571, log_prob: 2.0362, target_ent: -2.0000, Alpha: 0.2066
+Alpha Loss: 0.4735, log_prob: 2.3003, target_ent: -2.0000, Alpha: 0.2066
+[2K[2KEpisode: 80 | Episode Reward: -817640.88098143 | Duration: 1212.74s | CPU Memory: 3627.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1481, log_prob: 2.0941, target_ent: -2.0000, Alpha: 0.2073
+Alpha Loss: 0.0564, log_prob: 2.0356, target_ent: -2.0000, Alpha: 0.2050
+Alpha Loss: 0.0856, log_prob: 2.0538, target_ent: -2.0000, Alpha: 0.2036
+Alpha Loss: -0.2760, log_prob: 1.8280, target_ent: -2.0000, Alpha: 0.2011
+Alpha Loss: 0.1408, log_prob: 2.0859, target_ent: -2.0000, Alpha: 0.1944
+Alpha Loss: -0.2267, log_prob: 1.8624, target_ent: -2.0000, Alpha: 0.1926
+Alpha Loss: -0.1595, log_prob: 1.9039, target_ent: -2.0000, Alpha: 0.1901
+Alpha Loss: -0.2275, log_prob: 1.8621, target_ent: -2.0000, Alpha: 0.1921
+Alpha Loss: -0.2499, log_prob: 1.8483, target_ent: -2.0000, Alpha: 0.1926
+[2K[2KEpisode: 81 | Episode Reward: -809972.5439304387 | Duration: 1218.22s | CPU Memory: 3628.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.2394, log_prob: 1.8557, target_ent: -2.0000, Alpha: 0.1903
+Alpha Loss: 0.1858, log_prob: 2.1125, target_ent: -2.0000, Alpha: 0.1917
+Alpha Loss: -0.0379, log_prob: 1.9770, target_ent: -2.0000, Alpha: 0.1926
+Alpha Loss: 0.2448, log_prob: 2.1492, target_ent: -2.0000, Alpha: 0.1939
+Alpha Loss: 0.1401, log_prob: 2.0861, target_ent: -2.0000, Alpha: 0.1965
+Alpha Loss: 0.2181, log_prob: 2.1355, target_ent: -2.0000, Alpha: 0.2001
+Alpha Loss: 0.1379, log_prob: 2.0877, target_ent: -2.0000, Alpha: 0.2073
+Alpha Loss: 0.1390, log_prob: 2.0904, target_ent: -2.0000, Alpha: 0.2150
+Alpha Loss: 0.2284, log_prob: 2.1507, target_ent: -2.0000, Alpha: 0.2197
+[2K[2KEpisode: 82 | Episode Reward: -788843.8990161949 | Duration: 1271.67s | CPU Memory: 3631.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0006, log_prob: 2.0004, target_ent: -2.0000, Alpha: 0.2221
+Alpha Loss: 0.2458, log_prob: 2.1658, target_ent: -2.0000, Alpha: 0.2272
+Alpha Loss: 0.0508, log_prob: 2.0347, target_ent: -2.0000, Alpha: 0.2316
+Alpha Loss: 0.0827, log_prob: 2.0570, target_ent: -2.0000, Alpha: 0.2343
+Alpha Loss: 0.1906, log_prob: 2.1317, target_ent: -2.0000, Alpha: 0.2351
+Alpha Loss: -0.1478, log_prob: 1.8964, target_ent: -2.0000, Alpha: 0.2399
+Alpha Loss: 0.0249, log_prob: 2.0174, target_ent: -2.0000, Alpha: 0.2383
+Alpha Loss: 0.1042, log_prob: 2.0726, target_ent: -2.0000, Alpha: 0.2382
+Alpha Loss: -0.0506, log_prob: 1.9644, target_ent: -2.0000, Alpha: 0.2413
+[2K[2KEpisode: 83 | Episode Reward: -823671.8294649939 | Duration: 1323.47s | CPU Memory: 3632.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1167, log_prob: 2.0819, target_ent: -2.0000, Alpha: 0.2403
+Alpha Loss: 0.1474, log_prob: 2.1036, target_ent: -2.0000, Alpha: 0.2409
+Alpha Loss: -0.1950, log_prob: 1.8622, target_ent: -2.0000, Alpha: 0.2428
+Alpha Loss: -0.0772, log_prob: 1.9455, target_ent: -2.0000, Alpha: 0.2425
+Alpha Loss: 0.1807, log_prob: 2.1310, target_ent: -2.0000, Alpha: 0.2518
+Alpha Loss: 0.0884, log_prob: 2.0642, target_ent: -2.0000, Alpha: 0.2525
+Alpha Loss: 0.0297, log_prob: 2.0217, target_ent: -2.0000, Alpha: 0.2548
+Alpha Loss: -0.1516, log_prob: 1.8895, target_ent: -2.0000, Alpha: 0.2538
+Alpha Loss: -0.1245, log_prob: 1.9070, target_ent: -2.0000, Alpha: 0.2624
+[2K[2KEpisode: 84 | Episode Reward: -836422.407237671 | Duration: 1339.30s | CPU Memory: 3634.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.1215, log_prob: 1.9090, target_ent: -2.0000, Alpha: 0.2630
+Alpha Loss: -0.1488, log_prob: 1.8871, target_ent: -2.0000, Alpha: 0.2676
+Alpha Loss: 0.0240, log_prob: 2.0183, target_ent: -2.0000, Alpha: 0.2705
+Alpha Loss: 0.2043, log_prob: 2.1578, target_ent: -2.0000, Alpha: 0.2740
+Alpha Loss: -0.0596, log_prob: 1.9538, target_ent: -2.0000, Alpha: 0.2749
+Alpha Loss: -0.1151, log_prob: 1.9109, target_ent: -2.0000, Alpha: 0.2747
+Alpha Loss: -0.1427, log_prob: 1.8890, target_ent: -2.0000, Alpha: 0.2766
+Alpha Loss: -0.1100, log_prob: 1.9122, target_ent: -2.0000, Alpha: 0.2858
+Alpha Loss: 0.0210, log_prob: 2.0169, target_ent: -2.0000, Alpha: 0.2892
+[2K[2KEpisode: 85 | Episode Reward: -842137.2423722139 | Duration: 1271.72s | CPU Memory: 3635.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0955, log_prob: 1.9226, target_ent: -2.0000, Alpha: 0.2913
+Alpha Loss: 0.0210, log_prob: 2.0170, target_ent: -2.0000, Alpha: 0.2905
+Alpha Loss: 0.0977, log_prob: 2.0807, target_ent: -2.0000, Alpha: 0.2977
+Alpha Loss: 0.0920, log_prob: 2.0769, target_ent: -2.0000, Alpha: 0.3026
+Alpha Loss: -0.0024, log_prob: 1.9980, target_ent: -2.0000, Alpha: 0.3048
+Alpha Loss: 0.1097, log_prob: 2.0925, target_ent: -2.0000, Alpha: 0.3054
+Alpha Loss: -0.0689, log_prob: 1.9410, target_ent: -2.0000, Alpha: 0.3108
+Alpha Loss: -0.0256, log_prob: 1.9775, target_ent: -2.0000, Alpha: 0.3210
+Alpha Loss: 0.1945, log_prob: 2.1743, target_ent: -2.0000, Alpha: 0.3275
+[2K[2KEpisode: 86 | Episode Reward: -872143.7398636802 | Duration: 1247.00s | CPU Memory: 3637.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.1274, log_prob: 1.8856, target_ent: -2.0000, Alpha: 0.3282
+Alpha Loss: 0.1070, log_prob: 2.0974, target_ent: -2.0000, Alpha: 0.3332
+Alpha Loss: -0.2331, log_prob: 1.7857, target_ent: -2.0000, Alpha: 0.3369
+Alpha Loss: -0.0217, log_prob: 1.9798, target_ent: -2.0000, Alpha: 0.3406
+Alpha Loss: -0.1855, log_prob: 1.8245, target_ent: -2.0000, Alpha: 0.3473
+Alpha Loss: -0.0339, log_prob: 1.9679, target_ent: -2.0000, Alpha: 0.3479
+Alpha Loss: -0.0216, log_prob: 1.9793, target_ent: -2.0000, Alpha: 0.3526
+Alpha Loss: 0.0051, log_prob: 2.0050, target_ent: -2.0000, Alpha: 0.3626
+Alpha Loss: -0.1160, log_prob: 1.8838, target_ent: -2.0000, Alpha: 0.3686
+[2K[2KEpisode: 87 | Episode Reward: -897909.7952938002 | Duration: 1266.06s | CPU Memory: 3638.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0121, log_prob: 1.9881, target_ent: -2.0000, Alpha: 0.3629
+Alpha Loss: -0.0300, log_prob: 1.9690, target_ent: -2.0000, Alpha: 0.3801
+Alpha Loss: 0.0091, log_prob: 2.0095, target_ent: -2.0000, Alpha: 0.3840
+Alpha Loss: 0.1786, log_prob: 2.1869, target_ent: -2.0000, Alpha: 0.3846
+Alpha Loss: 0.1093, log_prob: 2.1175, target_ent: -2.0000, Alpha: 0.3944
+Alpha Loss: 0.0433, log_prob: 2.0458, target_ent: -2.0000, Alpha: 0.3892
+Alpha Loss: -0.2138, log_prob: 1.7700, target_ent: -2.0000, Alpha: 0.3947
+Alpha Loss: -0.0160, log_prob: 1.9828, target_ent: -2.0000, Alpha: 0.3937
+Alpha Loss: -0.0379, log_prob: 1.9586, target_ent: -2.0000, Alpha: 0.4005
+[2K[2KEpisode: 88 | Episode Reward: -933820.5515689992 | Duration: 1293.23s | CPU Memory: 3639.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0256, log_prob: 2.0278, target_ent: -2.0000, Alpha: 0.3981
+Alpha Loss: -0.1080, log_prob: 1.8839, target_ent: -2.0000, Alpha: 0.3946
+Alpha Loss: 0.1451, log_prob: 2.1552, target_ent: -2.0000, Alpha: 0.3925
+Alpha Loss: -0.0376, log_prob: 1.9597, target_ent: -2.0000, Alpha: 0.3927
+Alpha Loss: -0.0028, log_prob: 1.9971, target_ent: -2.0000, Alpha: 0.3822
+Alpha Loss: 0.0079, log_prob: 2.0082, target_ent: -2.0000, Alpha: 0.3830
+Alpha Loss: 0.3000, log_prob: 2.3082, target_ent: -2.0000, Alpha: 0.3778
+Alpha Loss: -0.1102, log_prob: 1.8861, target_ent: -2.0000, Alpha: 0.3799
+Alpha Loss: -0.0864, log_prob: 1.9114, target_ent: -2.0000, Alpha: 0.3768
+[2K[2KEpisode: 89 | Episode Reward: -956843.8706336111 | Duration: 1298.86s | CPU Memory: 3641.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0685, log_prob: 2.0690, target_ent: -2.0000, Alpha: 0.3705
+Alpha Loss: 0.0376, log_prob: 2.0381, target_ent: -2.0000, Alpha: 0.3730
+Alpha Loss: -0.0610, log_prob: 1.9383, target_ent: -2.0000, Alpha: 0.3720
+Alpha Loss: 0.0041, log_prob: 2.0042, target_ent: -2.0000, Alpha: 0.3801
+Alpha Loss: -0.0447, log_prob: 1.9540, target_ent: -2.0000, Alpha: 0.3787
+Alpha Loss: -0.1621, log_prob: 1.8311, target_ent: -2.0000, Alpha: 0.3830
+Alpha Loss: 0.0582, log_prob: 2.0613, target_ent: -2.0000, Alpha: 0.3866
+Alpha Loss: 0.0159, log_prob: 2.0169, target_ent: -2.0000, Alpha: 0.3917
+Alpha Loss: 0.0061, log_prob: 2.0066, target_ent: -2.0000, Alpha: 0.3973
+[2K[2KEpisode: 90 | Episode Reward: -1009944.4363447451 | Duration: 1268.43s | CPU Memory: 3641.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0607, log_prob: 1.9333, target_ent: -2.0000, Alpha: 0.4023
+Alpha Loss: -0.1137, log_prob: 1.8717, target_ent: -2.0000, Alpha: 0.4121
+Alpha Loss: 0.1164, log_prob: 2.1313, target_ent: -2.0000, Alpha: 0.4123
+Alpha Loss: -0.0098, log_prob: 1.9888, target_ent: -2.0000, Alpha: 0.4172
+Alpha Loss: 0.0144, log_prob: 2.0168, target_ent: -2.0000, Alpha: 0.4247
+Alpha Loss: -0.0646, log_prob: 1.9238, target_ent: -2.0000, Alpha: 0.4283
+Alpha Loss: -0.0245, log_prob: 1.9710, target_ent: -2.0000, Alpha: 0.4303
+Alpha Loss: 0.0832, log_prob: 2.1000, target_ent: -2.0000, Alpha: 0.4351
+Alpha Loss: -0.1674, log_prob: 1.7949, target_ent: -2.0000, Alpha: 0.4420
+[2K[2KEpisode: 91 | Episode Reward: -1022571.6788974053 | Duration: 1266.69s | CPU Memory: 3642.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1238, log_prob: 2.1512, target_ent: -2.0000, Alpha: 0.4412
+Alpha Loss: -0.0222, log_prob: 1.9725, target_ent: -2.0000, Alpha: 0.4456
+Alpha Loss: -0.1171, log_prob: 1.8520, target_ent: -2.0000, Alpha: 0.4532
+Alpha Loss: -0.1649, log_prob: 1.7887, target_ent: -2.0000, Alpha: 0.4583
+Alpha Loss: -0.0480, log_prob: 1.9384, target_ent: -2.0000, Alpha: 0.4587
+Alpha Loss: 0.1356, log_prob: 2.1811, target_ent: -2.0000, Alpha: 0.4731
+Alpha Loss: 0.0400, log_prob: 2.0535, target_ent: -2.0000, Alpha: 0.4734
+Alpha Loss: -0.1062, log_prob: 1.8553, target_ent: -2.0000, Alpha: 0.4801
+Alpha Loss: -0.0081, log_prob: 1.9887, target_ent: -2.0000, Alpha: 0.4904
+[2K[2KEpisode: 92 | Episode Reward: -955693.3771873941 | Duration: 1303.36s | CPU Memory: 3643.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1113, log_prob: 2.1548, target_ent: -2.0000, Alpha: 0.4873
+Alpha Loss: -0.0409, log_prob: 1.9420, target_ent: -2.0000, Alpha: 0.4935
+Alpha Loss: -0.0103, log_prob: 1.9851, target_ent: -2.0000, Alpha: 0.5030
+Alpha Loss: 0.0466, log_prob: 2.0685, target_ent: -2.0000, Alpha: 0.5061
+Alpha Loss: 0.0666, log_prob: 2.1001, target_ent: -2.0000, Alpha: 0.5141
+Alpha Loss: -0.1473, log_prob: 1.7799, target_ent: -2.0000, Alpha: 0.5122
+Alpha Loss: -0.0057, log_prob: 1.9912, target_ent: -2.0000, Alpha: 0.5243
+Alpha Loss: -0.0076, log_prob: 1.9884, target_ent: -2.0000, Alpha: 0.5205
+Alpha Loss: -0.0074, log_prob: 1.9883, target_ent: -2.0000, Alpha: 0.5282
+[2K[2KEpisode: 93 | Episode Reward: -892819.5946553156 | Duration: 1312.35s | CPU Memory: 3644.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0873, log_prob: 1.8629, target_ent: -2.0000, Alpha: 0.5291
+Alpha Loss: -0.0046, log_prob: 1.9926, target_ent: -2.0000, Alpha: 0.5397
+Alpha Loss: -0.0301, log_prob: 1.9504, target_ent: -2.0000, Alpha: 0.5456
+Alpha Loss: -0.0957, log_prob: 1.8367, target_ent: -2.0000, Alpha: 0.5566
+Alpha Loss: 0.0303, log_prob: 2.0540, target_ent: -2.0000, Alpha: 0.5712
+Alpha Loss: -0.0361, log_prob: 1.9347, target_ent: -2.0000, Alpha: 0.5747
+Alpha Loss: -0.0070, log_prob: 1.9868, target_ent: -2.0000, Alpha: 0.5894
+Alpha Loss: 0.0328, log_prob: 2.0624, target_ent: -2.0000, Alpha: 0.5916
+Alpha Loss: 0.0767, log_prob: 2.1478, target_ent: -2.0000, Alpha: 0.5949
+[2K[2KEpisode: 94 | Episode Reward: -846705.3088248065 | Duration: 1312.99s | CPU Memory: 3644.72 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0239, log_prob: 1.9533, target_ent: -2.0000, Alpha: 0.6000
+Alpha Loss: 0.1067, log_prob: 2.2122, target_ent: -2.0000, Alpha: 0.6048
+Alpha Loss: -0.0504, log_prob: 1.9003, target_ent: -2.0000, Alpha: 0.6034
+Alpha Loss: 0.0249, log_prob: 2.0507, target_ent: -2.0000, Alpha: 0.6117
+Alpha Loss: -0.0280, log_prob: 1.9427, target_ent: -2.0000, Alpha: 0.6129
+Alpha Loss: 0.0443, log_prob: 2.0912, target_ent: -2.0000, Alpha: 0.6149
+Alpha Loss: 0.0130, log_prob: 2.0274, target_ent: -2.0000, Alpha: 0.6220
+Alpha Loss: -0.1075, log_prob: 1.7702, target_ent: -2.0000, Alpha: 0.6264
+Alpha Loss: 0.0905, log_prob: 2.2000, target_ent: -2.0000, Alpha: 0.6359
+[2K[2KEpisode: 95 | Episode Reward: -909013.3814542686 | Duration: 1313.88s | CPU Memory: 3645.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0364, log_prob: 1.9173, target_ent: -2.0000, Alpha: 0.6444
+Alpha Loss: -0.0201, log_prob: 1.9538, target_ent: -2.0000, Alpha: 0.6467
+Alpha Loss: 0.0020, log_prob: 2.0047, target_ent: -2.0000, Alpha: 0.6486
+Alpha Loss: -0.1003, log_prob: 1.7555, target_ent: -2.0000, Alpha: 0.6636
+Alpha Loss: 0.0033, log_prob: 2.0080, target_ent: -2.0000, Alpha: 0.6644
+Alpha Loss: -0.0180, log_prob: 1.9544, target_ent: -2.0000, Alpha: 0.6734
+Alpha Loss: -0.0212, log_prob: 1.9444, target_ent: -2.0000, Alpha: 0.6830
+Alpha Loss: 0.0379, log_prob: 2.0997, target_ent: -2.0000, Alpha: 0.6839
+Alpha Loss: 0.1442, log_prob: 2.3818, target_ent: -2.0000, Alpha: 0.6855
+[2K[2KEpisode: 96 | Episode Reward: -800931.612427805 | Duration: 1316.61s | CPU Memory: 3646.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0174, log_prob: 2.0468, target_ent: -2.0000, Alpha: 0.6891
+Alpha Loss: -0.0544, log_prob: 1.8412, target_ent: -2.0000, Alpha: 0.7098
+Alpha Loss: -0.0778, log_prob: 1.7597, target_ent: -2.0000, Alpha: 0.7233
+Alpha Loss: 0.0156, log_prob: 2.0499, target_ent: -2.0000, Alpha: 0.7317
+Alpha Loss: -0.0202, log_prob: 1.9298, target_ent: -2.0000, Alpha: 0.7501
+Alpha Loss: 0.0701, log_prob: 2.3047, target_ent: -2.0000, Alpha: 0.7945
+Alpha Loss: 0.0114, log_prob: 2.0653, target_ent: -2.0000, Alpha: 0.8396
+Alpha Loss: 0.0239, log_prob: 2.1620, target_ent: -2.0000, Alpha: 0.8629
+Alpha Loss: 0.0078, log_prob: 2.0753, target_ent: -2.0000, Alpha: 0.9014
+[2K[2KEpisode: 97 | Episode Reward: -852726.1697116905 | Duration: 1307.53s | CPU Memory: 3647.22 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0083, log_prob: 2.1301, target_ent: -2.0000, Alpha: 0.9383
+Alpha Loss: -0.0044, log_prob: 1.8616, target_ent: -2.0000, Alpha: 0.9690
+Alpha Loss: 0.0016, log_prob: 2.2592, target_ent: -2.0000, Alpha: 0.9937
+Alpha Loss: 0.0002, log_prob: 2.0651, target_ent: -2.0000, Alpha: 0.9976
+Alpha Loss: 0.0007, log_prob: 1.7561, target_ent: -2.0000, Alpha: 1.0029
+Alpha Loss: 0.0005, log_prob: 2.0234, target_ent: -2.0000, Alpha: 0.9775
+Alpha Loss: 0.0140, log_prob: 2.3849, target_ent: -2.0000, Alpha: 0.9644
+Alpha Loss: -0.0036, log_prob: 1.8522, target_ent: -2.0000, Alpha: 0.9761
+Alpha Loss: 0.0001, log_prob: 1.9537, target_ent: -2.0000, Alpha: 1.0030
+[2K[2KEpisode: 98 | Episode Reward: -793130.7990573539 | Duration: 1318.59s | CPU Memory: 3647.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0002, log_prob: 2.0127, target_ent: -2.0000, Alpha: 1.0156
+Alpha Loss: 0.0044, log_prob: 1.9038, target_ent: -2.0000, Alpha: 1.0466
+Alpha Loss: -0.0033, log_prob: 2.0406, target_ent: -2.0000, Alpha: 1.0838
+Alpha Loss: -0.0014, log_prob: 2.0178, target_ent: -2.0000, Alpha: 1.0843
+Alpha Loss: 0.0049, log_prob: 1.9496, target_ent: -2.0000, Alpha: 1.1027
+Alpha Loss: 0.0015, log_prob: 1.9881, target_ent: -2.0000, Alpha: 1.1339
+Alpha Loss: 0.0182, log_prob: 1.8339, target_ent: -2.0000, Alpha: 1.1157
+Alpha Loss: -0.0262, log_prob: 2.2511, target_ent: -2.0000, Alpha: 1.1099
+Alpha Loss: 0.0054, log_prob: 1.9477, target_ent: -2.0000, Alpha: 1.1093
+[2K[2KEpisode: 99 | Episode Reward: -851562.2849219203 | Duration: 1348.87s | CPU Memory: 3648.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0007, log_prob: 1.9936, target_ent: -2.0000, Alpha: 1.1186
+Alpha Loss: -0.0048, log_prob: 2.0404, target_ent: -2.0000, Alpha: 1.1265
+Alpha Loss: 0.0022, log_prob: 1.9854, target_ent: -2.0000, Alpha: 1.1612
+Alpha Loss: 0.0110, log_prob: 1.9339, target_ent: -2.0000, Alpha: 1.1811
+Alpha Loss: -0.0185, log_prob: 2.0959, target_ent: -2.0000, Alpha: 1.2130
+Alpha Loss: -0.0167, log_prob: 2.0763, target_ent: -2.0000, Alpha: 1.2455
+Alpha Loss: 0.0202, log_prob: 1.9123, target_ent: -2.0000, Alpha: 1.2592
+Alpha Loss: -0.0198, log_prob: 2.0785, target_ent: -2.0000, Alpha: 1.2874
+Alpha Loss: 0.0362, log_prob: 1.8639, target_ent: -2.0000, Alpha: 1.3044
+[2K[2KEpisode: 100 | Episode Reward: -764640.5055637535 | Duration: 1348.21s | CPU Memory: 3648.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.0181, log_prob: 2.0633, target_ent: -2.0000, Alpha: 1.3321
+Alpha Loss: -0.0584, log_prob: 2.1821, target_ent: -2.0000, Alpha: 1.3779
+Alpha Loss: 0.0066, log_prob: 1.9807, target_ent: -2.0000, Alpha: 1.4110
+Alpha Loss: 0.0229, log_prob: 1.9397, target_ent: -2.0000, Alpha: 1.4618
+Alpha Loss: 0.0594, log_prob: 1.8567, target_ent: -2.0000, Alpha: 1.5140
+Alpha Loss: -0.1072, log_prob: 2.2415, target_ent: -2.0000, Alpha: 1.5584
+Alpha Loss: 0.0370, log_prob: 1.9243, target_ent: -2.0000, Alpha: 1.6314
+Alpha Loss: 0.0897, log_prob: 1.8288, target_ent: -2.0000, Alpha: 1.6887
+Alpha Loss: -0.1071, log_prob: 2.1924, target_ent: -2.0000, Alpha: 1.7448
+[2K[2KEpisode: 101 | Episode Reward: -932821.6586237462 | Duration: 1272.85s | CPU Memory: 3649.47 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0085, log_prob: 1.9857, target_ent: -2.0000, Alpha: 1.8155
+Alpha Loss: 0.0106, log_prob: 1.9825, target_ent: -2.0000, Alpha: 1.8353
+Alpha Loss: 0.0793, log_prob: 1.8784, target_ent: -2.0000, Alpha: 1.9190
+Alpha Loss: -0.0300, log_prob: 2.0443, target_ent: -2.0000, Alpha: 1.9659
+Alpha Loss: -0.0188, log_prob: 2.0267, target_ent: -2.0000, Alpha: 2.0173
+Alpha Loss: 0.0156, log_prob: 1.9782, target_ent: -2.0000, Alpha: 2.0521
+Alpha Loss: -0.0347, log_prob: 2.0471, target_ent: -2.0000, Alpha: 2.0901
+Alpha Loss: -0.0002, log_prob: 2.0002, target_ent: -2.0000, Alpha: 2.1314
+Alpha Loss: -0.1204, log_prob: 2.1546, target_ent: -2.0000, Alpha: 2.1795
+[2K[2KEpisode: 102 | Episode Reward: -741792.1738485727 | Duration: 1323.00s | CPU Memory: 3649.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.1316, log_prob: 2.1653, target_ent: -2.0000, Alpha: 2.2164
+Alpha Loss: 0.0310, log_prob: 1.9625, target_ent: -2.0000, Alpha: 2.2869
+Alpha Loss: 0.0157, log_prob: 1.9816, target_ent: -2.0000, Alpha: 2.3416
+Alpha Loss: 0.0301, log_prob: 1.9660, target_ent: -2.0000, Alpha: 2.4234
+Alpha Loss: -0.1001, log_prob: 2.1121, target_ent: -2.0000, Alpha: 2.4412
+Alpha Loss: -0.0557, log_prob: 2.0609, target_ent: -2.0000, Alpha: 2.4950
+Alpha Loss: -0.1394, log_prob: 2.1538, target_ent: -2.0000, Alpha: 2.4753
+Alpha Loss: -0.0065, log_prob: 2.0069, target_ent: -2.0000, Alpha: 2.5783
+Alpha Loss: 0.0308, log_prob: 1.9676, target_ent: -2.0000, Alpha: 2.5862
+[2K[2KEpisode: 103 | Episode Reward: -795733.2600975941 | Duration: 1334.76s | CPU Memory: 3649.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0010, log_prob: 1.9989, target_ent: -2.0000, Alpha: 2.5953
+Alpha Loss: 0.1819, log_prob: 1.8138, target_ent: -2.0000, Alpha: 2.6561
+Alpha Loss: 0.1353, log_prob: 1.8629, target_ent: -2.0000, Alpha: 2.6823
+Alpha Loss: -0.0640, log_prob: 2.0640, target_ent: -2.0000, Alpha: 2.7192
+Alpha Loss: -0.1954, log_prob: 2.1915, target_ent: -2.0000, Alpha: 2.7733
+Alpha Loss: 0.1232, log_prob: 1.8835, target_ent: -2.0000, Alpha: 2.8786
+Alpha Loss: 0.0839, log_prob: 1.9227, target_ent: -2.0000, Alpha: 2.9606
+Alpha Loss: 0.1176, log_prob: 1.8927, target_ent: -2.0000, Alpha: 2.9933
+Alpha Loss: -0.0936, log_prob: 2.0840, target_ent: -2.0000, Alpha: 3.0490
+[2K[2KEpisode: 104 | Episode Reward: -763701.834675962 | Duration: 1369.61s | CPU Memory: 3649.97 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0869, log_prob: 1.9236, target_ent: -2.0000, Alpha: 3.1180
+Alpha Loss: 0.1201, log_prob: 1.8959, target_ent: -2.0000, Alpha: 3.1713
+Alpha Loss: -0.0527, log_prob: 2.0458, target_ent: -2.0000, Alpha: 3.1571
+Alpha Loss: -0.0664, log_prob: 2.0576, target_ent: -2.0000, Alpha: 3.1638
+Alpha Loss: 0.0664, log_prob: 1.9432, target_ent: -2.0000, Alpha: 3.2221
+Alpha Loss: 0.0717, log_prob: 1.9389, target_ent: -2.0000, Alpha: 3.2301
+Alpha Loss: -0.0576, log_prob: 2.0487, target_ent: -2.0000, Alpha: 3.2611
+Alpha Loss: 0.1159, log_prob: 1.9026, target_ent: -2.0000, Alpha: 3.2874
+Alpha Loss: -0.1281, log_prob: 2.1059, target_ent: -2.0000, Alpha: 3.3512
+[2K[2KEpisode: 105 | Episode Reward: -794947.5831110282 | Duration: 1285.04s | CPU Memory: 3649.86 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0895, log_prob: 1.9260, target_ent: -2.0000, Alpha: 3.3551
+Alpha Loss: 0.0091, log_prob: 1.9926, target_ent: -2.0000, Alpha: 3.4371
+Alpha Loss: -0.0374, log_prob: 2.0304, target_ent: -2.0000, Alpha: 3.4141
+Alpha Loss: 0.0900, log_prob: 1.9283, target_ent: -2.0000, Alpha: 3.5045
+Alpha Loss: -0.0029, log_prob: 2.0023, target_ent: -2.0000, Alpha: 3.5025
+Alpha Loss: -0.1290, log_prob: 2.1014, target_ent: -2.0000, Alpha: 3.5687
+Alpha Loss: 0.0069, log_prob: 1.9947, target_ent: -2.0000, Alpha: 3.6719
+Alpha Loss: 0.1976, log_prob: 1.8482, target_ent: -2.0000, Alpha: 3.6766
+Alpha Loss: 0.0072, log_prob: 1.9945, target_ent: -2.0000, Alpha: 3.7649
+[2K[2KEpisode: 106 | Episode Reward: -762365.0322830091 | Duration: 1223.23s | CPU Memory: 3651.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1898, log_prob: 1.8571, target_ent: -2.0000, Alpha: 3.7750
+Alpha Loss: -0.0113, log_prob: 2.0084, target_ent: -2.0000, Alpha: 3.8622
+Alpha Loss: -0.2015, log_prob: 2.1474, target_ent: -2.0000, Alpha: 3.9225
+Alpha Loss: 0.1796, log_prob: 1.8696, target_ent: -2.0000, Alpha: 3.9646
+Alpha Loss: 0.0398, log_prob: 1.9715, target_ent: -2.0000, Alpha: 4.0439
+Alpha Loss: -0.0614, log_prob: 2.0436, target_ent: -2.0000, Alpha: 4.0860
+Alpha Loss: -0.0278, log_prob: 2.0194, target_ent: -2.0000, Alpha: 4.1832
+Alpha Loss: 0.1459, log_prob: 1.8990, target_ent: -2.0000, Alpha: 4.2385
+Alpha Loss: 0.2855, log_prob: 1.8051, target_ent: -2.0000, Alpha: 4.3278
+[2K[2KEpisode: 107 | Episode Reward: -732445.1016856323 | Duration: 1210.37s | CPU Memory: 3651.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0348, log_prob: 1.9764, target_ent: -2.0000, Alpha: 4.3616
+Alpha Loss: 0.0015, log_prob: 1.9990, target_ent: -2.0000, Alpha: 4.4869
+Alpha Loss: -0.1633, log_prob: 2.1064, target_ent: -2.0000, Alpha: 4.6372
+Alpha Loss: 0.0293, log_prob: 1.9814, target_ent: -2.0000, Alpha: 4.8177
+Alpha Loss: 0.1353, log_prob: 1.9144, target_ent: -2.0000, Alpha: 4.8610
+Alpha Loss: 0.0273, log_prob: 1.9829, target_ent: -2.0000, Alpha: 4.9452
+Alpha Loss: 0.0369, log_prob: 1.9770, target_ent: -2.0000, Alpha: 4.9848
+Alpha Loss: -0.2686, log_prob: 2.1653, target_ent: -2.0000, Alpha: 5.0755
+Alpha Loss: 0.2879, log_prob: 1.8235, target_ent: -2.0000, Alpha: 5.1119
+[2K[2KEpisode: 108 | Episode Reward: -868821.4405726215 | Duration: 1233.95s | CPU Memory: 3681.61 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0875, log_prob: 1.9465, target_ent: -2.0000, Alpha: 5.1303
+Alpha Loss: 0.0700, log_prob: 1.9578, target_ent: -2.0000, Alpha: 5.2552
+Alpha Loss: 0.0466, log_prob: 1.9722, target_ent: -2.0000, Alpha: 5.3421
+Alpha Loss: -0.1678, log_prob: 2.0992, target_ent: -2.0000, Alpha: 5.4289
+Alpha Loss: 0.1269, log_prob: 1.9259, target_ent: -2.0000, Alpha: 5.5361
+Alpha Loss: -0.2264, log_prob: 2.1318, target_ent: -2.0000, Alpha: 5.5727
+Alpha Loss: -0.3431, log_prob: 2.2000, target_ent: -2.0000, Alpha: 5.5623
+Alpha Loss: -0.0655, log_prob: 2.0380, target_ent: -2.0000, Alpha: 5.6040
+Alpha Loss: 0.1014, log_prob: 1.9418, target_ent: -2.0000, Alpha: 5.7105
+[2K[2KEpisode: 109 | Episode Reward: -854102.1465598659 | Duration: 1233.08s | CPU Memory: 3682.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0568, log_prob: 1.9675, target_ent: -2.0000, Alpha: 5.7271
+Alpha Loss: -0.0379, log_prob: 2.0215, target_ent: -2.0000, Alpha: 5.8344
+Alpha Loss: -0.1118, log_prob: 2.0634, target_ent: -2.0000, Alpha: 5.8339
+Alpha Loss: 0.0758, log_prob: 1.9574, target_ent: -2.0000, Alpha: 5.9116
+Alpha Loss: 0.1048, log_prob: 1.9414, target_ent: -2.0000, Alpha: 5.9749
+Alpha Loss: -0.0386, log_prob: 2.0214, target_ent: -2.0000, Alpha: 6.0941
+Alpha Loss: 0.1773, log_prob: 1.9027, target_ent: -2.0000, Alpha: 6.1879
+Alpha Loss: -0.0705, log_prob: 2.0385, target_ent: -2.0000, Alpha: 6.2302
+Alpha Loss: -0.1956, log_prob: 2.1062, target_ent: -2.0000, Alpha: 6.3054
+[2K[2KEpisode: 110 | Episode Reward: -779471.95660491 | Duration: 1229.69s | CPU Memory: 3682.11 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0511, log_prob: 1.9724, target_ent: -2.0000, Alpha: 6.3635
+Alpha Loss: -0.2281, log_prob: 2.1217, target_ent: -2.0000, Alpha: 6.5169
+Alpha Loss: 0.1562, log_prob: 1.9169, target_ent: -2.0000, Alpha: 6.5425
+Alpha Loss: -0.1192, log_prob: 2.0629, target_ent: -2.0000, Alpha: 6.6412
+Alpha Loss: -0.0927, log_prob: 2.0481, target_ent: -2.0000, Alpha: 6.8815
+Alpha Loss: 0.1697, log_prob: 1.9130, target_ent: -2.0000, Alpha: 7.0406
+Alpha Loss: -0.1005, log_prob: 2.0513, target_ent: -2.0000, Alpha: 7.1007
+Alpha Loss: -0.1486, log_prob: 2.0748, target_ent: -2.0000, Alpha: 7.2968
+Alpha Loss: 0.1384, log_prob: 1.9308, target_ent: -2.0000, Alpha: 7.3842
+[2K.3060
+[2K[2KEpisode: 111 | Episode Reward: -849230.193073818 | Duration: 1173.56s | CPU Memory: 3722.60 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.1622, log_prob: 1.9188, target_ent: -2.0000, Alpha: 7.3687
+Alpha Loss: -0.5707, log_prob: 2.2817, target_ent: -2.0000, Alpha: 7.5821
+Alpha Loss: 0.1389, log_prob: 1.9333, target_ent: -2.0000, Alpha: 8.0167
+Alpha Loss: 0.0427, log_prob: 1.9796, target_ent: -2.0000, Alpha: 8.1347
+Alpha Loss: 0.1380, log_prob: 1.9352, target_ent: -2.0000, Alpha: 8.4054
+Alpha Loss: 0.5468, log_prob: 1.7442, target_ent: -2.0000, Alpha: 8.4777
+Alpha Loss: -0.5144, log_prob: 2.2374, target_ent: -2.0000, Alpha: 8.7337
+Alpha Loss: -0.1367, log_prob: 2.0623, target_ent: -2.0000, Alpha: 8.9882
+Alpha Loss: 0.2700, log_prob: 1.8793, target_ent: -2.0000, Alpha: 9.3616
+[2K[2KEpisode: 112 | Episode Reward: -829052.9411359276 | Duration: 1169.34s | CPU Memory: 3724.10 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.1624, log_prob: 2.0725, target_ent: -2.0000, Alpha: 9.3870
+Alpha Loss: -0.4199, log_prob: 2.1847, target_ent: -2.0000, Alpha: 9.7125
+Alpha Loss: -0.0153, log_prob: 2.0066, target_ent: -2.0000, Alpha: 10.1167
+Alpha Loss: -0.1205, log_prob: 2.0510, target_ent: -2.0000, Alpha: 10.6056
+Alpha Loss: 0.1072, log_prob: 1.9554, target_ent: -2.0000, Alpha: 11.0577
+Alpha Loss: 0.1187, log_prob: 1.9510, target_ent: -2.0000, Alpha: 11.2735
+Alpha Loss: -0.3420, log_prob: 2.1389, target_ent: -2.0000, Alpha: 11.7311
+Alpha Loss: -0.4672, log_prob: 2.1870, target_ent: -2.0000, Alpha: 12.1537
+Alpha Loss: 0.2713, log_prob: 1.8929, target_ent: -2.0000, Alpha: 12.6048
+[2K[2KEpisode: 113 | Episode Reward: -770799.6118912505 | Duration: 1177.47s | CPU Memory: 3724.60 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0649, log_prob: 1.9743, target_ent: -2.0000, Alpha: 12.5290
+Alpha Loss: 0.0542, log_prob: 1.9789, target_ent: -2.0000, Alpha: 13.0895
+Alpha Loss: 0.0940, log_prob: 1.9636, target_ent: -2.0000, Alpha: 13.2707
+Alpha Loss: -0.7431, log_prob: 2.2841, target_ent: -2.0000, Alpha: 13.6796
+Alpha Loss: -0.4343, log_prob: 2.1654, target_ent: -2.0000, Alpha: 13.8195
+Alpha Loss: 0.0540, log_prob: 1.9799, target_ent: -2.0000, Alpha: 14.5850
+Alpha Loss: -0.6729, log_prob: 2.2502, target_ent: -2.0000, Alpha: 14.7190
+Alpha Loss: 0.2188, log_prob: 1.9200, target_ent: -2.0000, Alpha: 15.4167
+Alpha Loss: -0.2129, log_prob: 2.0768, target_ent: -2.0000, Alpha: 15.9804
+[2K[2KEpisode: 114 | Episode Reward: -809702.4168932306 | Duration: 1168.57s | CPU Memory: 3726.60 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: -0.7065, log_prob: 2.2549, target_ent: -2.0000, Alpha: 15.9862
+Alpha Loss: -0.1912, log_prob: 2.0684, target_ent: -2.0000, Alpha: 16.3919
+Alpha Loss: -0.2377, log_prob: 2.0847, target_ent: -2.0000, Alpha: 16.5702
+Alpha Loss: -0.0825, log_prob: 2.0291, target_ent: -2.0000, Alpha: 17.0693
+Alpha Loss: -0.2196, log_prob: 2.0774, target_ent: -2.0000, Alpha: 17.0354
+Alpha Loss: -0.0821, log_prob: 2.0287, target_ent: -2.0000, Alpha: 17.5519
+Alpha Loss: -0.4286, log_prob: 2.1482, target_ent: -2.0000, Alpha: 18.0224
+Alpha Loss: -0.0588, log_prob: 2.0200, target_ent: -2.0000, Alpha: 18.9812
+Alpha Loss: 0.0681, log_prob: 1.9770, target_ent: -2.0000, Alpha: 19.2793
+[2K[2KEpisode: 115 | Episode Reward: -794814.735892221 | Duration: 1170.97s | CPU Memory: 3727.85 MB | GPU Memory Allocated: 17.44 MB | Replay Buffer Usage: 100.00%
+Alpha Loss: 0.0749, log_prob: 1.9747, target_ent: -2.0000, Alpha: 19.3018
+Alpha Loss: -0.1828, log_prob: 2.0607, target_ent: -2.0000, Alpha: 20.2932
+Alpha Loss: 0.1375, log_prob: 1.9544, target_ent: -2.0000, Alpha: 20.3856
+Alpha Loss: 0.3303, log_prob: 1.8912, target_ent: -2.0000, Alpha: 20.8541
+Alpha Loss: -0.4038, log_prob: 2.1320, target_ent: -2.0000, Alpha: 21.3190
+Alpha Loss: -0.2197, log_prob: 2.0713, target_ent: -2.0000, Alpha: 21.7704
+Alpha Loss: -0.0892, log_prob: 2.0289, target_ent: -2.0000, Alpha: 21.8338
+Alpha Loss: 0.1459, log_prob: 1.9533, target_ent: -2.0000, Alpha: 22.7137
+Alpha Loss: -0.0014, log_prob: 2.0005, target_ent: -2.0000, Alpha: 23.6223
+[2K/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.15
+ Speed: 9.50
+ Duration: 384.00
+ WaitingTime: 77.61
+ TimeLoss: 122.28
+ DepartDelay: 0.55
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.11
+ RouteLength: 5559.77
+ Duration: 849.35
+ Bus: 13422
+ Aborted: 2525
+[2KEpisode: 10 | Episode Reward: -815209.9374768329 | Duration: 3322.54s | CPU Memory: 1022.45 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 13.82%
+ Retrying in 1 seconds
+Alpha Loss: 0.0196, log_prob: 2.0114, target_ent: -2.0000, Alpha: 0.1775
+[2K***Starting server on port 50837 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (271ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (12ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.07
+ Speed: 9.51
+ Duration: 382.44
+ WaitingTime: 76.60
+ TimeLoss: 120.64
+ DepartDelay: 0.55
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 304.24
+ RouteLength: 5543.99
+ Duration: 859.46
+ Bus: 13405
+ Aborted: 2542
+[2KEpisode: 11 | Episode Reward: -761401.971915212 | Duration: 3319.69s | CPU Memory: 1071.45 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 15.08%
+ Retrying in 1 seconds
+Alpha Loss: -0.0853, log_prob: 1.9515, target_ent: -2.0000, Alpha: 0.1719
+[2K***Starting server on port 39983 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (287ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (12ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.07
+ Speed: 9.49
+ Duration: 384.43
+ WaitingTime: 77.84
+ TimeLoss: 122.60
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.28
+ RouteLength: 5546.45
+ Duration: 859.63
+ Bus: 13405
+ Aborted: 2542
+[2KEpisode: 12 | Episode Reward: -783916.8373368653 | Duration: 3354.50s | CPU Memory: 1090.20 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 16.33%
+ Retrying in 1 seconds
+Alpha Loss: -0.4392, log_prob: 1.7543, target_ent: -2.0000, Alpha: 0.1673
+[2K***Starting server on port 42249 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (278ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (14ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.00
+ Speed: 9.50
+ Duration: 383.58
+ WaitingTime: 77.22
+ TimeLoss: 121.69
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 299.83
+ RouteLength: 5540.06
+ Duration: 860.25
+ Bus: 13395
+ Aborted: 2552
+[2KEpisode: 13 | Episode Reward: -770200.1919102168 | Duration: 3364.50s | CPU Memory: 1099.45 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 17.59%
+ Retrying in 1 seconds
+Alpha Loss: -0.1115, log_prob: 1.9381, target_ent: -2.0000, Alpha: 0.1652
+[2K***Starting server on port 52161 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (283ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (11ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.02
+ Speed: 9.50
+ Duration: 383.94
+ WaitingTime: 77.47
+ TimeLoss: 122.01
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.40
+ RouteLength: 5535.15
+ Duration: 862.94
+ Bus: 13387
+ Aborted: 2560
+[2KEpisode: 14 | Episode Reward: -746229.6390565977 | Duration: 3346.31s | CPU Memory: 1128.70 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 18.85%
+ Retrying in 1 seconds
+Alpha Loss: -0.2435, log_prob: 1.8639, target_ent: -2.0000, Alpha: 0.1671
+[2K***Starting server on port 47699 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (280ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.99
+ Speed: 9.50
+ Duration: 383.19
+ WaitingTime: 76.75
+ TimeLoss: 121.20
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 304.01
+ RouteLength: 5538.52
+ Duration: 866.95
+ Bus: 13392
+ Aborted: 2555
+[2KEpisode: 15 | Episode Reward: -732592.7487594233 | Duration: 3343.14s | CPU Memory: 1151.95 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 20.10%
+ Retrying in 1 seconds
+Alpha Loss: -0.3887, log_prob: 1.7791, target_ent: -2.0000, Alpha: 0.1721
+[2K***Starting server on port 42821 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (276ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (12ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3546.02
+ Speed: 9.51
+ Duration: 381.95
+ WaitingTime: 75.70
+ TimeLoss: 119.94
+ DepartDelay: 0.55
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.70
+ RouteLength: 5543.34
+ Duration: 864.63
+ Bus: 13396
+ Aborted: 2551
+[2KEpisode: 16 | Episode Reward: -742215.0989958245 | Duration: 3370.82s | CPU Memory: 1177.23 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 21.35%
+ Retrying in 1 seconds
+Alpha Loss: -0.0055, log_prob: 1.9968, target_ent: -2.0000, Alpha: 0.1798
+[2K***Starting server on port 57783 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (292ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.97
+ Speed: 9.50
+ Duration: 383.73
+ WaitingTime: 77.12
+ TimeLoss: 121.70
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 305.09
+ RouteLength: 5543.60
+ Duration: 868.83
+ Bus: 13395
+ Aborted: 2552
+[2KEpisode: 17 | Episode Reward: -716099.053657276 | Duration: 3347.19s | CPU Memory: 1189.05 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 22.61%
+ Retrying in 1 seconds
+Alpha Loss: 0.0680, log_prob: 2.0406, target_ent: -2.0000, Alpha: 0.1877
+[2K***Starting server on port 56515 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (289ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.96
+ Speed: 9.51
+ Duration: 383.61
+ WaitingTime: 77.35
+ TimeLoss: 121.54
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.12
+ RouteLength: 5535.58
+ Duration: 867.42
+ Bus: 13392
+ Aborted: 2555
+[2KEpisode: 18 | Episode Reward: -742615.6249715394 | Duration: 3335.62s | CPU Memory: 1263.91 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 23.86%
+ Retrying in 1 seconds
+Alpha Loss: -0.1114, log_prob: 1.9319, target_ent: -2.0000, Alpha: 0.1947
+[2K***Starting server on port 39277 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (277ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (12ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.96
+ Speed: 9.50
+ Duration: 385.01
+ WaitingTime: 78.44
+ TimeLoss: 122.95
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 299.95
+ RouteLength: 5533.23
+ Duration: 866.85
+ Bus: 13381
+ Aborted: 2566
+[2KEpisode: 19 | Episode Reward: -734926.4300463124 | Duration: 3308.59s | CPU Memory: 1270.66 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 25.12%
+ Retrying in 1 seconds
+Alpha Loss: -0.0471, log_prob: 1.9705, target_ent: -2.0000, Alpha: 0.2021
+[2K***Starting server on port 44471 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (319ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (14ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.94
+ Speed: 9.50
+ Duration: 384.92
+ WaitingTime: 77.83
+ TimeLoss: 122.78
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 301.89
+ RouteLength: 5534.02
+ Duration: 873.95
+ Bus: 13376
+ Aborted: 2571
+[2KEpisode: 20 | Episode Reward: -725311.9323926873 | Duration: 3509.81s | CPU Memory: 1284.16 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 26.37%
+ Retrying in 1 seconds
+Alpha Loss: 0.1615, log_prob: 2.1038, target_ent: -2.0000, Alpha: 0.2110
+[2K***Starting server on port 39799 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (297ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.94
+ Speed: 9.50
+ Duration: 384.30
+ WaitingTime: 77.59
+ TimeLoss: 122.21
+ DepartDelay: 0.55
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 303.27
+ RouteLength: 5535.71
+ Duration: 867.32
+ Bus: 13381
+ Aborted: 2566
+[2KEpisode: 21 | Episode Reward: -748625.2822713017 | Duration: 3560.19s | CPU Memory: 1303.16 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 27.63%
+ Retrying in 1 seconds
+Alpha Loss: 0.0783, log_prob: 2.0515, target_ent: -2.0000, Alpha: 0.2186
+[2K***Starting server on port 49523 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (332ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (14ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.88
+ Speed: 9.48
+ Duration: 386.93
+ WaitingTime: 79.87
+ TimeLoss: 124.77
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 301.88
+ RouteLength: 5520.97
+ Duration: 880.67
+ Bus: 13361
+ Aborted: 2586
+[2KEpisode: 22 | Episode Reward: -716020.6278605853 | Duration: 3457.52s | CPU Memory: 1404.97 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 28.88%
+ Retrying in 1 seconds
+Alpha Loss: 0.1037, log_prob: 2.0699, target_ent: -2.0000, Alpha: 0.2267
+[2K***Starting server on port 45465 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (334ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (35ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.91
+ Speed: 9.50
+ Duration: 382.80
+ WaitingTime: 76.32
+ TimeLoss: 120.69
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.90
+ RouteLength: 5522.17
+ Duration: 868.49
+ Bus: 13355
+ Aborted: 2592
+[2KEpisode: 23 | Episode Reward: -767513.0228983002 | Duration: 3421.79s | CPU Memory: 1421.47 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 30.13%
+ Retrying in 1 seconds
+Alpha Loss: -0.2956, log_prob: 1.7977, target_ent: -2.0000, Alpha: 0.2319
+[2K***Starting server on port 54519 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (345ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (43ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.92
+ Speed: 9.49
+ Duration: 386.47
+ WaitingTime: 79.12
+ TimeLoss: 124.31
+ DepartDelay: 0.58
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 300.90
+ RouteLength: 5533.63
+ Duration: 876.70
+ Bus: 13380
+ Aborted: 2567
+[2KEpisode: 24 | Episode Reward: -714821.6477095422 | Duration: 3475.00s | CPU Memory: 1464.03 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 31.39%
+ Retrying in 1 seconds
+Alpha Loss: -0.2292, log_prob: 1.8430, target_ent: -2.0000, Alpha: 0.2322
+[2K***Starting server on port 45613 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (359ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (50ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.89
+ Speed: 9.50
+ Duration: 383.88
+ WaitingTime: 77.08
+ TimeLoss: 121.67
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 303.75
+ RouteLength: 5528.95
+ Duration: 880.45
+ Bus: 13357
+ Aborted: 2590
+[2KEpisode: 25 | Episode Reward: -752816.4787687538 | Duration: 3490.71s | CPU Memory: 1472.78 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 32.64%
+ Retrying in 1 seconds
+Alpha Loss: 0.0055, log_prob: 2.0038, target_ent: -2.0000, Alpha: 0.2359
+[2K***Starting server on port 51197 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (394ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (46ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.88
+ Speed: 9.50
+ Duration: 384.34
+ WaitingTime: 77.87
+ TimeLoss: 122.20
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 300.58
+ RouteLength: 5532.35
+ Duration: 870.35
+ Bus: 13377
+ Aborted: 2570
+[2KEpisode: 26 | Episode Reward: -777968.803590036 | Duration: 3526.48s | CPU Memory: 1494.03 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 33.89%
+ Retrying in 1 seconds
+Alpha Loss: 0.2286, log_prob: 2.1591, target_ent: -2.0000, Alpha: 0.2377
+[2K***Starting server on port 43709 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (310ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (37ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.92
+ Speed: 9.48
+ Duration: 387.36
+ WaitingTime: 79.90
+ TimeLoss: 125.19
+ DepartDelay: 0.57
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 300.80
+ RouteLength: 5535.47
+ Duration: 875.94
+ Bus: 13385
+ Aborted: 2562
+[2KEpisode: 27 | Episode Reward: -717448.6098033396 | Duration: 3457.81s | CPU Memory: 1554.78 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 35.15%
+ Retrying in 1 seconds
+Alpha Loss: -0.0938, log_prob: 1.9344, target_ent: -2.0000, Alpha: 0.2394
+[2K***Starting server on port 49363 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (365ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (47ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.92
+ Speed: 9.50
+ Duration: 383.52
+ WaitingTime: 77.03
+ TimeLoss: 121.41
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 301.24
+ RouteLength: 5528.77
+ Duration: 867.42
+ Bus: 13373
+ Aborted: 2574
+[2KEpisode: 28 | Episode Reward: -757199.1316853696 | Duration: 3562.00s | CPU Memory: 1560.78 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 36.40%
+ Retrying in 1 seconds
+Alpha Loss: 0.0562, log_prob: 2.0391, target_ent: -2.0000, Alpha: 0.2377
+[2K***Starting server on port 54979 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (279ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (13ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Step #12500.00Step #12600.00Step #12700.00Step #12800.00Step #12900.00Step #13000.00Step #13100.00Step #13200.00Step #13300.00Step #13400.00Step #13500.00Step #13600.00Step #13700.00Step #13800.00Step #13900.00Step #14000.00Step #14100.00Step #14200.00Step #14300.00Step #14400.00Step #14500.00Step #14600.00Step #14700.00Step #14800.00Step #14900.00Step #15000.00Step #15100.00Step #15200.00Step #15300.00Step #15400.00Step #15500.00Step #15600.00Step #15700.00Step #15800.00Step #15900.00Step #16000.00Step #16100.00Step #16200.00Step #16300.00Step #16400.00Step #16500.00Step #16600.00Step #16700.00Step #16800.00Step #16900.00Step #17000.00Step #17100.00Step #17200.00Step #17300.00Step #17400.00Step #17500.00Step #17600.00Step #17700.00Step #17800.00Step #17900.00Step #18000.00
+Simulation ended at time: 18000.00.
+Reason: TraCI requested termination.
+Statistics (avg of 89982):
+ RouteLength: 3545.85
+ Speed: 9.50
+ Duration: 384.38
+ WaitingTime: 77.68
+ TimeLoss: 122.23
+ DepartDelay: 0.56
+ DepartDelayWaiting: 0.00
+Pedestrian Statistics (avg of 15079 walks):
+ RouteLength: 13.90
+ Duration: -9.81
+ TimeLoss: 1.55
+Ride Statistics (avg of 15947 rides):
+ WaitingTime: 302.82
+ RouteLength: 5517.47
+ Duration: 876.67
+ Bus: 13352
+ Aborted: 2595
+[2KEpisode: 29 | Episode Reward: -704710.59262624 | Duration: 3305.24s | CPU Memory: 1586.69 MB | GPU Memory Allocated: 0.00 MB | Replay Buffer Usage: 37.66%
+ Retrying in 1 seconds
+Alpha Loss: 0.1302, log_prob: 2.0907, target_ent: -2.0000, Alpha: 0.2382
+[2K***Starting server on port 33631 ***
+Loading net-file from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/5g_changsha_bus_network_with_signal_d.net.xml' ... done (274ms).
+Loading additional-files from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../b_network/3_bus_station.add.xml' ... done (11ms).
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../c_social_vehicle_rou/5_design_social_vehicle_add_addline_lesscar.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../d_bus_rou/2_bus_timetable.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_period_workday_passenger_VC_0805.rou.xml'
+Loading route-files incrementally from '/home/erzhu419/mine_code/sumo-rl/SUMO_ruiguang/online_control/../e_passenger_rou/3_modified_transfer_passenger_0805.rou.xml'
+Loading done.
+Simulation version 1.24.0 started with time: 0.00.
+Step #0.00Step #100.00Step #200.00Step #300.00Step #400.00Step #500.00Step #600.00Step #700.00Step #800.00Step #900.00Step #1000.00Step #1100.00Step #1200.00Step #1300.00Step #1400.00Step #1500.00Step #1600.00Step #1700.00Step #1800.00Step #1900.00Step #2000.00Step #2100.00Step #2200.00Step #2300.00Step #2400.00Step #2500.00Step #2600.00Step #2700.00Step #2800.00Step #2900.00Step #3000.00Step #3100.00Step #3200.00Step #3300.00Step #3400.00Step #3500.00Step #3600.00Step #3700.00Step #3800.00Step #3900.00Step #4000.00Step #4100.00Step #4200.00Step #4300.00Step #4400.00Step #4500.00Step #4600.00Step #4700.00Step #4800.00Step #4900.00Step #5000.00Step #5100.00Step #5200.00Step #5300.00Step #5400.00Step #5500.00Step #5600.00Step #5700.00Step #5800.00Step #5900.00Step #6000.00Step #6100.00Step #6200.00Step #6300.00Step #6400.00Step #6500.00Step #6600.00Step #6700.00Step #6800.00Step #6900.00Step #7000.00Step #7100.00Step #7200.00Step #7300.00Step #7400.00Step #7500.00Step #7600.00Step #7700.00Step #7800.00Step #7900.00Step #8000.00Step #8100.00Step #8200.00Step #8300.00Step #8400.00Step #8500.00Step #8600.00Step #8700.00Step #8800.00Step #8900.00Step #9000.00Step #9100.00Step #9200.00Step #9300.00Step #9400.00Step #9500.00Step #9600.00Step #9700.00Step #9800.00Step #9900.00Step #10000.00Step #10100.00Step #10200.00Step #10300.00Step #10400.00Step #10500.00Step #10600.00Step #10700.00Step #10800.00Step #10900.00Step #11000.00Step #11100.00Step #11200.00Step #11300.00Step #11400.00Step #11500.00Step #11600.00Step #11700.00Step #11800.00Step #11900.00Step #12000.00Step #12100.00Step #12200.00Step #12300.00Step #12400.00Error: tcpip::Socket::recvAndCheck @ recv: peer shutdown
+Quitting (on error).
